@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Moderator Chat — Vraag & Antwoord Template</title>
+  <style>
+    :root {
+      --bg: #0b111a;
+      --surface: #101826;
+      --card: #18243a;
+      --border: #233454;
+      --accent: #0078d4;
+      --accent-dim: #005a9e;
+      --green: #107c10;
+      --red: #d13438;
+      --text: #ffffff;
+      --text-dim: #a1b0cb;
+      --radius: 8px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      padding: 24px 16px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 560px;
+      position: relative;
+    }
+
+    .header-container {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 4px;
+    }
+
+    .brand-logo {
+      height: 28px;
+    }
+
+    h1 {
+      font-size: 20px;
+      font-weight: 600;
+      color: var(--accent);
+    }
+
+    .subtitle {
+      font-size: 13px;
+      color: var(--text-dim);
+      margin-bottom: 24px;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-dim);
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    label .required {
+      color: var(--red);
+      margin-left: 2px;
+    }
+
+    input, textarea, select {
+      width: 100%;
+      padding: 10px 12px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      color: var(--text);
+      font-size: 14px;
+      font-family: inherit;
+      transition: border-color 0.2s;
+    }
+
+    input:focus, textarea:focus, select:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 72px;
+    }
+
+    select {
+      cursor: pointer;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%238892a4' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      padding-right: 32px;
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    button {
+      flex: 1;
+      padding: 12px 16px;
+      border: none;
+      border-radius: var(--radius);
+      font-size: 14px;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.1s;
+    }
+
+    button:active { transform: scale(0.98); }
+
+    .btn-copy {
+      background: var(--accent);
+      color: #000;
+    }
+
+    .btn-copy:hover { opacity: 0.9; }
+
+    .btn-clear {
+      background: var(--card);
+      color: var(--text-dim);
+      border: 1px solid var(--border);
+      flex: 0.4;
+    }
+
+    .btn-clear:hover { border-color: var(--text-dim); }
+
+    .preview {
+      margin-top: 24px;
+      padding: 16px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      white-space: pre-wrap;
+      font-size: 13px;
+      line-height: 1.6;
+      color: var(--text);
+      min-height: 60px;
+    }
+
+    .preview img {
+      max-width: 100%;
+      height: auto;
+      display: block;
+      margin: 8px 0;
+    }
+
+    .preview-label {
+      font-size: 12px;
+      color: var(--text-dim);
+      font-weight: 600;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: var(--green);
+      color: #000;
+      padding: 10px 24px;
+      border-radius: var(--radius);
+      font-size: 14px;
+      font-weight: 600;
+      opacity: 0;
+      transition: all 0.3s ease;
+      pointer-events: none;
+      z-index: 100;
+    }
+
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+
+    .rules {
+      margin-top: 32px;
+      padding: 16px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      font-size: 12px;
+      color: var(--text-dim);
+      line-height: 1.7;
+    }
+
+    .rules summary {
+      cursor: pointer;
+      font-weight: 600;
+      color: var(--text);
+      font-size: 13px;
+    }
+
+    .rules ul {
+      margin: 8px 0 0 20px;
+    }
+
+
+    .error {
+      border-color: var(--red) !important;
+    }
+
+    .top-actions {
+      position: absolute;
+      top: 18px;
+      right: 18px;
+      display: flex;
+      gap: 16px;
+    }
+    .btn-switch {
+      background: transparent;
+      color: var(--text);
+      border: none;
+      padding: 0;
+      cursor: pointer;
+      font-size: 12px;
+      transition: all 0.2s;
+      opacity: 0.5;
+    }
+    .btn-switch:hover { opacity: 1; transform: scale(1.1); }
+
+    body.light-mode {
+      --bg: #f2f4f7;
+      --surface: #ffffff;
+      --card: #e5e9f0;
+      --border: #d2d8e0;
+      --text: #12161c;
+      --text-dim: #334155;
+    }
+    body.light-mode .brand-logo {
+      filter: none !important;
+    }
+
+    .textarea-like {
+      display: block;
+      width: 100%;
+      min-height: 100px;
+      padding: 12px 16px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      color: var(--text);
+      font-size: 14px;
+      line-height: 1.6;
+      transition: all 0.2s;
+      overflow-y: auto;
+      resize: vertical;
+    }
+    .textarea-like:focus {
+      outline: none;
+      border-color: var(--accent);
+      background: var(--card);
+    }
+    .textarea-like:empty:before {
+      content: attr(data-placeholder);
+      color: var(--text-dim);
+      pointer-events: none;
+    }
+    .textarea-like img {
+      max-width: 100%;
+      max-height: 300px;
+      height: auto;
+      margin: 8px 0;
+      border-radius: 4px;
+      border: 1px solid var(--border);
+    }
+  </style>
+
+</head>
+<body>
+
+<div class="container">
+  <div class="header-container" style="justify-content: space-between;">
+    <div style="display: flex; align-items: center; gap: 16px;">
+      <img src="https://www.delta.nl/images/delta/logo-delta-blue.svg?v=20210414" alt="DELTA" class="brand-logo" style="filter: brightness(0) invert(1);">
+      <h1 id="pageTitle">Vraag & Antwoord Template</h1>
+    </div>
+    <div class="top-actions">
+      <button class="btn-switch" id="themeBtn" onclick="toggleTheme()" title="Wissel Licht/Donker">☀️</button>
+      <button class="btn-switch" id="switchBtn" title="Vraag & Antwoord Template">🔄</button>
+    </div>
+  </div>
+  <p class="subtitle" style="margin-bottom: 24px;">Vul het formulier in en kopieer het bericht naar Teams.</p>
+
+  <!-- VRAAG TEMPLATE -->
+  <div id="tmpl-vraag">
+  <div class="form-group">
+    <label>Wachtrij <span class="required">*</span></label>
+    <select id="wachtrij">
+      <option value="">— Kies wachtrij —</option>
+      <optgroup label="HD">
+        <option value="Internet en vaste Telefonie">Internet en vaste Telefonie</option>
+        <option value="Televisie en radio">Televisie en radio</option>
+        <option value="Overig Technisch">Overig Technisch</option>
+      </optgroup>
+      <optgroup label="SC">
+        <option value="Factuur en Betalen">Factuur en Betalen</option>
+        <option value="Wijzigen of opzeggen">Wijzigen of opzeggen</option>
+        <option value="Overige Service">Overige Service</option>
+        <option value="Mobiel">Mobiel</option>
+        <option value="Sales">Sales</option>
+        <option value="Prijswijziging">Prijswijziging</option>
+        <option value="Migratielijn">Migratielijn</option>
+      </optgroup>
+    </select>
+  </div>
+
+  <div class="form-group">
+    <label>Klantnummer <span class="required">*</span></label>
+    <input type="text" id="klantnummer" placeholder="Bijv. 12345678" maxlength="20" autocomplete="off">
+  </div>
+
+  <div class="form-group">
+    <label>Klantvraag <span class="required">*</span></label>
+    <textarea id="klantvraag" placeholder="Wat is de vraag van de klant?" rows="3"></textarea>
+  </div>
+
+  <div class="form-group">
+    <label>Waar loop je vast <span class="required">*</span></label>
+    <textarea id="vastloper" placeholder="Beschrijf waar je vastzit..." rows="3"></textarea>
+  </div>
+
+  <div class="form-group">
+    <label>Gewenste uitkomst <span class="required">*</span></label>
+    <textarea id="uitkomst" placeholder="Wat wil je bereiken?" rows="2"></textarea>
+  </div>
+  </div> <!-- end tmpl-vraag -->
+
+  <!-- ANTWOORD TEMPLATE -->
+  <div id="tmpl-antwoord" style="display: none;">
+    <div class="form-group">
+      <label>Antwoord <span class="required">*</span></label>
+      <div id="antwoord" contenteditable="true" class="textarea-like" data-placeholder="Typ hier je inhoudelijke antwoord en/of screenshot..."></div>
+    </div>
+    <div class="form-group">
+      <label>Bron</label>
+      <input type="text" id="bron" placeholder="Uit welk systeem komt de informatie?" autocomplete="off">
+    </div>
+    <div class="form-group">
+      <label>Vervolgstap</label>
+      <textarea id="vervolgstap" placeholder="Wat verwacht je nu van de agent?" rows="2"></textarea>
+    </div>
+  </div>
+
+  <div class="actions">
+    <button class="btn-copy" id="btn-copy">📋 Kopieer naar klembord</button>
+    <button class="btn-clear" id="btn-clear">Wissen</button>
+  </div>
+
+  <div style="margin-top: 24px;">
+    <div class="preview-label">Voorbeeld</div>
+    <div class="preview" id="preview"></div>
+  </div>
+
+  <details class="rules">
+    <summary>📌 Spelregels moderator chat</summary>
+    <ul>
+      <li>Gebruik altijd dit template.</li>
+      <li>Er wordt altijd met een citaat gereageerd.</li>
+      <li>Alleen een moderator reageert op een vraag.</li>
+      <li>Houd je vraag duidelijk en to-the-point.</li>
+      <li>Reageer als de moderator om extra informatie vraagt.</li>
+      <li>Geen discussies, social talk of privéberichten.</li>
+      <li>Verbeter anderen niet in de chat — signaleer bij je TM of senior.</li>
+    </ul>
+  </details>
+</div>
+
+<div class="toast" id="toast">✅ Gekopieerd naar klembord!</div>
+
+<script src="script.js"></script>
+
+</body>
+</html>
