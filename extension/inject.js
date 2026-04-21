@@ -14,8 +14,8 @@ if (!window.location.href.toLowerCase().includes('crs')) {
         // Maak de knop aan
         var btn = document.createElement('button');
         btn.id = 'moderator-vraag-btn';
-        btn.innerText = 'Vraag / Antwoord Maken';
-        btn.style.cssText = "background-color: #0078D4; color: white; border: none; padding: 6px 12px; border-radius: 4px; font-weight: bold; cursor: pointer; margin-bottom: 10px; font-size: 14px;";
+        btn.innerText = 'Vraag maken';
+        btn.style.cssText = "background-color: #002B54; color: white; border: none; padding: 3px 8px; border-radius: 3px; font-weight: normal; cursor: pointer; margin-bottom: 8px; font-size: 12px;";
 
         btn.addEventListener('click', function(e) {
             e.preventDefault();

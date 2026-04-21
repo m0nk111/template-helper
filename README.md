@@ -2,7 +2,7 @@
 
 Welkom bij de **Delta V&A Template Helper**! Deze Chrome extensie is speciaal gebouwd voor het team om overtypen en kopieerfoutjes te voorkomen bij het aanmaken van vragen voor de Moderator.
 
-Zodra je in ons systeem (CRS) aan het werk bent, injecteert deze tool volautomatisch een handige blauwe **"Vraag / Antwoord Maken"** knop direct op je scherm.
+Zodra je in ons systeem (CRS) aan het werk bent, injecteert deze tool volautomatisch een handige blauwe **"Vraag maken"** knop direct op je scherm.
 
 ### 🚀 Installatie Instructies (Voor Gebruikers)
 
@@ -32,7 +32,7 @@ Zodra de beoordeling door Google is afgerond, vervalt al het bovenstaande gedoe:
 
 1. Je bent aan het werk in het Klantportaal (CRS).
 2. Typ je probleem/notitie in het tekstveld, net zoals je normaal doet.
-3. Klik op de blauwe knop **"Vraag / Antwoord Maken"** (deze knop staat direct boven het tekstveld).
+3. Klik op de blauwe knop **"Vraag maken"** (deze knop staat direct boven het tekstveld).
 4. De tool leest direct de `Klantcode` en jouw `Notitie` uit, en opent direct een nieuw scherm.
 5. In dat nieuwe scherm is de Moderator V&A Template al perfect voor je ingevuld en klaar om te versturen!
 
