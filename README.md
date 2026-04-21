@@ -33,8 +33,8 @@ Zodra de beoordeling door Google is afgerond, vervalt al het bovenstaande gedoe:
 1. Je bent aan het werk in het Klantportaal (CRS).
 2. Typ je probleem/notitie in het tekstveld, net zoals je normaal doet.
 3. Klik op de blauwe knop **"Vraag maken"** (deze knop staat direct boven het tekstveld).
-4. De tool leest direct de `Klantcode` en jouw `Notitie` uit, en opent direct een nieuw scherm.
-5. In dat nieuwe scherm is de Moderator V&A Template al perfect voor je ingevuld en klaar om te versturen!
+4. De tool leest direct de `Klantcode` en jouw `Notitie` uit, en opent als een compact en smal venster aan de rechterkant van je beeldscherm.
+5. In dat nieuwe, smalle venster is de Moderator V&A Template al perfect voor je ingevuld. Doordat CRS er nog naast staat, kun je makkelijk heen en weer kijken of kopiëren!
 
 ---
 ---

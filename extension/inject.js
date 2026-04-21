@@ -28,9 +28,15 @@ if (!window.location.href.toLowerCase().includes('crs')) {
 
             // 2. Haal de interne URL op van de ingebouwde template
             var url = chrome.runtime.getURL("template.html");
+            var finalUrl = url + '?klantnummer=' + klantnummer + '&klantvraag=' + klantvraag;
 
-            // 3. Open de template in een nieuwe tab mét de data
-            window.open(url + '?klantnummer=' + klantnummer + '&klantvraag=' + klantvraag, '_blank');
+            // 3. Open de template als een smal popup venster aan de rechterkant van het scherm ipv tab
+            var w = 450; // Smalle breedte
+            var h = window.screen.availHeight || 800; // Volledige hoogte
+            var left = (window.screen.availWidth || 1280) - w; // Helemaal rechts
+            var top = 0;
+            
+            window.open(finalUrl, 'ModeratorTemplate', 'popup=yes,width=' + w + ',height=' + h + ',left=' + left + ',top=' + top);
         });
 
         // Plaats de knop net boven het notitieveld
