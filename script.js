@@ -173,3 +173,63 @@
   document.getElementById("switchBtn").addEventListener("click", toggleTemplate);
   document.getElementById("btn-copy").addEventListener("click", copyToClipboard);
   document.getElementById("btn-clear").addEventListener("click", clearForm);
+// --- Local "Dumb AI" Text Beautifier (100% Privacy Proof) ---
+  function applyLocalTextBeautifier(e) {
+    let el = e.target;
+    let val = el.value;
+    if (!val) return;
+
+    // 1. Verwijder dubbele spaties
+    val = val.replace(/  +/g, ' ');
+
+    // 2. Fix ALL CAPS (als meer dan 60% hoofdletters is)
+    const letters = val.replace(/[^a-zA-Z]/g, '');
+    const upperCases = val.replace(/[^A-Z]/g, '');
+    if (letters.length > 10 && (upperCases.length / letters.length) > 0.6) {
+       val = val.toLowerCase();
+    }
+
+    // 3. Hoofdletter aan het begin van nieuwe zinnen
+    val = val.replace(/(^\s*|[.!?]\s+)([a-z])/g, function(match) {
+        return match.toUpperCase();
+    });
+
+    if (el.value !== val) {
+      el.value = val;
+      updatePreview();
+    }
+  }
+
+  // --- Slash Commands ---
+  function handleSlashCommands(e) {
+    let el = e.target;
+    let val = el.value;
+    if (!val) return;
+
+    const commands = {
+      '/mvg': 'Met vriendelijke groet,',
+      '/bvd': 'Bij voorbaat dank voor de moeite!',
+      '/fbi': 'Klant is boos, escalatie nodig.',
+      '/done': 'Actie succesvol uitgevoerd.'
+    };
+
+    let changed = false;
+    for (const [cmd, repl] of Object.entries(commands)) {
+      if (val.includes(cmd + ' ') || val.endsWith(cmd)) {
+        val = val.replace(new RegExp(cmd + '(?=\\s|$)', 'g'), repl);
+        changed = true;
+      }
+    }
+
+    if (changed) {
+      el.value = val;
+      updatePreview();
+    }
+  }
+
+  // Bind beautifier en slash commands
+  const textFields = ['klantvraag', 'vastloper', 'uitkomst', 'vervolgstap'];
+  for (const id of textFields) {
+    document.getElementById(id).addEventListener('blur', applyLocalTextBeautifier);
+    document.getElementById(id).addEventListener('keyup', handleSlashCommands);
+  }
