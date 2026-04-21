@@ -36,7 +36,20 @@ if (!window.location.href.toLowerCase().includes('crs')) {
             var left = (window.screen.availWidth || 1280) - w; // Helemaal rechts
             var top = 0;
             
-            window.open(finalUrl, 'ModeratorTemplate', 'popup=yes,width=' + w + ',height=' + h + ',left=' + left + ',top=' + top);
+            // Stuur het request via de background page, deze kan meer permissies vragen bij de browser zoals "always on top" (sticky mode)
+            chrome.runtime.sendMessage({
+                action: "open_popup",
+                url: finalUrl,
+                width: w,
+                height: h,
+                left: left,
+                top: top
+            }, function(response) {
+                if (chrome.runtime.lastError) {
+                    // Fallback naar de standaard js-manier mocht permissions/message-kanaal blokkeren
+                    window.open(finalUrl, 'ModeratorTemplate', 'popup=yes,width=' + w + ',height=' + h + ',left=' + left + ',top=' + top);
+                }
+            });
         });
 
         // Plaats de knop net boven het notitieveld
