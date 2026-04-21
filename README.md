@@ -6,14 +6,25 @@ Zodra je in ons systeem (CRS) aan het werk bent, injecteert deze tool volautomat
 
 ### 🚀 Installatie Instructies (Voor Gebruikers)
 
-Omdat de extensie in de officiële Chrome Web Store staat, is installeren een fluitje van een cent:
+**Let op:** Deze extensie ligt op dit moment ter goedkeuring bij Google. Zolang we daarop wachten, kun je onderstaande instructies volgen om hem nu al werkend te krijgen via een `.zip` bestand. Zodra de goedkeuring rond is, gebruiken we de makkelijke Chrome Web Store link!
 
-1. Ga naar de officiële [Chrome Web Store pagina](https://chrome.google.com/webstore/detail/hpbpojapeangpogedgcobiipmhebcjcn).
-2. Klik op **Toevoegen aan Chrome** (Add to Chrome).
-3. Bevestig de pop-up door op **Extensie toevoegen** te klikken.
-4. Klaar! Je hoeft verder niets in te stellen. Zodra je het CRS portaal opent, verschijnt de knop vanzelf op de juiste plek.
+#### 🔧 Tijdelijke Methode: Handmatig Installeren (Tot de goedkeuring)
+Om de extensie toch al te kunnen gebruiken:
 
-*(Wanneer er in de toekomst updates zijn, zal Google Chrome deze automatisch op de achtergrond voor je installeren. Je werkt dus altijd met de nieuwste versie!)*
+1. Download het nieuwste `.zip` bestand (klik de bovenste release aan) via de **[GitHub Releases pagina](https://github.com/m0nk111/template-helper/releases)**.
+2. **Pak deze `.zip` file uit** (Extract) in een willekeurige map op je computer (bijv. in Documenten).
+3. Open Google Chrome en typ of plak `chrome://extensions/` in je adresbalk (en druk op Enter).
+4. Zet rechtsboven in dat scherm de switch **Ontwikkelaarsmodus** (Developer mode) AAN.
+5. Er verschijnt nu een knop **Uitgepakte extensie laden** (Load unpacked) linksboven. Klik hierop.
+6. Selecteer de zojuist uitgepakte map op je computer. De extensie is nu toegevoegd en klaar voor gebruik!
+
+#### 🌐 Officiële Methode: Chrome Web Store (Zodra goedgekeurd)
+Zodra de beoordeling door Google is afgerond, vervalt al het bovenstaande gedoe:
+
+1. Ga naar de [Chrome Web Store pagina](https://chrome.google.com/webstore/detail/hpbpojapeangpogedgcobiipmhebcjcn).
+2. Klik simpelweg op **Toevoegen aan Chrome**.
+
+*(Wanneer er vanaf dat moment in de toekomst updates zijn, zal Google Chrome deze automatisch voor je installeren!)*
 
 ---
 
