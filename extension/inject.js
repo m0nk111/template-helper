@@ -35,15 +35,40 @@ if (!window.location.href.toLowerCase().includes('crs')) {
             if (sidebarContainer) {
                 // Update iframe met nieuwe data
                 document.getElementById('delta-moderator-sidebar-iframe').src = finalUrl;
-                sidebarContainer.style.display = 'flex';
+                // Sidebar openklappen (naar binnen schuiven)
+                sidebarContainer.style.transform = 'translateX(0)';
+                var toggleBtn = document.getElementById('delta-moderator-sidebar-toggle');
+                if(toggleBtn) toggleBtn.innerHTML = "▶"; // Pijltje wijst naar rechts (inklappen)
             } else {
                 // Maak de zijbalk aan
                 sidebarContainer = document.createElement('div');
                 sidebarContainer.id = 'delta-moderator-sidebar-container';
-                // Vastzetten aan de rechterkant, on top of alles in de pagina
-                sidebarContainer.style.cssText = "position: fixed; top: 0; right: 0; width: 450px; height: 100vh; z-index: 2147483647; box-shadow: -5px 0 25px rgba(0,0,0,0.3); background-color: white; display: flex; flex-direction: column; transition: transform 0.3s ease-in-out;";
+                // Vastzetten aan de rechterkant, met een smooth transform (slide) animatie
+                sidebarContainer.style.cssText = "position: fixed; top: 0; right: 0; width: 450px; height: 100vh; z-index: 2147483647; box-shadow: -5px 0 25px rgba(0,0,0,0.3); background-color: white; display: flex; flex-direction: column; transition: transform 0.3s ease-in-out; transform: translateX(0);";
                 
-                // Titelbalkje met sluitknop
+                // --- Het inklapbare "uitsteekseltje" ---
+                var toggleBtn = document.createElement('div');
+                toggleBtn.id = 'delta-moderator-sidebar-toggle';
+                // Maak de knop vast aan de linkerkant (maar búiten) de sidebar Container
+                toggleBtn.style.cssText = "position: absolute; left: -36px; top: 50%; transform: translateY(-50%); width: 36px; height: 70px; background-color: #002B54; color: white; display: flex; justify-content: center; align-items: center; cursor: pointer; border-radius: 8px 0 0 8px; box-shadow: -3px 0 10px rgba(0,0,0,0.2); font-size: 18px; user-select: none;";
+                toggleBtn.innerHTML = "▶"; // Omdat hij default open is
+                toggleBtn.title = "Verberg / Toon Vraag Template";
+                
+                // Toggle animatie logic op het uitsteekseltje
+                toggleBtn.onclick = function() {
+                    // Check huidige staat op basis van transform string
+                    if (sidebarContainer.style.transform === 'translateX(0px)' || sidebarContainer.style.transform === 'translateX(0)') {
+                        sidebarContainer.style.transform = 'translateX(450px)'; // Klap in (verberg de breedte)
+                        toggleBtn.innerHTML = "◀"; // Pijltje naar links (openklappen)
+                    } else {
+                        sidebarContainer.style.transform = 'translateX(0)'; // Klap uit (zichtbaar maken)
+                        toggleBtn.innerHTML = "▶"; // Pijltje wijst naar rechts (klaar om weer in te klappen)
+                    }
+                };
+                sidebarContainer.appendChild(toggleBtn);
+                // ----------------------------------------
+                
+                // Titelbalkje met header. CloseBtn is nu optioneel eigenlijk, maar handig als hard-close/hide
                 var header = document.createElement('div');
                 header.style.cssText = "display: flex; justify-content: space-between; align-items: center; background-color: #002B54; color: white; padding: 12px 15px; font-weight: bold; font-family: sans-serif;";
                 header.innerText = "Delta Vraag Maken";
@@ -53,7 +78,11 @@ if (!window.location.href.toLowerCase().includes('crs')) {
                 closeBtn.style.cssText = "background: rgba(255,255,255,0.2); border: none; color: white; font-size: 13px; cursor: pointer; padding: 4px 8px; border-radius: 4px;";
                 closeBtn.addEventListener('mouseover', function() { closeBtn.style.background = 'rgba(255,255,255,0.4)'; });
                 closeBtn.addEventListener('mouseout', function() { closeBtn.style.background = 'rgba(255,255,255,0.2)'; });
-                closeBtn.onclick = function() { sidebarContainer.style.display = 'none'; };
+                closeBtn.onclick = function() { 
+                    // Bij Sluiten klappen we hem in en past de toggle netjes mee aan (lijkt op collapse behaviour)
+                    sidebarContainer.style.transform = 'translateX(450px)';
+                    toggleBtn.innerHTML = "◀"; 
+                };
                 
                 header.appendChild(closeBtn);
                 
