@@ -12,7 +12,7 @@ mkdir -p "$DEPLOY_DIR"
 ZIP_NAME="mod-helper-${GIT_COMMIT}"
 ZIP_PATH="${DEPLOY_DIR}/${ZIP_NAME}"
 
-echo "📦 Packing Vraag & Antwoord Helper (${GIT_COMMIT})..."
+echo "📦 Packing Delta Vraag en Antwoord Template Helper (${GIT_COMMIT})..."
 
 # Gooi oude zips weg zodat we niet oneindig veel zips opsparen
 rm -f ${DEPLOY_DIR}/mod-helper-*.zip

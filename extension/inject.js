@@ -1,7 +1,7 @@
 // Zoek uit of we in het CRS zijn
 if (!window.location.href.toLowerCase().includes('crs')) {
     // Stop onmiddellijk met uitvoeren als de URL 'crs' niet bevat, scheelt processor/browser-rekenwerk
-    console.debug('Vraag & Antwoord Helper: Niet the CRS site, injectie gestopt.');
+    console.debug('Delta Vraag en Antwoord Template Helper: Niet the CRS site, injectie gestopt.');
 } else {
     function createVraagButton() {
         // Check of de knop al bestaat

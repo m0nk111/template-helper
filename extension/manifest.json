@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "Vraag & Antwoord Helper",
+  "name": "Delta Vraag en Antwoord Template Helper",
   "version": "1.0",
   "description": "Haalt met één klik gegevens uit het systeem en opent de Moderator Vraag & Antwoord Template.",
   "action": {

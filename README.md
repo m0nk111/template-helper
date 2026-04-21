@@ -1,4 +1,4 @@
-# Moderator Vraag & Antwoord Helper
+# Delta Vraag en Antwoord Template Helper
 
 Je hebt twee manieren om dit lokaal te gebruiken:
 1. **Optie 1: De Browser Extensie (Aanbevolen, makkelijkst)** - Installeren via developer mode.
@@ -15,7 +15,7 @@ We kunnen deze extensie in zijn geheel publiceren in the officiële Google Chrom
 1. Maak een Google Developer Account aan ($5 eenmalig) op de [Chrome Developer Dashboard](https://chrome.google.com/webstore/developer/dashboard).
 2. Druk op **Nieuw Item toevoegen**.
 3. Upload de zip file die onze eigen `pack.sh` zojuist heeft gegenereerd in the `ext-deploy/` map (bijv. `mod-helper-[commit-hash].zip`). Deze Zip is al **100% Store CWS-Ready** (inclusief correct Manifest V3 structuur en icoontjes)!
-4. Vul The titel, beschrijving (Vraag & Antwoord Helper), en wat screenshots in.
+4. Vul The titel, beschrijving (Delta Vraag en Antwoord Template Helper), en wat screenshots in.
 5. Verstuur hem ter verificatie (Review duurt meestal een paar uur tot 2 dagen). 
 6. Zodra het gepubliceerd is, deel je the linkje the The moderator team. Iedereen the installeert, krijgt updates vanaf nu the auto-magic in Chrome.
 
@@ -33,7 +33,7 @@ In plaats van handmatig te kloten met Windows mappen of bookmarklets, is er een 
 2. Zet de switch **Ontwikkelaarsmodus** (Developer mode) rechtsboven AAN.
 3. Klik op **Uitgepakte extensie laden** (Load unpacked).
 4. Pak de zip file `ext-deploy/mod-helper-[commit-hash].zip` uit in een map op je computer. Selecteer deze **uitgepakte map** in Chrome (Chrome accepteert hier namelijk géén losse .zip bestanden).
-5. Je ziet nu het "Vraag & Antwoord Helper" icoontje (als puzzelstukje) in je browser balk verschijnen. Zet hem eventueel vast (pin) in de balk.
+5. Je ziet nu het "Delta Vraag en Antwoord Template Helper" icoontje (als puzzelstukje) in je browser balk verschijnen. Zet hem eventueel vast (pin) in de balk.
 
 **Hoe het werkt:**
 - Zorg dat je op een Klantkaart zit en dat je scherm klopt.
