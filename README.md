@@ -6,7 +6,24 @@ Je hebt twee manieren om dit lokaal te gebruiken:
 
 ---
 
-## 🚀 Optie 1: De Chrome Extensie (Optioneel maar makkelijker)
+## 🚀 Optie 3: Publiceren via de Chrome Web Store (De échte manier)
+
+We kunnen deze extensie in zijn geheel publiceren in the officiële Google Chrome Store voor het team. Dat lost alle update- en installatieproblemen in één keer op; collega's hoeven niet meer aan the kloten met zipjes, en als jij de code updatet rollen de updates automatisch the browsers in!
+
+**Hoe publiceer je dit in the Store?**
+
+1. Maak een Google Developer Account aan ($5 eenmalig) op de [Chrome Developer Dashboard](https://chrome.google.com/webstore/developer/dashboard).
+2. Druk op **Nieuw Item toevoegen**.
+3. Upload de zip file die onze eigen `pack.sh` zojuist heeft gegenereerd in the `ext-deploy/` map (bijv. `mod-helper-[commit-hash].zip`). Deze Zip is al **100% Store CWS-Ready** (inclusief correct Manifest V3 structuur en icoontjes)!
+4. Vul The titel, beschrijving (Vraag & Antwoord Helper), en wat screenshots in.
+5. Verstuur hem ter verificatie (Review duurt meestal een paar uur tot 2 dagen). 
+6. Zodra het gepubliceerd is, deel je the linkje the The moderator team. Iedereen the installeert, krijgt updates vanaf nu the auto-magic in Chrome.
+
+Blijf the code hiërarchie simpel houden in GitHub, the pack script regelt de rest! 
+
+---
+
+## 💻 Optie 1: Lokale Chrome Extensie (Lokaal the testen / Developer Mode)
 
 In plaats van handmatig te kloten met Windows mappen of bookmarklets, is er een kant-en-klare Chrome Extensie (Manifest V3) gemaakt!
 

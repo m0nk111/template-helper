@@ -4,7 +4,13 @@
   "version": "1.0",
   "description": "Haalt met één klik gegevens uit het systeem en opent de Moderator Vraag & Antwoord Template.",
   "action": {
-    "default_title": "Open Vraag Template"
+    "default_title": "Open Vraag Template",
+    "default_icon": {
+      "128": "icon128.png"
+    }
+  },
+  "icons": {
+    "128": "icon128.png"
   },
   "permissions": [
     "activeTab",
