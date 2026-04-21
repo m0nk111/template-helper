@@ -152,6 +152,8 @@
     localStorage.setItem('vraag-tmpl-theme', isLight ? 'light' : 'dark');
   }
 
+  document.getElementById('themeBtn').addEventListener('click', toggleTheme);
+
   if (localStorage.getItem('vraag-tmpl-theme') === 'light') {
     document.body.classList.add('light-mode');
     document.getElementById('themeBtn').textContent = '🌙';
