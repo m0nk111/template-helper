@@ -8,18 +8,14 @@ Je hebt twee manieren om dit lokaal te gebruiken:
 
 ## 🚀 Optie 1: De Chrome Extensie (Optioneel maar makkelijker)
 
-In plaats van handmatig te kloten met Windows mappen of bookmarklets, is er een kant-en-klare Chrome Extensie (Manifest V3) gemaakt! Deze neemt de HTML-template met zich mee; het werkt letterlijk met één muisklik uit the box. 
-
-**Locatie van de code:**
-`template-helper/extension/`
+In plaats van handmatig te kloten met Windows mappen of bookmarklets, is er een kant-en-klare Chrome Extensie (Manifest V3) gemaakt!
 
 **Installatie via Developer Mode (Chrome / Edge):**
 
 1. Open je browser en ga naar Extensions (via `chrome://extensions/` of `edge://extensions/`).
 2. Zet de switch **Ontwikkelaarsmodus** (Developer mode) rechtsboven AAN.
-3. Klik op **Gepakte extensie laden...** (Load unpacked).
-4. Selecteer de nieuwe map: `template-helper/extension`.
-5. Je ziet nu het "Vraag & Antwoord Helper" icoontje (als puzzelstukje) in je browser balk verschijnen. Zet hem eventueel vast (pin) in the balk.
+3. Pak de zip file `mod-helper-v1.0.zip` uit (of kloon deze repo). Installeer de uitgepakte **volledige directory** of het ingepakte .zipje.
+4. Je ziet nu het "Vraag & Antwoord Helper" icoontje (als puzzelstukje) in je browser balk verschijnen. Zet hem eventueel vast (pin) in de balk.
 
 **Hoe het werkt:**
 - Zorg dat je op een Klantkaart zit en dat je scherm klopt.

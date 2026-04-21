@@ -12,7 +12,16 @@ echo "📦 Packing Vraag & Antwoord Helper v${VERSION}..."
 
 rm -f "${ZIP_FILE}.zip"
 
-# Gebruik Python om direct de extension map in te pakken
-python3 -c "import shutil; shutil.make_archive('${ZIP_FILE}', 'zip', 'extension')"
+# Create a temporary build directory
+mkdir -p build_extension
+cp -R extension/* build_extension/
+# Copy the template files into the extension so they are packaged inside it
+cp template.html script.js build_extension/
+
+# Pack the build directory
+python3 -c "import shutil; shutil.make_archive('${ZIP_FILE}', 'zip', 'build_extension')"
+
+# Clean up
+rm -rf build_extension
 
 echo "✅ Klaar! Extensie ingepakt in: ${ZIP_FILE}.zip"
