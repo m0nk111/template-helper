@@ -8,7 +8,7 @@ chrome.action.onClicked.addListener((tab) => {
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     if (request.action === "open_popup") {
-        // Maak een robuust en gefocust venster, liefst sticky/on-top (als het OS dit toelaat)
+        // Maak een robuust en gefocust venster
         chrome.windows.create({
             url: request.url,
             type: "popup",
@@ -18,14 +18,6 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             top: request.top || 0,
             focused: true
         }, (win) => {
-            // Probeer hem achteraf hard 'alwaysOnTop' in te stellen
-            if (win) {
-                chrome.windows.update(win.id, { alwaysOnTop: true }, () => {
-                    if(chrome.runtime.lastError) {
-                        console.log("AlwaysOnTop gracefully fallback op OS beheer.");
-                    }
-                });
-            }
             sendResponse({status: "ok"});
         });
         return true; // Asynchrone response aanzetten
