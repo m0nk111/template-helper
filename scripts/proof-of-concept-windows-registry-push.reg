@@ -1,14 +1,14 @@
 Windows Registry Editor Version 5.00
 
-; Waarschuwing: Dit is een Proof of Concept om aan management te laten zien 
-; hoe krachtig en naadloos een uitrol via Microsoft Intune / GPO werkt.
+; Warning: This is a Proof of Concept to demonstrate to management 
+; how powerful and seamless a deployment via Microsoft Intune / GPO works.
 ;
-; Deze sleutel vertelt Google Chrome dat hij *moet* toestaan dat we 
-; extensies van buiten de Web Store installeren, puur omdat deze 
-; geregistreerd staat in het "bedrijven beleid".
+; This registry key tells Google Chrome that it *must* allow the installation 
+; of extensions outside the Web Store, purely because they're registered 
+; in the "enterprise policy".
 ;
-; Verander "C:\\Users\\Naam\\DeltaModeratorHelper" naar het netwerkpad of 
-; standaardpad waar je de Delta Helper wilt neerzetten via je deployment systeem.
+; Change "C:\\Users\\Name\\DeltaModeratorHelper" to the network path or 
+; target path where your deployment system places the Delta Helper files.
 
 [HKEY_LOCAL_MACHINE\Software\Policies\Google\Chrome\ExtensionInstallSources]
 "1"="file:///C:/Users/*/DeltaModeratorHelper/*"
