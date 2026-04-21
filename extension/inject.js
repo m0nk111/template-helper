@@ -30,26 +30,43 @@ if (!window.location.href.toLowerCase().includes('crs')) {
             var url = chrome.runtime.getURL("template.html");
             var finalUrl = url + '?klantnummer=' + klantnummer + '&klantvraag=' + klantvraag;
 
-            // 3. Open de template als een smal popup venster aan de rechterkant van het scherm ipv tab
-            var w = 450; // Smalle breedte
-            var h = window.screen.availHeight || 800; // Volledige hoogte
-            var left = (window.screen.availWidth || 1280) - w; // Helemaal rechts
-            var top = 0;
-            
-            // Stuur het request via de background page, deze kan meer permissies vragen bij de browser zoals "always on top" (sticky mode)
-            chrome.runtime.sendMessage({
-                action: "open_popup",
-                url: finalUrl,
-                width: w,
-                height: h,
-                left: left,
-                top: top
-            }, function(response) {
-                if (chrome.runtime.lastError) {
-                    // Fallback naar de standaard js-manier mocht permissions/message-kanaal blokkeren
-                    window.open(finalUrl, 'ModeratorTemplate', 'popup=yes,width=' + w + ',height=' + h + ',left=' + left + ',top=' + top);
-                }
-            });
+            // 3. Injecteer de template direct in de crs-pagina als een sidebar aan de rechterkant
+            var sidebarContainer = document.getElementById('delta-moderator-sidebar-container');
+            if (sidebarContainer) {
+                // Update iframe met nieuwe data
+                document.getElementById('delta-moderator-sidebar-iframe').src = finalUrl;
+                sidebarContainer.style.display = 'flex';
+            } else {
+                // Maak de zijbalk aan
+                sidebarContainer = document.createElement('div');
+                sidebarContainer.id = 'delta-moderator-sidebar-container';
+                // Vastzetten aan de rechterkant, on top of alles in de pagina
+                sidebarContainer.style.cssText = "position: fixed; top: 0; right: 0; width: 450px; height: 100vh; z-index: 2147483647; box-shadow: -5px 0 25px rgba(0,0,0,0.3); background-color: white; display: flex; flex-direction: column; transition: transform 0.3s ease-in-out;";
+                
+                // Titelbalkje met sluitknop
+                var header = document.createElement('div');
+                header.style.cssText = "display: flex; justify-content: space-between; align-items: center; background-color: #002B54; color: white; padding: 12px 15px; font-weight: bold; font-family: sans-serif;";
+                header.innerText = "Delta Vraag Maken";
+                
+                var closeBtn = document.createElement('button');
+                closeBtn.innerText = "✖ Sluiten";
+                closeBtn.style.cssText = "background: rgba(255,255,255,0.2); border: none; color: white; font-size: 13px; cursor: pointer; padding: 4px 8px; border-radius: 4px;";
+                closeBtn.addEventListener('mouseover', function() { closeBtn.style.background = 'rgba(255,255,255,0.4)'; });
+                closeBtn.addEventListener('mouseout', function() { closeBtn.style.background = 'rgba(255,255,255,0.2)'; });
+                closeBtn.onclick = function() { sidebarContainer.style.display = 'none'; };
+                
+                header.appendChild(closeBtn);
+                
+                // Het iframe laadt de Chrome web accessible template in
+                var iframe = document.createElement('iframe');
+                iframe.id = 'delta-moderator-sidebar-iframe';
+                iframe.src = finalUrl;
+                iframe.style.cssText = "flex-grow: 1; border: none; width: 100%; height: 100%; background: #f4f6f8;";
+                
+                sidebarContainer.appendChild(header);
+                sidebarContainer.appendChild(iframe);
+                document.body.appendChild(sidebarContainer);
+            }
         });
 
         // Plaats de knop net boven het notitieveld
