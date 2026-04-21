@@ -14,7 +14,7 @@ In plaats van handmatig te kloten met Windows mappen of bookmarklets, is er een 
 
 1. Open je browser en ga naar Extensions (via `chrome://extensions/` of `edge://extensions/`).
 2. Zet de switch **Ontwikkelaarsmodus** (Developer mode) rechtsboven AAN.
-3. Pak de zip file `mod-helper-v1.0.zip` uit (of kloon deze repo). Installeer de uitgepakte **volledige directory** of het ingepakte .zipje.
+3. Pak de zip file `ext-deploy/mod-helper-[commit-hash].zip` uit (of kloon deze repo). Installeer de uitgepakte **volledige directory** of het ingepakte .zipje.
 4. Je ziet nu het "Vraag & Antwoord Helper" icoontje (als puzzelstukje) in je browser balk verschijnen. Zet hem eventueel vast (pin) in de balk.
 
 **Hoe het werkt:**

@@ -2,15 +2,20 @@
 
 cd "$(dirname "$0")"
 
-VERSION=$(grep '"version"' extension/manifest.json | grep -oE '[0-9]+\.[0-9]+' | head -n 1)
-if [ -z "$VERSION" ]; then
-    VERSION="1.0"
-fi
+# Gebruik de Git commit hash (short) in plaats van versie
+GIT_COMMIT=$(git rev-parse --short HEAD 2>/dev/null || echo "init")
 
-ZIP_FILE="mod-helper-v${VERSION}"
-echo "📦 Packing Vraag & Antwoord Helper v${VERSION}..."
+# Map voor de deployments
+DEPLOY_DIR="ext-deploy"
+mkdir -p "$DEPLOY_DIR"
 
-rm -f "${ZIP_FILE}.zip"
+ZIP_NAME="mod-helper-${GIT_COMMIT}"
+ZIP_PATH="${DEPLOY_DIR}/${ZIP_NAME}"
+
+echo "📦 Packing Vraag & Antwoord Helper (${GIT_COMMIT})..."
+
+# Gooi oude zips weg zodat we niet oneindig veel zips opsparen
+rm -f ${DEPLOY_DIR}/mod-helper-*.zip
 
 # Create a temporary build directory
 mkdir -p build_extension
@@ -19,9 +24,9 @@ cp -R extension/* build_extension/
 cp template.html script.js build_extension/
 
 # Pack the build directory
-python3 -c "import shutil; shutil.make_archive('${ZIP_FILE}', 'zip', 'build_extension')"
+python3 -c "import shutil; shutil.make_archive('${ZIP_PATH}', 'zip', 'build_extension')"
 
 # Clean up
 rm -rf build_extension
 
-echo "✅ Klaar! Extensie ingepakt in: ${ZIP_FILE}.zip"
+echo "✅ Klaar! Extensie ingepakt in: ${ZIP_PATH}.zip"
