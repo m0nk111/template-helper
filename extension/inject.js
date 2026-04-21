@@ -1,41 +1,46 @@
 // Zoek uit of we in het CRS zijn
-function createVraagButton() {
-    // Check of de knop al bestaat
-    if (document.getElementById('moderator-vraag-btn')) return;
+if (!window.location.href.toLowerCase().includes('crs')) {
+    // Stop onmiddellijk met uitvoeren als de URL 'crs' niet bevat, scheelt processor/browser-rekenwerk
+    console.debug('Vraag & Antwoord Helper: Niet the CRS site, injectie gestopt.');
+} else {
+    function createVraagButton() {
+        // Check of de knop al bestaat
+        if (document.getElementById('moderator-vraag-btn')) return;
 
-    // Check of dit de bekende CRS weergave is
-    var targetArea = document.getElementById('IWMEMO_SCRIPT_EIGENINPUT');
-    if (!targetArea) return; 
+        // Check of dit de bekende CRS weergave is
+        var targetArea = document.getElementById('IWMEMO_SCRIPT_EIGENINPUT');
+        if (!targetArea) return; 
 
-    // Maak de knop aan
-    var btn = document.createElement('button');
-    btn.id = 'moderator-vraag-btn';
-    btn.innerText = 'Vraag / Antwoord Maken';
-    btn.style.cssText = "background-color: #0078D4; color: white; border: none; padding: 6px 12px; border-radius: 4px; font-weight: bold; cursor: pointer; margin-bottom: 10px; font-size: 14px;";
+        // Maak de knop aan
+        var btn = document.createElement('button');
+        btn.id = 'moderator-vraag-btn';
+        btn.innerText = 'Vraag / Antwoord Maken';
+        btn.style.cssText = "background-color: #0078D4; color: white; border: none; padding: 6px 12px; border-radius: 4px; font-weight: bold; cursor: pointer; margin-bottom: 10px; font-size: 14px;";
 
-    btn.addEventListener('click', function(e) {
-        e.preventDefault();
-        // 1. Haal de gegevens uit het pagina
-        var klnrEl = document.querySelector('.ut_DFI_EL_PARTY_ID');
-        var klantnummer = klnrEl ? encodeURIComponent(klnrEl.innerText.trim()) : '';
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            // 1. Haal de gegevens uit het pagina
+            var klnrEl = document.querySelector('.ut_DFI_EL_PARTY_ID');
+            var klantnummer = klnrEl ? encodeURIComponent(klnrEl.innerText.trim()) : '';
 
-        var notitieEl = document.getElementById('IWMEMO_SCRIPT_EIGENINPUT');
-        var klantvraag = notitieEl ? encodeURIComponent(notitieEl.value.trim()) : '';
+            var notitieEl = document.getElementById('IWMEMO_SCRIPT_EIGENINPUT');
+            var klantvraag = notitieEl ? encodeURIComponent(notitieEl.value.trim()) : '';
 
-        // 2. Haal de interne URL op van de ingebouwde template
-        var url = chrome.runtime.getURL("template.html");
+            // 2. Haal de interne URL op van de ingebouwde template
+            var url = chrome.runtime.getURL("template.html");
 
-        // 3. Open de template in een nieuwe tab mét de data
-        window.open(url + '?klantnummer=' + klantnummer + '&klantvraag=' + klantvraag, '_blank');
-    });
+            // 3. Open de template in een nieuwe tab mét de data
+            window.open(url + '?klantnummer=' + klantnummer + '&klantvraag=' + klantvraag, '_blank');
+        });
 
-    // Plaats de knop net boven het notitieveld
-    targetArea.parentNode.insertBefore(btn, targetArea);
+        // Plaats de knop net boven het notitieveld
+        targetArea.parentNode.insertBefore(btn, targetArea);
+    }
+
+    // Probeer de knop in te laden
+    createVraagButton();
+
+    // CRM's laden vaak dynamisch (SPA/React/Angular), observe de DOM
+    var observer = new MutationObserver(createVraagButton);
+    observer.observe(document.body, { childList: true, subtree: true });
 }
-
-// Probeer de knop in te laden
-createVraagButton();
-
-// CRM's laden vaak dynamisch (SPA/React/Angular), observe de DOM
-var observer = new MutationObserver(createVraagButton);
-observer.observe(document.body, { childList: true, subtree: true });

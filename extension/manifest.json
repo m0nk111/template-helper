@@ -12,7 +12,8 @@
   ],
   "content_scripts": [
     {
-      "matches": ["<all_urls>"],
+      "matches": ["http://*/*", "https://*/*"],
+      "include_globs": ["*crs*", "*CRS*"],
       "js": ["inject.js"],
       "run_at": "document_idle"
     }
