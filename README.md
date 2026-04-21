@@ -6,25 +6,26 @@ Zodra je in ons systeem (CRS) aan het werk bent, injecteert deze tool volautomat
 
 ### 🚀 Installatie Instructies (Voor Gebruikers)
 
-**Let op:** Deze extensie ligt op dit moment ter goedkeuring bij Google. Zolang we daarop wachten, kun je onderstaande instructies volgen om hem nu al werkend te krijgen via een `.zip` bestand. Zodra de goedkeuring rond is, gebruiken we de makkelijke Chrome Web Store link!
+**Let op:** Deze extensie ligt op dit moment ter goedkeuring bij Google. Zolang we daarop wachten, hebben we een volautomatische installer gebouwd voor Windows gebruikers.
 
-#### 🔧 Tijdelijke Methode: Handmatig Installeren (Tot de goedkeuring)
-Om de extensie toch al te kunnen gebruiken:
+#### 🔧 Optie 1: De Volautomatische Installer (Aanbevolen)
+Dit is de makkelijkste manier voor collega's om de extensie te installeren zonder zip-bestanden te hoeven uitpakken:
 
-1. Download het nieuwste `.zip` bestand (klik de bovenste release aan) via de **[GitHub Releases pagina](https://github.com/m0nk111/template-helper/releases)**.
-2. **Pak deze `.zip` file uit** (Extract) in een willekeurige map op je computer (bijv. in Documenten).
-3. Open Google Chrome en typ of plak `chrome://extensions/` in je adresbalk (en druk op Enter).
-4. Zet rechtsboven in dat scherm de switch **Ontwikkelaarsmodus** (Developer mode) AAN.
-5. Er verschijnt nu een knop **Uitgepakte extensie laden** (Load unpacked) linksboven. Klik hierop.
-6. Selecteer de zojuist uitgepakte map op je computer. De extensie is nu toegevoegd en klaar voor gebruik!
+1. Download het **[Install-DeltaHelper.bat](https://github.com/m0nk111/template-helper/releases/latest/download/Install-DeltaHelper.bat)** bestand.
+2. Dubbelklik op het gedownloade bestand.
+   *(Krijg je een blauwe Windows Defender melding? Klik op "Meer informatie" en dan "Toch uitvoeren")*
+3. Het script downloadt en installeert automatisch de laatste versie.
+4. Chrome opent vanzelf de instellingenpagina (`chrome://extensions/`).
+5. Zet rechtsboven **Ontwikkelaarsmodus** aan, klik linksboven op **Uitgepakte extensie laden** en selecteer de map `C:\Users\[JouwNaam]\DeltaModeratorHelper` (de Installer vertelt je precies waar hij staat).
 
-#### 🌐 Officiële Methode: Chrome Web Store (Zodra goedgekeurd)
-Zodra de beoordeling door Google is afgerond, vervalt al het bovenstaande gedoe:
+#### 🔧 Optie 2: Handmatig Zip Uitpakken (Voor Mac/Linux of handmatige controle)
+1. Download de nieuwste release via de **[GitHub Releases pagina](https://github.com/m0nk111/template-helper/releases)**.
+2. **Pak deze `.zip` file uit** in een vaste map op je computer.
+3. Open Chrome en ga naar `chrome://extensions/`. Zet **Ontwikkelaarsmodus** AAN.
+4. Klik op **Uitgepakte extensie laden** (Load unpacked) en selecteer de uitgepakte map.
 
-1. Ga naar de [Chrome Web Store pagina](https://chrome.google.com/webstore/detail/hpbpojapeangpogedgcobiipmhebcjcn).
-2. Klik simpelweg op **Toevoegen aan Chrome**.
-
-*(Wanneer er vanaf dat moment in de toekomst updates zijn, zal Google Chrome deze automatisch voor je installeren!)*
+#### 🌐 Optie 4: Chrome Web Store (Zodra goedgekeurd)
+Zodra de beoordeling door Google is afgerond, vervalt al het bovenstaande gedoe. Je klikt dan simpelweg op "Toevoegen aan Chrome" in de Web Store.
 
 ---
 
