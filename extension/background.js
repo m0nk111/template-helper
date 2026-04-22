@@ -1,8 +1,8 @@
 chrome.action.onClicked.addListener((tab) => {
-    // Injecteer de scraper in de actieve (huidige) tab
+    // Mocht het automatische script niet afgaan door een ander bedrijfsdomein, 
+    // injecteer met 1 klik geforceerd de blauwe knop/zijbalk via 'activeTab' rechten
     chrome.scripting.executeScript({
         target: { tabId: tab.id },
-        files: ['content.js']
+        files: ['inject.js']
     });
 });
-

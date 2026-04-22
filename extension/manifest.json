@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "Delta Vraag en Antwoord Template Helper",
-  "version": "1.0",
-  "description": "Haalt met één klik gegevens uit het systeem en opent de Moderator Vraag & Antwoord Template.",
+  "version": "1.2.3",
+  "description": "Haalt met één klik gegevens uit het CRS en opent de Moderator Vraag & Antwoord Template.",
   "action": {
     "default_title": "Open Vraag Template",
     "default_icon": {
@@ -16,10 +16,14 @@
     "activeTab",
     "scripting"
   ],
+  "host_permissions": [
+    "https://crs.gw.dfnld.nl/*"
+  ],
   "content_scripts": [
     {
-      "matches": ["http://*/*", "https://*/*"],
-      "include_globs": ["*crs*", "*CRS*"],
+      "matches": [
+        "https://crs.gw.dfnld.nl/*"
+      ],
       "js": ["inject.js"],
       "run_at": "document_idle"
     }
@@ -30,7 +34,9 @@
   "web_accessible_resources": [
     {
       "resources": ["template.html"],
-      "matches": ["<all_urls>"]
+      "matches": [
+        "https://crs.gw.dfnld.nl/*"
+      ]
     }
   ]
 }
