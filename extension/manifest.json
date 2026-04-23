@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Delta Vraag en Antwoord Template Helper",
-  "version": "1.2.3",
+  "version": "1.2.4",
   "description": "Haalt met één klik gegevens uit het CRS en opent de Moderator Vraag & Antwoord Template.",
   "action": {
     "default_title": "Open Vraag Template",
@@ -15,18 +15,6 @@
   "permissions": [
     "activeTab",
     "scripting"
-  ],
-  "host_permissions": [
-    "https://crs.gw.dfnld.nl/*"
-  ],
-  "content_scripts": [
-    {
-      "matches": [
-        "https://crs.gw.dfnld.nl/*"
-      ],
-      "js": ["inject.js"],
-      "run_at": "document_idle"
-    }
   ],
   "background": {
     "service_worker": "background.js"
