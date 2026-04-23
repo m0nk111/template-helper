@@ -9,13 +9,13 @@ GIT_COMMIT=$(git rev-parse --short HEAD 2>/dev/null || echo "init")
 DEPLOY_DIR="ext-deploy"
 mkdir -p "$DEPLOY_DIR"
 
-ZIP_NAME="mod-helper-${GIT_COMMIT}"
+ZIP_NAME="template-helper-${GIT_COMMIT}"
 ZIP_PATH="${DEPLOY_DIR}/${ZIP_NAME}"
 
 echo "📦 Packing Delta Vraag en Antwoord Template Helper (${GIT_COMMIT})..."
 
 # Gooi oude zips weg zodat we niet oneindig veel zips opsparen
-rm -f ${DEPLOY_DIR}/mod-helper-*.zip
+rm -f ${DEPLOY_DIR}/template-helper-*.zip
 
 # Create a temporary build directory
 mkdir -p build_extension
