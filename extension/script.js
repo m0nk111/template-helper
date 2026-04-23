@@ -311,47 +311,8 @@ function applyLocalTextBeautifier(e) {
   }
 }
 
-/**
- * SLASH COMMANDS (Shortcuts)
- * Expands a short code into a full sentence while you are typing.
- * e.g., typing "/mvg " instantly changes to "Met vriendelijke groet,"
- */
-function handleSlashCommands(e) {
-  let el = e.target;
-  let val = el.value;
-  if (!val) return;
-
-  // The dictionary of available shortcut commands
-  const commands = {
-    '/mvg': 'Met vriendelijke groet,',
-    '/bvd': 'Bij voorbaat dank voor de moeite!',
-    '/fbi': 'Klant is boos, escalatie nodig.',
-    '/done': 'Actie succesvol uitgevoerd.'
-  };
-
-  let changed = false;
-  
-  // Scan the text for any of the shortcuts above
-  for (const [cmd, repl] of Object.entries(commands)) {
-    if (val.includes(cmd + ' ') || val.endsWith(cmd)) {
-      // Replace the shortcut with the full sentence
-      val = val.replace(new RegExp(cmd + '(?=\\s|$)', 'g'), repl);
-      changed = true;
-    }
-  }
-
-  // If a shortcut was triggered, update the text box
-  if (changed) {
-    el.value = val;
-    updatePreview();
-  }
-}
-
-// Bind the two "AI" features to the big text boxes only
+// Bind Text Beautifier to the big text boxes only
 const textFieldsToWatch = ['klantvraag', 'vastloper', 'uitkomst', 'vervolgstap'];
 for (const id of textFieldsToWatch) {
-  // Trigger 'Text Beautifier' when the user clicks away from the box ('blur')
   document.getElementById(id).addEventListener('blur', applyLocalTextBeautifier);
-  // Trigger 'Slash Commands' exactly when a user releases a key on their keyboard ('keyup')
-  document.getElementById(id).addEventListener('keyup', handleSlashCommands);
 }
