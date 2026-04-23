@@ -46,6 +46,12 @@ Deze extensie wordt volautomatisch gebouwd en uitgerold via **GitHub Actions**. 
 1. `pack.sh` aftrappen om alles te bundelen en irrelevante files uit te sluiten.
 2. Via de Google Chrome Web Store API de nieuwste `.zip` indienen en publiceren in de Chrome Store.
 
+### Single Source Of Truth (belangrijk)
+Om dubbel werk en versie-drift te voorkomen:
+1. Pas alleen bestanden aan in `extension/template.html` en `extension/script.js`.
+2. `standalone-template.html` wordt automatisch gegenereerd via `build-standalone.sh`.
+3. `pack.sh` roept deze stap automatisch aan, zodat release ZIP en standalone altijd op 1 lijn blijven.
+
 ### Lokaal Testen
 Wil je aan de code sleutelen zonder dat het meteen in de Store belandt?
 1. Check de code uit via Git.

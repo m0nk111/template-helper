@@ -14,6 +14,9 @@ ZIP_PATH="${DEPLOY_DIR}/${ZIP_NAME}"
 
 echo "📦 Packing Delta Vraag en Antwoord Template Helper (${GIT_COMMIT})..."
 
+# Houd standalone-template.html altijd in sync met de extension bronbestanden.
+./build-standalone.sh
+
 # Gooi oude zips weg zodat we niet oneindig veel zips opsparen
 rm -f ${DEPLOY_DIR}/template-helper-*.zip
 
