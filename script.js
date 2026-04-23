@@ -54,11 +54,11 @@ function buildMessageHTML() {
     const u = document.getElementById('uitkomst').value.trim().replace(/\n/g, '<br>');
 
     // Build the final text layout. If a box is empty, it puts '...' instead.
-    return `<div>• Wachtrij: ${w || '…'}</div>` +
-           `<div>• Klantnummer: ${k || '…'}</div>` +
-           `<div>• Klantvraag: ${v || '…'}</div>` +
-           `<div>• Waar loop je vast: ${l || '…'}</div>` +
-           `<div>• Gewenste uitkomst: ${u || '…'}</div>`;
+    return `<div><b>• Wachtrij:</b> ${w || '…'}</div>` +
+           `<div><b>• Klantnummer:</b> ${k || '…'}</div>` +
+           `<div><b>• Klantvraag:</b> ${v || '…'}</div>` +
+           `<div><b>• Waar loop je vast:</b> ${l || '…'}</div>` +
+           `<div><b>• Gewenste uitkomst:</b> ${u || '…'}</div>`;
   } else {
     // Grab text from the Answer boxes
     const a = document.getElementById('antwoord').innerHTML.trim();
@@ -66,9 +66,9 @@ function buildMessageHTML() {
     const v = document.getElementById('vervolgstap').value.trim().replace(/\n/g, '<br>');
     
     // The Answer template is a bit smarter: it only shows 'Bron' (Source) and 'Vervolgstap' if you actually typed something in them.
-    let msg = `<div>• Antwoord: ${a || '…'}</div>`;
-    if (b) msg += `<div>• Bron: ${b}</div>`;
-    if (v) msg += `<div>• Vervolgstap: ${v}</div>`;
+    let msg = `<div><b>• Antwoord:</b> ${a || '…'}</div>`;
+    if (b) msg += `<div><b>• Bron:</b> ${b}</div>`;
+    if (v) msg += `<div><b>• Vervolgstap:</b> ${v}</div>`;
     return msg;
   }
 }
