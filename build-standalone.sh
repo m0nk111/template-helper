@@ -10,7 +10,9 @@ from pathlib import Path
 
 template_path = Path("extension/template.html")
 script_path = Path("extension/script.js")
-output_path = Path("standalone-template.html")
+
+Path("release").mkdir(exist_ok=True)
+output_path = Path("release/standalone-template.html")
 marker = '<script src="script.js"></script>'
 
 template = template_path.read_text(encoding="utf-8")
