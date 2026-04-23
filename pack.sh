@@ -5,12 +5,12 @@ cd "$(dirname "$0")"
 # Gebruik de Git commit hash (short) in plaats van versie
 GIT_COMMIT=$(git rev-parse --short HEAD 2>/dev/null || echo "init")
 
-# Map voor de deployments
-DEPLOY_DIR="ext-deploy"
-mkdir -p "$DEPLOY_DIR"
+# Map voor release artifacts
+RELEASE_DIR="release"
+mkdir -p "$RELEASE_DIR"
 
 ZIP_NAME="template-helper-${GIT_COMMIT}"
-ZIP_PATH="${DEPLOY_DIR}/${ZIP_NAME}"
+ZIP_PATH="${RELEASE_DIR}/${ZIP_NAME}"
 
 echo "📦 Packing Delta Vraag en Antwoord Template Helper (${GIT_COMMIT})..."
 
@@ -18,7 +18,7 @@ echo "📦 Packing Delta Vraag en Antwoord Template Helper (${GIT_COMMIT})..."
 ./build-standalone.sh
 
 # Gooi oude zips weg zodat we niet oneindig veel zips opsparen
-rm -f ${DEPLOY_DIR}/template-helper-*.zip
+rm -f ${RELEASE_DIR}/template-helper-*.zip
 
 # Create a temporary build directory
 mkdir -p build_extension

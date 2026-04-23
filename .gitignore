@@ -1,2 +1,2 @@
 *.zip
-!ext-deploy/*.zip
+!release/*.zip

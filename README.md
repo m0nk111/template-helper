@@ -51,6 +51,7 @@ Om dubbel werk en versie-drift te voorkomen:
 1. Pas alleen bestanden aan in `extension/template.html` en `extension/script.js`.
 2. `standalone-template.html` wordt automatisch gegenereerd via `build-standalone.sh`.
 3. `pack.sh` roept deze stap automatisch aan, zodat release ZIP en standalone altijd op 1 lijn blijven.
+4. Build artifacts (ZIP) komen in de map `release/` in plaats van `ext-deploy/`.
 
 ### Lokaal Testen
 Wil je aan de code sleutelen zonder dat het meteen in de Store belandt?
