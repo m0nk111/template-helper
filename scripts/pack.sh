@@ -1,6 +1,6 @@
 #!/bin/bash
 
-cd "$(dirname "$0")"
+cd "$(dirname "$0")/.."
 
 # Gebruik de Git commit hash (short) in plaats van versie
 GIT_COMMIT=$(git rev-parse --short HEAD 2>/dev/null || echo "init")
@@ -15,7 +15,7 @@ ZIP_PATH="${RELEASE_DIR}/${ZIP_NAME}"
 echo "📦 Packing Delta Vraag en Antwoord Template Helper (${GIT_COMMIT})..."
 
 # Houd standalone-template.html altijd in sync met de extension bronbestanden.
-./build-standalone.sh
+./scripts/build-standalone.sh
 
 # Gooi oude zips weg zodat we niet oneindig veel zips opsparen
 rm -f ${RELEASE_DIR}/template-helper-*.zip

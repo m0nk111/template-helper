@@ -13,8 +13,8 @@ jobs:
 
       - name: Build Extension
         run: |
-          chmod +x ./pack.sh
-          ./pack.sh
+          chmod +x ./scripts/pack.sh
+          ./scripts/pack.sh
 
       - name: Upload to Chrome Web Store
         uses: mnao305/chrome-extension-upload@v5.0.0
