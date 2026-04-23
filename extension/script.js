@@ -223,6 +223,30 @@ function toggleTheme() {
 // Hook the theme toggle function to the button
 document.getElementById('themeBtn').addEventListener('click', toggleTheme);
 
+function resolveTemplateVersion() {
+  try {
+    if (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.getManifest) {
+      const manifest = chrome.runtime.getManifest();
+      if (manifest && manifest.version) return manifest.version;
+    }
+  } catch {
+    // Ignore and fallback to meta value.
+  }
+
+  const metaVersion = document.querySelector('meta[name="template-version"]');
+  if (metaVersion && metaVersion.content) {
+    return metaVersion.content;
+  }
+
+  return 'dev';
+}
+
+function renderTemplateVersion() {
+  const versionEl = document.getElementById('templateVersion');
+  if (!versionEl) return;
+  versionEl.textContent = `v${resolveTemplateVersion()}`;
+}
+
 // When loading, check if they previously chose light mode, and if so, apply it immediately
 if (localStorage.getItem('vraag-tmpl-theme') === 'light') {
   document.body.classList.add('light-mode');
@@ -242,6 +266,7 @@ for (const key of fillableFields) {
 }
 
 // 5. Connect all the main UI buttons to their respective logic functions
+renderTemplateVersion();
 updatePreview();
 document.getElementById("switchBtn").addEventListener("click", toggleTemplate);
 document.getElementById("btn-copy").addEventListener("click", copyToClipboard);
