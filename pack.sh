@@ -20,8 +20,6 @@ rm -f ${DEPLOY_DIR}/template-helper-*.zip
 # Create a temporary build directory
 mkdir -p build_extension
 cp -R extension/* build_extension/
-# Copy the template files into the extension so they are packaged inside it
-cp template.html script.js build_extension/
 
 # Bepaal de versie via git tags (bijv v1.0.2 -> 1.0.2). Als er geen tag is, gebruik "1.0.0".
 if [ -n "$GITHUB_REF_NAME" ] && [[ "$GITHUB_REF_NAME" == v* ]]; then
