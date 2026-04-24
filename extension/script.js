@@ -121,7 +121,7 @@ async function copyToClipboard() {
   if (!validate()) {
     const errorToast = document.getElementById('toast-error');
     errorToast.classList.add('show');
-    setTimeout(() => errorToast.classList.remove('show'), 3000);
+    setTimeout(() => errorToast.classList.remove('show'), 10000);
     return;
   }
 
@@ -156,10 +156,10 @@ async function copyToClipboard() {
     document.body.removeChild(buffer); // Clean up the invisible box
   }
 
-  // Show the little pop-up message saying "Copied!" (Gekopieerd!) for 2 seconds
+  // Show the little pop-up message saying "Copied!" (Gekopieerd!) for 10 seconds
   const toast = document.getElementById('toast');
   toast.classList.add('show');
-  setTimeout(() => toast.classList.remove('show'), 2000);
+  setTimeout(() => toast.classList.remove('show'), 10000);
 }
 
 /**
