@@ -1,5 +1,8 @@
 # Changelog
 
+## [2.1.8] - 2026-04-24
+- Toegevoegd: Duidelijke waarschuwing / tip in de instellingen dat je altijd `Ctrl+V` moet gebruiken bij het plakken in Teams om afbeeldingen en opmaak te behouden.
+
 ## [2.1.7] - 2026-04-24
 - Bugfix: Prevent copying white background to clipboard in Light Mode by stripping inline styles.
 
