@@ -1,8 +1,7 @@
-name: Deploy to Chrome Web Store
+name: Deploy to Chrome Web Store (Manual)
 
 on:
-  release:
-    types: [published] # Triggert alleen als je een Release aanmaakt op GitHub
+  workflow_dispatch: # Temporarily manual while the package is still rejected
 
 jobs:
   deploy:

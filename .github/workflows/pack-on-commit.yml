@@ -1,0 +1,25 @@
+name: Build ZIP on Commit
+
+on:
+  push:
+
+jobs:
+  pack:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build extension package
+        run: |
+          chmod +x ./scripts/pack.sh
+          ./scripts/pack.sh
+
+      - name: Upload packaged artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: template-helper-release-${{ github.sha }}
+          path: |
+            release/*.zip
+            release/standalone-template.html
+          if-no-files-found: error
