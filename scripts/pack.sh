@@ -24,16 +24,10 @@ rm -f ${RELEASE_DIR}/template-helper-*.zip
 mkdir -p build_extension
 cp -R extension/* build_extension/
 
-# Bepaal de versie via git tags (bijv v1.0.2 -> 1.0.2). Als er geen tag is, gebruik "1.0.0".
-if [ -n "$GITHUB_REF_NAME" ] && [[ "$GITHUB_REF_NAME" == v* ]]; then
-    GIT_TAG="$GITHUB_REF_NAME"
-else
-    GIT_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v1.0.0")
-fi
-VERSION="${GIT_TAG#v}"
+# Lees altijd de versie direct uit het manifest, zodat lokale aanpassingen bewaard blijven
+VERSION=$(python3 -c "import json; print(json.load(open('extension/manifest.json', encoding='utf-8')).get('version', '1.0.0'))")
 
-echo "🔧 Injecting version ${VERSION} into manifest.json..."
-sed -i -E 's/"version": ".*"/"version": "'"${VERSION}"'"/' build_extension/manifest.json
+echo "🔧 Using version ${VERSION} from manifest.json..."
 
 # Pack the build directory
 python3 -c "import shutil; shutil.make_archive('${ZIP_PATH}', 'zip', 'build_extension')"
