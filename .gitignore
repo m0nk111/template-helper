@@ -1,3 +1,4 @@
 *.zip
 !release/*.zip
 standalone-template.html
+!release/standalone-template.html
