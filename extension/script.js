@@ -49,16 +49,16 @@ function buildMessageHTML() {
     // The 'replace(/\n/g, '<br>')' turns your "Enter/Return" line breaks into actual HTML line breaks.
     const w = document.getElementById('wachtrij').value;
     const k = document.getElementById('klantnummer').value.trim();
-    const v = document.getElementById('klantvraag').value.trim().replace(/\n/g, '<br>');
-    const l = document.getElementById('vastloper').value.trim().replace(/\n/g, '<br>');
-    const u = document.getElementById('uitkomst').value.trim().replace(/\n/g, '<br>');
+    const v = document.getElementById('klantvraag').innerHTML.trim();
+    const l = document.getElementById('vastloper').innerHTML.trim();
+    const u = document.getElementById('uitkomst').innerHTML.trim();
 
     // Build the final text layout. If a box is empty, it puts '...' instead.
-    return `<div><b>• Wachtrij:</b> ${w || '…'}</div>` +
-           `<div><b>• Klantnummer:</b> ${k || '…'}</div>` +
-           `<div><b>• Klantvraag:</b> ${v || '…'}</div>` +
-           `<div><b>• Waar loop je vast:</b> ${l || '…'}</div>` +
-           `<div><b>• Gewenste uitkomst:</b> ${u || '…'}</div>`;
+    return `<div><b>• Wachtrij:</b><br><br>${w || '…'}</div><br>` +
+           `<div><b>• Klantnummer:</b><br><br>${k || '…'}</div><br>` +
+           `<div><b>• Klantvraag:</b><br><br>${v || '…'}</div><br>` +
+           `<div><b>• Waar loop je vast:</b><br><br>${l || '…'}</div><br>` +
+           `<div><b>• Gewenste uitkomst:</b><br><br>${u || '…'}</div>`;
   } else {
     // Grab text from the Answer boxes
     const a = document.getElementById('antwoord').innerHTML.trim();
@@ -66,9 +66,9 @@ function buildMessageHTML() {
     const v = document.getElementById('vervolgstap').value.trim().replace(/\n/g, '<br>');
     
     // The Answer template is a bit smarter: it only shows 'Bron' (Source) and 'Vervolgstap' if you actually typed something in them.
-    let msg = `<div><b>• Antwoord:</b> ${a || '…'}</div>`;
-    if (b) msg += `<div><b>• Bron:</b> ${b}</div>`;
-    if (v) msg += `<div><b>• Vervolgstap:</b> ${v}</div>`;
+    let msg = `<div><b>• Antwoord:</b><br><br>${a || '…'}</div>`;
+    if (b) msg += `<br><div><b>• Bron:</b><br><br>${b}</div>`;
+    if (v) msg += `<br><div><b>• Vervolgstap:</b><br><br>${v}</div>`;
     return msg;
   }
 }
@@ -179,17 +179,19 @@ function clearForm() {
  * If a user copies text from a website that has crazy colors and huge fonts, 
  * this forces it to paste as normal, flat text. BUT it still allows pasting screenshots/images!
  */
-document.getElementById('antwoord').addEventListener('paste', function(e) {
-  const clipboardData = e.clipboardData || window.clipboardData;
-  if (!clipboardData) return;
-  
-  // Check if they pasted an image file. If yes, let it pass normally.
-  if (clipboardData.files && clipboardData.files.length > 0) return; 
-  
-  // Otherwise, block the paste, grab only the plain text version, and insert that instead.
-  e.preventDefault();
-  const text = clipboardData.getData('text/plain');
-  document.execCommand('insertText', false, text);
+document.querySelectorAll('div[contenteditable="true"]').forEach(el => {
+  el.addEventListener('paste', function(e) {
+    const clipboardData = e.clipboardData || window.clipboardData;
+    if (!clipboardData) return;
+    
+    // Check if they pasted an image file. If yes, let it pass normally.
+    if (clipboardData.files && clipboardData.files.length > 0) return; 
+    
+    // Otherwise, block the paste, grab only the plain text version, and insert that instead.
+    e.preventDefault();
+    const text = clipboardData.getData('text/plain');
+    document.execCommand('insertText', false, text);
+  });
 });
 
 /**
@@ -261,7 +263,10 @@ const fillableFields = ['wachtrij', 'klantnummer', 'klantvraag', 'vastloper', 'u
 for (const key of fillableFields) {
   if (urlParams.has(key)) {
     const el = document.getElementById(key);
-    if (el) el.value = decodeURIComponent(urlParams.get(key));
+    if (el) {
+      if (el.tagName === 'DIV') el.innerHTML = decodeURIComponent(urlParams.get(key));
+      else el.value = decodeURIComponent(urlParams.get(key));
+    }
   }
 }
 
