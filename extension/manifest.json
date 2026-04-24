@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Delta Vraag en Antwoord Template Helper",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "Haalt met één klik gegevens uit het CRS en opent de Moderator Vraag & Antwoord Template.",
   "action": {
     "default_title": "Open Vraag Template",
