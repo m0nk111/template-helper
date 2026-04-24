@@ -3,6 +3,9 @@ name: Deploy to Chrome Web Store (Manual)
 on:
   workflow_dispatch: # Temporarily manual while the package is still rejected
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
