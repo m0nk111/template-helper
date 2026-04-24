@@ -18,3 +18,7 @@ Heb je een probleem ontdekt? Het makkelijkste is om hier op GitHub even een issu
 
 ---
 *Deze tool is gebouwd in samenwerking met Mark B. (m0nk111) en Davey G. (windhoos).*
+
+## Git Workflow
+Om co-auteur credits te geven aan Davey (windhoos), voeg je de volgende regel toe aan het einde van relevante commit berichten (met minimaal 1 witregel boven deze tag!):
+`Co-authored-by: windhoos <99618360+windhoos@users.noreply.github.com>`
