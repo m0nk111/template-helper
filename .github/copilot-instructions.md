@@ -1,0 +1,14 @@
+# Template Helper - Project Rules
+
+## Release Notes
+ALWAYS include the installation instructions in the GitHub release notes.
+Use the exact formatting from previous releases:
+
+### Installatie Instructies
+1. Download het `.zip` bestand en pak het uit
+2. Ga in Chrome naar `chrome://extensions/`
+3. Zet rechtsboven de slider op Developer mode (Ontwikkelaarsmodus) aan
+4. Klik op Load unpacked (Uitgepakte extensie laden)
+5. Selecteer de uitgepakte map
+
+Of download `standalone-template.html` en open dit direct in je browser.
