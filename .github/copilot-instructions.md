@@ -13,5 +13,8 @@ Use the exact formatting from previous releases:
 
 Of download `standalone-template.html` en open dit direct in je browser.
 
+### Probleem ontdekt?
+Heb je een probleem ontdekt? Het makkelijkste is om hier op GitHub even een issue aan te maken. Op die manier kunnen we het probleem gestructureerd onderzoeken en oplossen!
+
 ---
 *Deze tool is gebouwd in samenwerking met Mark B. (m0nk111) en Davey G. (windhoos).*
