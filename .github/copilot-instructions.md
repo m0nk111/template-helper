@@ -1,7 +1,7 @@
 # Template Helper - Project Rules
 
 ## Release Notes
-ALWAYS include the installation instructions in the GitHub release notes.
+ALWAYS include the installation instructions and the credits footer in the GitHub release notes.
 Use the exact formatting from previous releases:
 
 ### Installatie Instructies
@@ -12,3 +12,6 @@ Use the exact formatting from previous releases:
 5. Selecteer de uitgepakte map
 
 Of download `standalone-template.html` en open dit direct in je browser.
+
+---
+*Deze tool is gebouwd in samenwerking met Mark B. (m0nk111) en Davey G. (windhoos).*
