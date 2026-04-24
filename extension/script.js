@@ -119,7 +119,9 @@ function validate() {
 async function copyToClipboard() {
   // Stop immediately if mandatory boxes are empty
   if (!validate()) {
-    alert("Let op: je hebt nog niet alle verplichte velden ingevuld!");
+    const errorToast = document.getElementById('toast-error');
+    errorToast.classList.add('show');
+    setTimeout(() => errorToast.classList.remove('show'), 3000);
     return;
   }
 
