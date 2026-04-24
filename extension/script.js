@@ -44,14 +44,20 @@ function toggleTemplate() {
  * This grabs whatever you typed in the boxes and turns it into a nice, formatted dot-point list.
  */
 function buildMessageHTML() {
+  // Helper to grab text AND strip sneaky inline styles (like white backgrounds from Light Mode)
+  const getCleanHTML = (id) => {
+    let html = document.getElementById(id).innerHTML || '';
+    return html.replace(/\s+style=(['"]).*?\1/gi, '').trim();
+  };
+
   if (activeTmpl === 'vraag') {
     // Grab text from the Question boxes. The 'trim()' removes invisible spaces at the start/end.
     // The 'replace(/\n/g, '<br>')' turns your "Enter/Return" line breaks into actual HTML line breaks.
     const w = document.getElementById('wachtrij').value;
     const k = document.getElementById('klantnummer').value.trim();
-    const v = document.getElementById('klantvraag').innerHTML.trim();
-    const l = document.getElementById('vastloper').innerHTML.trim();
-    const u = document.getElementById('uitkomst').innerHTML.trim();
+    const v = getCleanHTML('klantvraag');
+    const l = getCleanHTML('vastloper');
+    const u = getCleanHTML('uitkomst');
 
     // Build the final text layout. If a box is empty, it puts '...' instead.
     return `<b>• wachtrij:</b><br>${w || '…'}<br><br>` +
@@ -61,7 +67,7 @@ function buildMessageHTML() {
            `<b>• gewenste uitkomst:</b><br>${u || '…'}`;
   } else {
     // Grab text from the Answer boxes
-    const a = document.getElementById('antwoord').innerHTML.trim();
+    const a = getCleanHTML('antwoord');
     const b = document.getElementById('bron').value.trim();
     const v = document.getElementById('vervolgstap').value.trim().replace(/\n/g, '<br>');
     
@@ -141,9 +147,8 @@ async function copyToClipboard() {
     buffer.innerHTML = htmlMsg;
     buffer.style.position = 'fixed';
     buffer.style.opacity = '0'; // Hide it from the screen
-    document.body.appendChild(buffer);
-    
-    // Select the hidden text and press "Copy" via code
+      buffer.style.background = 'transparent'; // Prevent copying body background
+      buffer.style.color = 'inherit'; // Prevent copying body text color
     const sel = window.getSelection();
     sel.removeAllRanges();
     const range = document.createRange();

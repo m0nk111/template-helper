@@ -1,5 +1,8 @@
 # Changelog
 
+## [2.1.7] - 2026-04-24
+- Bugfix: Prevent copying white background to clipboard in Light Mode by stripping inline styles.
+
 ## [2.1.6] - 2026-04-24
 - Fixed double blank lines appearing below values when copy-pasting to Teams by removing `div` wrappers.
 
