@@ -1,6 +1,6 @@
 ### Changelog v2.1.10
 - **Afbeeldingen Plakken Uitgebreid:** Vanaf nu zijn de invoervelden **Bron** en **Vervolgstap** op de achtergrond slim omgezet in `Rich Text Contenteditable` blokken. Dit betekent dat je, net zoals in de *Klantvraag* of *Antwoord* opties, nu gewoon een screenshot in deze velden kunt CMD+V / CTRL+V / Droppen! De uitleg-teksten ("Wat verwacht je nu..." / "Uit welk systeem..") zijn netjes abstracter gehouden op verzoek.
-- **Experimental Docking:** De ingebouwde CRS-zijbalk heeft nu experimentele knoppen om het template links, rechts of onderaan te docken. Met de `↗` knop open je dezelfde ingevulde template los in een apart browservenster.
+- **Experimental Docking ZIP:** Er is nu een aparte download `template-helper-experimental-docking-v2.1.10.zip`. Alleen deze experimental build heeft knoppen om het template links, rechts of onderaan te docken. Met de `↗` knop open je dezelfde ingevulde template los in een apart browservenster. De normale `template-helper-v2.1.10.zip` blijft de standaard rechter zijbalk gebruiken.
 - **Release Artifact Cleanup:** De oude `standalone-template.html` zonder versienummer is verwijderd. Releases gebruiken nu alleen nog versie-bestanden zoals `standalone-template-v2.1.10.html`.
 
 ### Installatie Instructies
