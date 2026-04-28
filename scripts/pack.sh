@@ -11,8 +11,6 @@ mkdir -p "$RELEASE_DIR"
 
 ZIP_NAME="template-helper-v${VERSION}"
 ZIP_PATH="${RELEASE_DIR}/${ZIP_NAME}"
-EXPERIMENTAL_ZIP_NAME="template-helper-experimental-docking-v${VERSION}"
-EXPERIMENTAL_ZIP_PATH="${RELEASE_DIR}/${EXPERIMENTAL_ZIP_NAME}"
 
 echo "📦 Packing Delta Vraag en Antwoord Template Helper (v${VERSION})..."
 
@@ -37,15 +35,4 @@ python3 -c "import shutil; shutil.make_archive('${ZIP_PATH}', 'zip', 'build_exte
 # Clean up
 rm -rf build_extension
 
-echo "🧪 Building experimental docking ZIP..."
-
-mkdir -p build_extension_experimental
-cp -R extension/* build_extension_experimental/
-cp experimental/docking/inject.js build_extension_experimental/inject.js
-
-python3 -c "import shutil; shutil.make_archive('${EXPERIMENTAL_ZIP_PATH}', 'zip', 'build_extension_experimental')"
-
-rm -rf build_extension_experimental
-
 echo "✅ Klaar! Extensie ingepakt in: ${ZIP_PATH}.zip"
-echo "🧪 Experimental docking build: ${EXPERIMENTAL_ZIP_PATH}.zip"

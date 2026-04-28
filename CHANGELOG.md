@@ -1,8 +1,10 @@
 # Changelog
 
-## [Unreleased]
-- **Experimental:** Added a separate experimental docking ZIP where the injected CRS sidebar header can be dragged to dock left, right, or at the bottom without changing the normal ZIP behavior.
-- **Build:** Removed the legacy unversioned standalone release artifact and made the release folder version-only for standalone HTML output.
+## [3.0.0] - 2026-04-28
+- **Major:** Promoted sidebar docking to the default extension behavior. Drag the blue sidebar header to dock the template left, right, top, or bottom.
+- **Added:** Top docking support, including matching open/close tab placement and remembered dock position.
+- **Changed:** Removed the separate experimental docking ZIP. The normal release ZIP now contains the docking behavior.
+- **Build:** Removed the legacy unversioned standalone release artifact and kept the release folder version-only for standalone HTML output.
 
 ## [2.1.10] - 2026-04-28
 - **Functionaliteit Mijlpaal:** Het kopiëren van screenshots / afbeeldingen is voortaan niet meer gelimiteerd aan de velden `Klantvraag`, `Vastloper`, `Uitkomst` en `Antwoord`. Vanaf nu zijn de invoervelden **Bron** en **Vervolgstap** óók omgezet naar zogenaamde contenteditable 'Rich Text' vakken! 
