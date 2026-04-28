@@ -11,7 +11,7 @@ Use the exact formatting from previous releases:
 4. Klik op Load unpacked (Uitgepakte extensie laden)
 5. Selecteer de uitgepakte map
 
-Of download `standalone-template.html` en open dit direct in je browser.
+Of download `standalone-template-v[versie].html` en open dit direct in je browser.
 
 ### Probleem ontdekt?
 Heb je een probleem ontdekt? Het makkelijkste is om hier op GitHub even een issue aan te maken. Op die manier kunnen we het probleem gestructureerd onderzoeken en oplossen!

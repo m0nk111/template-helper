@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="template-version" content="2.1.9">
+  <title>Delta Vraag en Antwoord Template Helper</title>
+  <style>
+    :root {
+      --bg: #0b111a;
+      --surface: #101826;
+      --card: #18243a;
+      --border: #233454;
+      --accent: #0078d4;
+      --accent-dim: #005a9e;
+      --green: #107c10;
+      --red: #d13438;
+      --text: #ffffff;
+      --text-dim: #a1b0cb;
+      --radius: 8px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      padding: 24px 16px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 560px;
+      position: relative;
+    }
+
+    .header-container {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 4px;
+    }
+
+    .brand-logo {
+      height: 28px;
+    }
+
+    h1 {
+      font-size: 20px;
+      font-weight: 600;
+      color: var(--accent);
+    }
+
+    .subtitle {
+      font-size: 13px;
+      color: var(--text-dim);
+      margin-bottom: 24px;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-dim);
+      margin-bottom: 6px;
+      text-transform: none;
+      letter-spacing: 0.5px;
+    }
+
+    label .required {
+      color: var(--red);
+      margin-left: 2px;
+    }
+
+    input, textarea, select {
+      width: 100%;
+      padding: 10px 12px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      color: var(--text);
+      font-size: 14px;
+      font-family: inherit;
+      transition: border-color 0.2s;
+    }
+
+    input:focus, textarea:focus, select:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 72px;
+    }
+
+    select {
+      cursor: pointer;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%238892a4' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      padding-right: 32px;
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    button {
+      flex: 1;
+      padding: 12px 16px;
+      border: none;
+      border-radius: var(--radius);
+      font-size: 14px;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.1s;
+    }
+
+    button:active { transform: scale(0.98); }
+
+    .btn-copy {
+      background: var(--accent);
+      color: #000;
+    }
+
+    .btn-copy:hover { opacity: 0.9; }
+
+    .btn-clear {
+      background: var(--card);
+      color: var(--text-dim);
+      border: 1px solid var(--border);
+      flex: 0.4;
+    }
+
+    .btn-clear:hover { border-color: var(--text-dim); }
+
+    .preview {
+      margin-top: 24px;
+      padding: 16px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      white-space: pre-wrap;
+      font-size: 13px;
+      line-height: 1.6;
+      color: var(--text);
+      min-height: 60px;
+    }
+
+    .preview img {
+      max-width: 100%;
+      height: auto;
+      display: block;
+      margin: 8px 0;
+    }
+
+    .preview-label {
+      font-size: 12px;
+      color: var(--text-dim);
+      font-weight: 600;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: var(--green);
+      color: #000;
+      padding: 10px 24px;
+      border-radius: var(--radius);
+      font-size: 14px;
+      font-weight: 600;
+      opacity: 0;
+      transition: all 0.3s ease;
+      pointer-events: none;
+      z-index: 100;
+      text-align: center;
+    }
+
+    .toast-error {
+      background: var(--red);
+      color: #fff;
+    }
+
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+
+    .rules {
+      margin-top: 32px;
+      padding: 16px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      font-size: 12px;
+      color: var(--text-dim);
+      line-height: 1.7;
+    }
+
+    .rules summary {
+      cursor: pointer;
+      font-weight: 600;
+      color: var(--text);
+      font-size: 13px;
+    }
+
+    .rules ul {
+      margin: 8px 0 0 20px;
+    }
+
+
+    .error {
+      border-color: var(--red) !important;
+    }
+
+    .top-actions {
+      position: absolute;
+      top: 18px;
+      right: 18px;
+      display: flex;
+      gap: 16px;
+    }
+    .btn-switch {
+      background: transparent;
+      color: var(--text);
+      border: none;
+      padding: 0;
+      cursor: pointer;
+      font-size: 12px;
+      transition: all 0.2s;
+      opacity: 0.5;
+    }
+    .btn-switch:hover { opacity: 1; transform: scale(1.1); }
+
+    body.light-mode {
+      --bg: #f2f4f7;
+      --surface: #ffffff;
+      --card: #e5e9f0;
+      --border: #d2d8e0;
+      --text: #12161c;
+      --text-dim: #334155;
+    }
+    body.light-mode .brand-logo {
+      filter: none !important;
+    }
+
+    .textarea-like {
+      display: block;
+      width: 100%;
+      min-height: 100px;
+      padding: 12px 16px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      color: var(--text);
+      font-size: 14px;
+      line-height: 1.6;
+      transition: all 0.2s;
+      overflow-y: auto;
+      resize: vertical;
+    }
+    .textarea-like:focus {
+      outline: none;
+      border-color: var(--accent);
+      background: var(--card);
+    }
+    .textarea-like:empty:before {
+      content: attr(data-placeholder);
+      color: var(--text-dim);
+      pointer-events: none;
+    }
+    .textarea-like img {
+      max-width: 100%;
+      max-height: 300px;
+      height: auto;
+      margin: 8px 0;
+      border-radius: 4px;
+      border: 1px solid var(--border);
+    }
+  </style>
+
+</head>
+<body>
+
+<div class="container">
+  <div class="header-container" style="justify-content: space-between;">
+    <div style="display: flex; align-items: center; gap: 16px;">
+      <img src="https://www.delta.nl/images/delta/logo-delta-blue.svg?v=20210414" alt="DELTA" class="brand-logo" style="filter: brightness(0) invert(1);">
+      <h1 id="pageTitle">Delta Vraag en Antwoord Template Helper</h1>
+    </div>
+    <div class="top-actions">
+      <button class="btn-switch" id="themeBtn"  title="Wissel Licht/Donker">☀️</button>
+      <button class="btn-switch" id="switchBtn" title="Delta Vraag en Antwoord Template Helper">🔄</button>
+    </div>
+  </div>
+  <p class="subtitle" style="margin-bottom: 24px;">Vul het formulier in en kopieer het bericht naar Teams.</p>
+
+  <!-- VRAAG TEMPLATE -->
+  <div id="tmpl-vraag">
+  <div class="form-group">
+    <label>wachtrij <span class="required">*</span></label>
+    <select id="wachtrij">
+      <option value="">— Kies wachtrij —</option>
+      <optgroup label="HD">
+        <option value="Internet en vaste Telefonie">Internet en vaste Telefonie</option>
+        <option value="Televisie en radio">Televisie en radio</option>
+        <option value="Overig Technisch">Overig Technisch</option>
+      </optgroup>
+      <optgroup label="SC">
+        <option value="Factuur en Betalen">Factuur en Betalen</option>
+        <option value="Wijzigen of opzeggen">Wijzigen of opzeggen</option>
+        <option value="Overige Service">Overige Service</option>
+        <option value="Mobiel">Mobiel</option>
+        <option value="Sales">Sales</option>
+        <option value="Prijswijziging">Prijswijziging</option>
+        <option value="Migratielijn">Migratielijn</option>
+      </optgroup>
+    </select>
+  </div>
+
+  <div class="form-group">
+    <label>klantnummer <span class="required">*</span></label>
+    <input type="text" id="klantnummer" placeholder="Bijv. 12345678" maxlength="20" autocomplete="off">
+  </div>
+
+  <div class="form-group">
+    <label>klantvraag <span class="required">*</span></label>
+    <div id="klantvraag" contenteditable="true" class="textarea-like" data-placeholder="Wat is de vraag van de klant? Je kunt hier ook een screenshot droppen."></div>
+  </div>
+
+  <div class="form-group">
+    <label>waar loop je vast <span class="required">*</span></label>
+    <div id="vastloper" contenteditable="true" class="textarea-like" data-placeholder="Beschrijf waar je vastzit..."></div>
+  </div>
+
+  <div class="form-group">
+    <label>gewenste uitkomst <span class="required">*</span></label>
+    <div id="uitkomst" contenteditable="true" class="textarea-like" data-placeholder="Wat wil je bereiken?"></div>
+  </div>
+  </div> <!-- end tmpl-vraag -->
+
+  <!-- ANTWOORD TEMPLATE -->
+  <div id="tmpl-antwoord" style="display: none;">
+    <div class="form-group">
+      <label>antwoord <span class="required">*</span></label>
+      <div id="antwoord" contenteditable="true" class="textarea-like" data-placeholder="Typ hier je inhoudelijke antwoord en/of screenshot..."></div>
+    </div>
+    <div class="form-group">
+      <label>bron</label>
+      <input type="text" id="bron" placeholder="Uit welk systeem komt de informatie?" autocomplete="off">
+    </div>
+    <div class="form-group">
+      <label>vervolgstap</label>
+      <textarea id="vervolgstap" placeholder="Wat verwacht je nu van de agent?" rows="2"></textarea>
+    </div>
+  </div>
+
+  <div class="actions">
+    <button class="btn-copy" id="btn-copy">📋 Kopieer naar klembord</button>
+    <button class="btn-clear" id="btn-clear">Wissen</button>
+  </div>
+
+  <div style="font-size: 12px; color: var(--text-dim); text-align: center; margin-top: 12px; font-style: italic;">
+    💡 <strong>Tip Teams:</strong> Gebruik altijd <strong>Ctrl+V</strong> bij het plakken. (De Rechtermuisknop -> "Plakken" filtert alle opmaak en screenshots weg!)
+  </div>
+
+  <div style="margin-top: 24px;">
+    <div class="preview-label">voorbeeld</div>
+    <div class="preview" id="preview"></div>
+  </div>
+
+  <details class="rules">
+    <summary>📌 Spelregels moderator chat</summary>
+    <ul>
+      <li>Gebruik altijd dit template.</li>
+      <li>Er wordt altijd met een citaat gereageerd.</li>
+      <li>Alleen een moderator reageert op een vraag.</li>
+      <li>Houd je vraag duidelijk en to-the-point.</li>
+      <li>Reageer als de moderator om extra informatie vraagt.</li>
+      <li>Geen discussies, social talk of privéberichten.</li>
+      <li>Verbeter anderen niet in de chat — signaleer bij je TM of senior.</li>
+    </ul>
+  </details>
+  <div style="font-size:10px; color:#bbbbbb; text-align:center; padding-top:15px; padding-bottom:5px; user-select:none; font-family:monospace; cursor:default;">built by Mark B. en Davey G. | versie: <span id="templateVersion">v-</span></div>
+</div>
+
+<div class="toast" id="toast">✅ Gekopieerd!<br><span style="font-size:11px;opacity:0.8;">(Gebruik Ctrl+V om te plakken in Teams)</span></div>
+<div class="toast toast-error" id="toast-error">⚠️ Let op: vul alle verplichte velden in!</div>
+
+<script>
+/**
+ * MAIN INTERFACE SCRIPT (script.js)
+ * 
+ * This file controls the visual "Template" you see on your screen.
+ * It manages what happens when you type, click buttons, or switch between the "Vraag" (Question) and "Antwoord" (Answer) tabs.
+ * 
+ * Think of it as the brain behind the text boxes.
+ */
+
+// Keeps track of which tab is currently open. It always starts on 'vraag' (Question).
+let activeTmpl = 'vraag';
+
+// These are the exact ID names of the text boxes on the screen for each tab
+const fieldsVraag = ['wachtrij', 'klantnummer', 'klantvraag', 'vastloper', 'uitkomst'];
+const fieldsAntwoord = ['antwoord', 'bron', 'vervolgstap'];
+
+/**
+ * TOGGLE TEMPLATE FUNCTION
+ * This function runs when you click the Switch button.
+ * It hides the "Question" text boxes and shows the "Answer" text boxes, and vice versa.
+ */
+function toggleTemplate() {
+  if (activeTmpl === 'vraag') {
+    // Switch to Answer mode
+    activeTmpl = 'antwoord';
+    document.getElementById('tmpl-vraag').style.display = 'none';      // Hide question fields
+    document.getElementById('tmpl-antwoord').style.display = 'block';  // Show answer fields
+    document.getElementById('pageTitle').textContent = 'Antwoord Template'; // Change title text
+    document.getElementById('switchBtn').title = 'Vraag Template';    // Change hover text of the button
+  } else {
+    // Switch back to Question mode
+    activeTmpl = 'vraag';
+    document.getElementById('tmpl-antwoord').style.display = 'none';
+    document.getElementById('tmpl-vraag').style.display = 'block';
+    document.getElementById('pageTitle').textContent = 'Vraag Template';
+    document.getElementById('switchBtn').title = 'Mod Antwoord Template';
+  }
+  // Whenever we switch, update the live preview window at the bottom of the screen
+  updatePreview();
+}
+
+/**
+ * BUILD MESSAGE HTML FUNCTION
+ * This grabs whatever you typed in the boxes and turns it into a nice, formatted dot-point list.
+ */
+function buildMessageHTML() {
+  // Helper to grab text AND strip sneaky inline styles (like white backgrounds from Light Mode)
+  const getCleanHTML = (id) => {
+    let html = document.getElementById(id).innerHTML || '';
+    return html.replace(/\s+style=(['"]).*?\1/gi, '').trim();
+  };
+
+  if (activeTmpl === 'vraag') {
+    // Grab text from the Question boxes. The 'trim()' removes invisible spaces at the start/end.
+    // The 'replace(/\n/g, '<br>')' turns your "Enter/Return" line breaks into actual HTML line breaks.
+    const w = document.getElementById('wachtrij').value;
+    const k = document.getElementById('klantnummer').value.trim();
+    const v = getCleanHTML('klantvraag');
+    const l = getCleanHTML('vastloper');
+    const u = getCleanHTML('uitkomst');
+
+    // Build the final text layout. If a box is empty, it puts '...' instead.
+    return `<b>• wachtrij:</b><br>${w || '…'}<br><br>` +
+           `<b>• klantnummer:</b><br>${k || '…'}<br><br>` +
+           `<b>• klantvraag:</b><br>${v || '…'}<br><br>` +
+           `<b>• waar loop je vast:</b><br>${l || '…'}<br><br>` +
+           `<b>• gewenste uitkomst:</b><br>${u || '…'}`;
+  } else {
+    // Grab text from the Answer boxes
+    const a = getCleanHTML('antwoord');
+    const b = document.getElementById('bron').value.trim();
+    const v = document.getElementById('vervolgstap').value.trim().replace(/\n/g, '<br>');
+    
+    // The Answer template is a bit smarter: it only shows 'Bron' (Source) and 'Vervolgstap' if you actually typed something in them.
+    let msg = `<b>• antwoord:</b><br>${a || '…'}`;
+    if (b) msg += `<br><br><b>• bron:</b><br>${b}`;
+    if (v) msg += `<br><br><b>• vervolgstap:</b><br>${v}`;
+    return msg;
+  }
+}
+
+/**
+ * UPDATE PREVIEW FUNCTION
+ * Pushes the formatted text we just built directly into the grey "Preview" box at the bottom.
+ */
+function updatePreview() {
+  document.getElementById('preview').innerHTML = buildMessageHTML();
+}
+
+/**
+ * VALIDATE FUNCTION
+ * Checks if you forgot to fill in any mandatory boxes before it allows you to copy the text.
+ */
+function validate() {
+  // Define which boxes are mandatory depending on the active tab
+  const required = activeTmpl === 'vraag' ? ['wachtrij', 'klantnummer', 'klantvraag', 'vastloper', 'uitkomst'] : ['antwoord'];
+  
+  let ok = true; // Assume everything is OK until we find an empty box
+  
+  for (const id of required) {
+    const el = document.getElementById(id);
+    let empty = false;
+    
+    // Check if the dropdown box is empty, or if text boxes are empty
+    if (el.tagName === 'SELECT') {
+      empty = !el.value;
+    } else if (el.tagName === 'DIV') {
+      empty = el.innerText.trim() === '' && !el.innerHTML.includes('<img'); // Allow images in the rich text box
+    } else {
+      empty = !el.value.trim();
+    }
+    
+    // If it's empty, paint the box with a red border (by adding the 'error' CSS class)
+    el.classList.toggle('error', empty);
+    if (empty) ok = false; // Mark the whole form as NOT ok
+  }
+  
+  return ok; // Returns true if everything is filled in, false if something is missing
+}
+
+/**
+ * COPY TO CLIPBOARD FUNCTION 
+ * The magic function that takes your typed text and securely copies it to your computer's clipboard.
+ */
+async function copyToClipboard() {
+  // Stop immediately if mandatory boxes are empty
+  if (!validate()) {
+    const errorToast = document.getElementById('toast-error');
+    errorToast.classList.add('show');
+    setTimeout(() => errorToast.classList.remove('show'), 10000);
+    return;
+  }
+
+  const htmlMsg = buildMessageHTML();
+  
+  try {
+    // Try the modern, secure way to copy text (this preserves nice formatting like bold/lists)
+    const clipboardItem = new ClipboardItem({
+      'text/html': new Blob([htmlMsg], { type: 'text/html' }),
+      'text/plain': new Blob([document.getElementById('preview').innerText], { type: 'text/plain' })
+    });
+    await navigator.clipboard.write([clipboardItem]);
+  } catch {
+    // Fallback: If the modern way fails (e.g. older browsers), use the invisible fake-box trick
+    const buffer = document.createElement('div');
+    buffer.contentEditable = true;
+    buffer.innerHTML = htmlMsg;
+    buffer.style.position = 'fixed';
+    buffer.style.opacity = '0'; // Hide it from the screen
+      buffer.style.background = 'transparent'; // Prevent copying body background
+      buffer.style.color = 'inherit'; // Prevent copying body text color
+      
+      document.body.appendChild(buffer); // Add the invisible box to the page so it can be selected
+
+    const sel = window.getSelection();
+    sel.removeAllRanges();
+    const range = document.createRange();
+    range.selectNodeContents(buffer);
+    sel.addRange(range);
+    
+    document.execCommand('copy'); // The actual copy command
+    
+    sel.removeAllRanges();
+    document.body.removeChild(buffer); // Clean up the invisible box
+  }
+
+  // Show the little pop-up message saying "Copied!" (Gekopieerd!) for 10 seconds
+  const toast = document.getElementById('toast');
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 10000);
+}
+
+/**
+ * CLEAR FORM FUNCTION 
+ * Empties all the boxes when you click the "Wissen" (Clear) button.
+ */
+function clearForm() {
+  // Combine all boxes from both tabs into one big list
+  const allFields = [...fieldsVraag, ...fieldsAntwoord];
+  
+  for (const id of allFields) {
+    const el = document.getElementById(id);
+    if (el.tagName === 'DIV') el.innerHTML = ''; // Clear rich text box
+    else el.value = ''; // Clear normal text boxes
+    el.classList.remove('error'); // Remove red warning borders just in case
+  }
+  updatePreview(); // Update the preview to show it's empty
+}
+
+/**
+ * PREVENT UGLY PASTE FORMATTING
+ * If a user copies text from a website that has crazy colors and huge fonts, 
+ * this forces it to paste as normal, flat text. BUT it still allows pasting screenshots/images!
+ */
+document.querySelectorAll('div[contenteditable="true"]').forEach(el => {
+  el.addEventListener('paste', function(e) {
+    const clipboardData = e.clipboardData || window.clipboardData;
+    if (!clipboardData) return;
+    
+    // Check if they pasted an image file. If yes, let it pass normally.
+    if (clipboardData.files && clipboardData.files.length > 0) return; 
+    
+    // Otherwise, block the paste, grab only the plain text version, and insert that instead.
+    e.preventDefault();
+    const text = clipboardData.getData('text/plain');
+    document.execCommand('insertText', false, text);
+  });
+});
+
+/**
+ * STARTUP INSTRUCTIONS (These run automatically when the tool opens)
+ */
+
+// 1. Make the preview box update instantly every time you press a key in ANY box
+const allFieldsInit = [...fieldsVraag, ...fieldsAntwoord];
+for (const id of allFieldsInit) {
+  document.getElementById(id).addEventListener('input', updatePreview);
+  document.getElementById(id).addEventListener('change', updatePreview);
+}
+
+// 2. Allow users to press "Ctrl + Enter" on their keyboard as a shortcut to Copy
+document.addEventListener('keydown', (e) => {
+  if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+    e.preventDefault();
+    copyToClipboard();
+  }
+});
+
+// 3. Setup the Light/Dark mode "Theme" toggle button (The Sun/Moon icon)
+function toggleTheme() {
+  document.body.classList.toggle('light-mode');
+  const isLight = document.body.classList.contains('light-mode');
+  document.getElementById('themeBtn').textContent = isLight ? '🌙' : '☀️';
+  // Save their choice in the browser memory so it remembers their preference next time
+  localStorage.setItem('vraag-tmpl-theme', isLight ? 'light' : 'dark');
+}
+
+// Hook the theme toggle function to the button
+document.getElementById('themeBtn').addEventListener('click', toggleTheme);
+
+function resolveTemplateVersion() {
+  try {
+    if (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.getManifest) {
+      const manifest = chrome.runtime.getManifest();
+      if (manifest && manifest.version) return manifest.version;
+    }
+  } catch {
+    // Ignore and fallback to meta value.
+  }
+
+  const metaVersion = document.querySelector('meta[name="template-version"]');
+  if (metaVersion && metaVersion.content) {
+    return metaVersion.content;
+  }
+
+  return 'dev';
+}
+
+function renderTemplateVersion() {
+  const versionEl = document.getElementById('templateVersion');
+  if (!versionEl) return;
+  versionEl.textContent = `v${resolveTemplateVersion()}`;
+}
+
+// When loading, check if they previously chose light mode, and if so, apply it immediately
+if (localStorage.getItem('vraag-tmpl-theme') === 'light') {
+  document.body.classList.add('light-mode');
+  document.getElementById('themeBtn').textContent = '🌙';
+}
+
+// 4. AUTO-FILL MAGIC (How the extension talks to this template window)
+// This reads the URL of the iframe (e.g. ?klantnummer=123&klantvraag=help) 
+// and auto-types those values into the correct boxes for you!
+const urlParams = new URLSearchParams(window.location.search);
+const fillableFields = ['wachtrij', 'klantnummer', 'klantvraag', 'vastloper', 'uitkomst'];
+for (const key of fillableFields) {
+  if (urlParams.has(key)) {
+    const el = document.getElementById(key);
+    if (el) {
+      if (el.tagName === 'DIV') el.innerHTML = decodeURIComponent(urlParams.get(key));
+      else el.value = decodeURIComponent(urlParams.get(key));
+    }
+  }
+}
+
+// 5. Connect all the main UI buttons to their respective logic functions
+renderTemplateVersion();
+updatePreview();
+document.getElementById("switchBtn").addEventListener("click", toggleTemplate);
+document.getElementById("btn-copy").addEventListener("click", copyToClipboard);
+document.getElementById("btn-clear").addEventListener("click", clearForm);
+
+
+/**
+ * ============================================================================
+ * "DUMB AI" - OFFLINE TEXT BEAUTIFIER & MACRO SYSTEM
+ * This operates 100% inside your local browser. It never sends data to the internet.
+ * ============================================================================
+ */
+
+/**
+ * TEXT BEAUTIFIER
+ * Automatically cleans up sloppy typing when you click outside a text box.
+ */
+function applyLocalTextBeautifier(e) {
+  let el = e.target;
+  let val = el.value;
+  if (!val) return;
+
+  // 1. Removes accidental double or triple spaces
+  val = val.replace(/  +/g, ' ');
+
+  // 2. Fixes angry ALL CAPS text. (If someone types more than 10 letters and 60% are capital letters, it forces it all to lowercase)
+  const letters = val.replace(/[^a-zA-Z]/g, '');
+  const upperCases = val.replace(/[^A-Z]/g, '');
+  if (letters.length > 10 && (upperCases.length / letters.length) > 0.6) {
+     val = val.toLowerCase();
+  }
+
+  // 3. Scans for periods or exclamation marks, and makes sure the next letter starts with a Capital
+  val = val.replace(/(^\s*|[.!?]\s+)([a-z])/g, function(match) {
+      return match.toUpperCase();
+  });
+
+  // If we changed anything, shove the cleaned text back into the box
+  if (el.value !== val) {
+    el.value = val;
+    updatePreview();
+  }
+}
+
+// Bind Text Beautifier to the big text boxes only
+const textFieldsToWatch = ['klantvraag', 'vastloper', 'uitkomst', 'vervolgstap'];
+for (const id of textFieldsToWatch) {
+  document.getElementById(id).addEventListener('blur', applyLocalTextBeautifier);
+}
+
+</script>
+
+</body>
+</html>

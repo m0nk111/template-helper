@@ -17,7 +17,7 @@ Zodra je in ons systeem (CRS) aan het werk bent, injecteert deze tool volautomat
 
 #### 📄 Optie 2: Standalone HTML Pagina
 Heb je geen mogelijkheid om Chrome extensies te installeren of heb je de zijbalk overlay niet per sé nodig? Er is ook een "Standalone Formaat". 
-1. Download via **[GitHub Releases pagina](https://github.com/m0nk111/template-helper/releases/latest)** de `standalone-template.html` file (staat in de `release/` map).
+1. Download via **[GitHub Releases pagina](https://github.com/m0nk111/template-helper/releases/latest)** de `standalone-template.html` file (staat als `standalone-template-v[versie].html` in de release).
 2. Open dit bestand in willekeurig welke webbrowser. Je hebt dan meteen alle invulvelden, de tekstopmaak (bolding), kopieer knop e.d.
 
 #### 🌐 Optie 3: Chrome Web Store
@@ -49,9 +49,9 @@ Deze extensie wordt volautomatisch gebouwd en uitgerold via **GitHub Actions**. 
 ### Single Source Of Truth (belangrijk)
 Om dubbel werk en versie-drift te voorkomen:
 1. Pas alleen bestanden aan in `extension/template.html` en `extension/script.js`.
-2. `standalone-template.html` wordt automatisch gegenereerd via `build-standalone.sh`.
+2. `standalone-template.html` wordt automatisch gegenereerd via `build-standalone.sh` (als `standalone-template-v[versie].html`).
 3. `pack.sh` roept deze stap automatisch aan, zodat release ZIP en standalone altijd op 1 lijn blijven.
-4. Build artifacts (ZIP + `standalone-template.html`) komen in de map `release/`.
+4. Build artifacts (ZIP + `standalone-template-v[versie].html`) komen in de map `release/`.
 5. PNG assets (screenshots, icon) staan in `assets/`.
 
 ### Lokaal Testen

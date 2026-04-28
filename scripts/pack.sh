@@ -2,32 +2,30 @@
 
 cd "$(dirname "$0")/.."
 
-# Gebruik de Git commit hash (short) in plaats van versie
-GIT_COMMIT=$(git rev-parse --short HEAD 2>/dev/null || echo "init")
+# Lees altijd de versie direct uit het manifest
+VERSION=$(python3 -c "import json; print(json.load(open('extension/manifest.json', encoding='utf-8')).get('version', '1.0.0'))")
 
 # Map voor release artifacts
 RELEASE_DIR="release"
 mkdir -p "$RELEASE_DIR"
 
-ZIP_NAME="template-helper-${GIT_COMMIT}"
+ZIP_NAME="template-helper-v${VERSION}"
 ZIP_PATH="${RELEASE_DIR}/${ZIP_NAME}"
 
-echo "📦 Packing Delta Vraag en Antwoord Template Helper (${GIT_COMMIT})..."
+echo "📦 Packing Delta Vraag en Antwoord Template Helper (v${VERSION})..."
 
-# Houd standalone-template.html altijd in sync met de extension bronbestanden.
-./scripts/build-standalone.sh
-
-# Gooi oude zips weg zodat we niet oneindig veel zips opsparen
+# Gooi oude zips en standalone bestanden weg
 rm -f ${RELEASE_DIR}/template-helper-*.zip
+rm -f ${RELEASE_DIR}/standalone-template-*.html
+
+# Houd standalone-template.html altijd in sync
+./scripts/build-standalone.sh
 
 # Create a temporary build directory
 mkdir -p build_extension
 cp -R extension/* build_extension/
 
-# Lees altijd de versie direct uit het manifest, zodat lokale aanpassingen bewaard blijven
-VERSION=$(python3 -c "import json; print(json.load(open('extension/manifest.json', encoding='utf-8')).get('version', '1.0.0'))")
-
-echo "🔧 Using version ${VERSION} from manifest.json..."
+echo "🔧 Using version v${VERSION} from manifest.json..."
 
 # Pack the build directory
 python3 -c "import shutil; shutil.make_archive('${ZIP_PATH}', 'zip', 'build_extension')"
