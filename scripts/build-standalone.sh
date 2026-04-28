@@ -3,7 +3,7 @@ set -euo pipefail
 
 cd "$(dirname "$0")/.."
 
-echo "🔧 Bouwen van standalone-template.html..."
+echo "🔧 Bouwen van standalone-template-v[version].html..."
 
 python3 - <<'PY'
 import json

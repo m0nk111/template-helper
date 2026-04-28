@@ -17,8 +17,9 @@ echo "📦 Packing Delta Vraag en Antwoord Template Helper (v${VERSION})..."
 # Gooi oude zips en standalone bestanden weg
 rm -f ${RELEASE_DIR}/template-helper-*.zip
 rm -f ${RELEASE_DIR}/standalone-template-*.html
+rm -f ${RELEASE_DIR}/standalone-template.html
 
-# Houd standalone-template.html altijd in sync
+# Houd standalone-template-v[version].html altijd in sync
 ./scripts/build-standalone.sh
 
 # Create a temporary build directory

@@ -2,6 +2,7 @@
 
 ## [Unreleased]
 - **Experimental:** Added docking controls to the injected CRS sidebar so the template helper can be docked left, right, at the bottom, or opened in a separate window without cutting a new release.
+- **Build:** Removed the legacy unversioned standalone release artifact and made the release folder version-only for standalone HTML output.
 
 ## [2.1.10] - 2026-04-28
 - **Functionaliteit Mijlpaal:** Het kopiëren van screenshots / afbeeldingen is voortaan niet meer gelimiteerd aan de velden `Klantvraag`, `Vastloper`, `Uitkomst` en `Antwoord`. Vanaf nu zijn de invoervelden **Bron** en **Vervolgstap** óók omgezet naar zogenaamde contenteditable 'Rich Text' vakken! 
