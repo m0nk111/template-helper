@@ -149,6 +149,9 @@ async function copyToClipboard() {
     buffer.style.opacity = '0'; // Hide it from the screen
       buffer.style.background = 'transparent'; // Prevent copying body background
       buffer.style.color = 'inherit'; // Prevent copying body text color
+      
+      document.body.appendChild(buffer); // Add the invisible box to the page so it can be selected
+
     const sel = window.getSelection();
     sel.removeAllRanges();
     const range = document.createRange();

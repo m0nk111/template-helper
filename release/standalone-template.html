@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="template-version" content="2.1.8">
+  <meta name="template-version" content="2.1.9">
   <title>Delta Vraag en Antwoord Template Helper</title>
   <style>
     :root {
@@ -557,6 +557,9 @@ async function copyToClipboard() {
     buffer.style.opacity = '0'; // Hide it from the screen
       buffer.style.background = 'transparent'; // Prevent copying body background
       buffer.style.color = 'inherit'; // Prevent copying body text color
+      
+      document.body.appendChild(buffer); // Add the invisible box to the page so it can be selected
+
     const sel = window.getSelection();
     sel.removeAllRanges();
     const range = document.createRange();

@@ -111,6 +111,8 @@ if (!window.location.href.toLowerCase().includes('crs')) {
                 // Using an iframe prevents the CRS page's global CSS/JS from interfering with our template
                 var iframe = document.createElement('iframe');
                 iframe.id = 'delta-moderator-sidebar-iframe';
+                // Allow the iframe to use the modern Clipboard API so copying text works
+                iframe.setAttribute('allow', 'clipboard-read; clipboard-write');
                 // Load the constructed URL (including payload parameters) into the iframe
                 iframe.src = finalUrl;
                 iframe.style.cssText = "flex-grow: 1; border: none; width: 100%; height: 100%; background: #f4f6f8;";
