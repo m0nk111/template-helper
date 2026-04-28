@@ -1,7 +1,7 @@
-### Changelog v2.1.9
-
-- **iFrame Klembord Permissies gefixed:** Kopiëren werkte helemaal niet meer in specifieke web-omgevingen omdat in Chrome Extensions het nieuwe *moderne* Klembord API (Clipboard-write) standaard geblokkeerd is zonder expliciete attributies op de ingesloten Extensie-Scherm (Permissions policy violation). Dit lost het probleem met de rode klembord API timeout waarschuwingen op!
-- **Fallback Reparatie:** Omdat het oude klembord faalde, voerde de code zijn *noodkopieersysteem* (verstopt veld in scherm selecteren, document.execCommand) uit zonder op de pagina terug verbonden te zijn (`addRange` errors). Dit is nu weer teruggebracht én is de foute Witte Achtergrond op lichte-modus nu afgevangen!
+### Changelog v2.1.10
+- **Afbeeldingen Plakken Uitgebreid:** Vanaf nu zijn de invoervelden **Bron** en **Vervolgstap** op de achtergrond slim omgezet in `Rich Text Contenteditable` blokken. Dit betekent dat je, net zoals in de *Klantvraag* of *Antwoord* opties, nu gewoon een screenshot in deze velden kunt CMD+V / CTRL+V / Droppen! De uitleg-teksten ("Wat verwacht je nu..." / "Uit welk systeem..") zijn netjes abstracter gehouden op verzoek.
+- **Experimental Docking:** De ingebouwde CRS-zijbalk heeft nu experimentele knoppen om het template links, rechts of onderaan te docken. Met de `↗` knop open je dezelfde ingevulde template los in een apart browservenster.
+- **Release Artifact Cleanup:** De oude `standalone-template.html` zonder versienummer is verwijderd. Releases gebruiken nu alleen nog versie-bestanden zoals `standalone-template-v2.1.10.html`.
 
 ### Installatie Instructies
 1. Download het `.zip` bestand en pak het uit
@@ -10,7 +10,7 @@
 4. Klik op Load unpacked (Uitgepakte extensie laden)
 5. Selecteer de uitgepakte map
 
-Of download `standalone-template-v2.1.9.html` en open dit direct in je browser.
+Of download `standalone-template-v[versie].html` en open dit direct in je browser.
 
 ### Probleem ontdekt?
 Heb je een probleem ontdekt? Het makkelijkste is om hier op GitHub even een issue aan te maken. Op die manier kunnen we het probleem gestructureerd onderzoeken en oplossen!
