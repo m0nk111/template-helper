@@ -1,5 +1,11 @@
 # Changelog
 
+## [2.1.10] - 2026-04-28
+- **Functionaliteit Mijlpaal:** Het kopiëren van screenshots / afbeeldingen is voortaan niet meer gelimiteerd aan de velden `Klantvraag`, `Vastloper`, `Uitkomst` en `Antwoord`. Vanaf nu zijn de invoervelden **Bron** en **Vervolgstap** óók omgezet naar zogenaamde contenteditable 'Rich Text' vakken! 
+  - Je kunt nu dus direct een screenshot droppen in de *Bron* en *Vervolgstap* velden.
+  - De code houdt op de achtergrond slim rekening met de format formattering hiervan naar het klembord.
+  - Placedholders ("Uit welk systeem komt..." / "Wat verwacht je nu...") zijn minimalistisch en onveranderd gehouden op verzoek.
+
 ## [2.1.9] - 2026-04-28
 - **Hotfix Klembord:** Kopiëren werkte helemaal niet meer omdat Chrome's Clipboard Permissies in de extensie botsten met de iFrame-weergave. 
   - De 'Moderne' manier heeft nu `allow="clipboard-write"` gekregen in het iFrame, zodat de error "Clipboard API block" niet meer voorkomt.

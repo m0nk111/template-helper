@@ -68,8 +68,8 @@ function buildMessageHTML() {
   } else {
     // Grab text from the Answer boxes
     const a = getCleanHTML('antwoord');
-    const b = document.getElementById('bron').value.trim();
-    const v = document.getElementById('vervolgstap').value.trim().replace(/\n/g, '<br>');
+    const b = getCleanHTML('bron');
+    const v = getCleanHTML('vervolgstap');
     
     // The Answer template is a bit smarter: it only shows 'Bron' (Source) and 'Vervolgstap' if you actually typed something in them.
     let msg = `<b>• antwoord:</b><br>${a || '…'}`;
