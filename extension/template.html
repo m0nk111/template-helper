@@ -295,6 +295,56 @@
       border-radius: 4px;
       border: 1px solid var(--border);
     }
+
+    .question-hints {
+      margin-top: 4px;
+      margin-bottom: 16px;
+      padding: 12px 14px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+    }
+    .question-hints-title {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .question-hints ul {
+      display: grid;
+      gap: 6px;
+      list-style: none;
+    }
+    .question-hints li {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      color: var(--text-dim);
+      font-size: 12px;
+      line-height: 1.45;
+    }
+    .question-hints li::before {
+      content: "Nog";
+      flex: 0 0 auto;
+      min-width: 34px;
+      padding: 1px 5px;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      color: var(--text-dim);
+      font-size: 10px;
+      font-weight: 700;
+      text-align: center;
+    }
+    .question-hints li.done {
+      color: var(--green);
+    }
+    .question-hints li.done::before {
+      content: "OK";
+      border-color: var(--green);
+      color: var(--green);
+    }
   </style>
 
 </head>
@@ -354,6 +404,11 @@
   <div class="form-group">
     <label>gewenste uitkomst <span class="required">*</span></label>
     <div id="uitkomst" contenteditable="true" class="textarea-like" data-placeholder="Wat wil je bereiken?"></div>
+  </div>
+
+  <div class="question-hints" aria-live="polite">
+    <div class="question-hints-title">Vraag hints</div>
+    <ul id="questionHints"></ul>
   </div>
   </div> <!-- end tmpl-vraag -->
 

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="template-version" content="3.0.0">
+  <meta name="template-version" content="3.1.0">
   <title>Delta Vraag en Antwoord Template Helper</title>
   <style>
     :root {
@@ -295,6 +295,56 @@
       border-radius: 4px;
       border: 1px solid var(--border);
     }
+
+    .question-hints {
+      margin-top: 4px;
+      margin-bottom: 16px;
+      padding: 12px 14px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+    }
+    .question-hints-title {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .question-hints ul {
+      display: grid;
+      gap: 6px;
+      list-style: none;
+    }
+    .question-hints li {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      color: var(--text-dim);
+      font-size: 12px;
+      line-height: 1.45;
+    }
+    .question-hints li::before {
+      content: "Nog";
+      flex: 0 0 auto;
+      min-width: 34px;
+      padding: 1px 5px;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      color: var(--text-dim);
+      font-size: 10px;
+      font-weight: 700;
+      text-align: center;
+    }
+    .question-hints li.done {
+      color: var(--green);
+    }
+    .question-hints li.done::before {
+      content: "OK";
+      border-color: var(--green);
+      color: var(--green);
+    }
   </style>
 
 </head>
@@ -354,6 +404,11 @@
   <div class="form-group">
     <label>gewenste uitkomst <span class="required">*</span></label>
     <div id="uitkomst" contenteditable="true" class="textarea-like" data-placeholder="Wat wil je bereiken?"></div>
+  </div>
+
+  <div class="question-hints" aria-live="polite">
+    <div class="question-hints-title">Vraag hints</div>
+    <ul id="questionHints"></ul>
   </div>
   </div> <!-- end tmpl-vraag -->
 
@@ -421,6 +476,61 @@ let activeTmpl = 'vraag';
 // These are the exact ID names of the text boxes on the screen for each tab
 const fieldsVraag = ['wachtrij', 'klantnummer', 'klantvraag', 'vastloper', 'uitkomst'];
 const fieldsAntwoord = ['antwoord', 'bron', 'vervolgstap'];
+const questionHintRules = [
+  {
+    id: 'wachtrij',
+    text: 'Kies de wachtrij die past bij het onderwerp.'
+  },
+  {
+    id: 'klantnummer',
+    text: 'Vul het klantnummer in zodat moderators meteen kunnen meekijken.'
+  },
+  {
+    id: 'klantvraag',
+    text: 'Maak de klantvraag concreet: wat vraagt de klant precies?'
+  },
+  {
+    id: 'vastloper',
+    text: 'Noem de stap, foutmelding of twijfel waar je vastloopt.'
+  },
+  {
+    id: 'uitkomst',
+    text: 'Schrijf welke uitkomst of beslissing je nodig hebt.'
+  }
+];
+
+function getFieldState(id) {
+  const el = document.getElementById(id);
+  if (!el) return { text: '', hasImage: false };
+
+  if (el.tagName === 'SELECT' || el.tagName === 'INPUT') {
+    return { text: el.value.trim(), hasImage: false };
+  }
+
+  return {
+    text: el.innerText.trim(),
+    hasImage: el.innerHTML.includes('<img')
+  };
+}
+
+function fieldHasUsefulContent(id) {
+  const state = getFieldState(id);
+  return state.hasImage || state.text.length >= (id === 'klantnummer' ? 1 : 12);
+}
+
+function updateQuestionHints() {
+  const hintsEl = document.getElementById('questionHints');
+  if (!hintsEl) return;
+
+  hintsEl.innerHTML = '';
+
+  questionHintRules.forEach((rule) => {
+    const item = document.createElement('li');
+    item.classList.toggle('done', fieldHasUsefulContent(rule.id));
+    item.textContent = rule.text;
+    hintsEl.appendChild(item);
+  });
+}
 
 /**
  * TOGGLE TEMPLATE FUNCTION
@@ -493,6 +603,7 @@ function buildMessageHTML() {
  */
 function updatePreview() {
   document.getElementById('preview').innerHTML = buildMessageHTML();
+  updateQuestionHints();
 }
 
 /**

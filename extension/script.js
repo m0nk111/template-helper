@@ -13,6 +13,61 @@ let activeTmpl = 'vraag';
 // These are the exact ID names of the text boxes on the screen for each tab
 const fieldsVraag = ['wachtrij', 'klantnummer', 'klantvraag', 'vastloper', 'uitkomst'];
 const fieldsAntwoord = ['antwoord', 'bron', 'vervolgstap'];
+const questionHintRules = [
+  {
+    id: 'wachtrij',
+    text: 'Kies de wachtrij die past bij het onderwerp.'
+  },
+  {
+    id: 'klantnummer',
+    text: 'Vul het klantnummer in zodat moderators meteen kunnen meekijken.'
+  },
+  {
+    id: 'klantvraag',
+    text: 'Maak de klantvraag concreet: wat vraagt de klant precies?'
+  },
+  {
+    id: 'vastloper',
+    text: 'Noem de stap, foutmelding of twijfel waar je vastloopt.'
+  },
+  {
+    id: 'uitkomst',
+    text: 'Schrijf welke uitkomst of beslissing je nodig hebt.'
+  }
+];
+
+function getFieldState(id) {
+  const el = document.getElementById(id);
+  if (!el) return { text: '', hasImage: false };
+
+  if (el.tagName === 'SELECT' || el.tagName === 'INPUT') {
+    return { text: el.value.trim(), hasImage: false };
+  }
+
+  return {
+    text: el.innerText.trim(),
+    hasImage: el.innerHTML.includes('<img')
+  };
+}
+
+function fieldHasUsefulContent(id) {
+  const state = getFieldState(id);
+  return state.hasImage || state.text.length >= (id === 'klantnummer' ? 1 : 12);
+}
+
+function updateQuestionHints() {
+  const hintsEl = document.getElementById('questionHints');
+  if (!hintsEl) return;
+
+  hintsEl.innerHTML = '';
+
+  questionHintRules.forEach((rule) => {
+    const item = document.createElement('li');
+    item.classList.toggle('done', fieldHasUsefulContent(rule.id));
+    item.textContent = rule.text;
+    hintsEl.appendChild(item);
+  });
+}
 
 /**
  * TOGGLE TEMPLATE FUNCTION
@@ -85,6 +140,7 @@ function buildMessageHTML() {
  */
 function updatePreview() {
   document.getElementById('preview').innerHTML = buildMessageHTML();
+  updateQuestionHints();
 }
 
 /**
