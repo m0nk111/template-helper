@@ -1,7 +1,7 @@
 # Changelog
 
 ## [Unreleased]
-- **Experimental:** Added a separate experimental docking ZIP for the injected CRS sidebar so the template helper can be docked left, right, at the bottom, or opened in a separate window without changing the normal ZIP behavior.
+- **Experimental:** Added a separate experimental docking ZIP where the injected CRS sidebar header can be dragged to dock left, right, or at the bottom without changing the normal ZIP behavior.
 - **Build:** Removed the legacy unversioned standalone release artifact and made the release folder version-only for standalone HTML output.
 
 ## [2.1.10] - 2026-04-28

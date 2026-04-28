@@ -102,6 +102,76 @@ if (!window.location.href.toLowerCase().includes('crs')) {
         return button;
     }
 
+    function resolveDockModeFromPointer(clientX, clientY) {
+        if (clientY > window.innerHeight * 0.68) return 'bottom';
+        return clientX < window.innerWidth / 2 ? 'left' : 'right';
+    }
+
+    function enableHeaderDrag(header, sidebarContainer, toggleBtn) {
+        var dragState = null;
+
+        header.addEventListener('pointerdown', function(e) {
+            if (e.button !== 0 || e.target.closest('button')) return;
+
+            dragState = {
+                pointerId: e.pointerId,
+                startX: e.clientX,
+                startY: e.clientY,
+                lastX: e.clientX,
+                lastY: e.clientY,
+                moved: false
+            };
+
+            header.setPointerCapture(e.pointerId);
+            header.style.cursor = 'grabbing';
+            sidebarContainer.style.transition = 'none';
+            e.preventDefault();
+        });
+
+        header.addEventListener('pointermove', function(e) {
+            if (!dragState || e.pointerId !== dragState.pointerId) return;
+
+            dragState.lastX = e.clientX;
+            dragState.lastY = e.clientY;
+
+            var deltaX = e.clientX - dragState.startX;
+            var deltaY = e.clientY - dragState.startY;
+            dragState.moved = dragState.moved || Math.abs(deltaX) > 8 || Math.abs(deltaY) > 8;
+
+            if (dragState.moved) {
+                sidebarContainer.style.transform = 'translate(' + deltaX + 'px, ' + deltaY + 'px)';
+            }
+        });
+
+        header.addEventListener('pointerup', function(e) {
+            if (!dragState || e.pointerId !== dragState.pointerId) return;
+
+            var shouldDock = dragState.moved;
+            var dockMode = resolveDockModeFromPointer(dragState.lastX, dragState.lastY);
+            dragState = null;
+
+            header.releasePointerCapture(e.pointerId);
+            header.style.cursor = 'grab';
+            sidebarContainer.style.transition = 'transform 0.3s ease-in-out';
+
+            if (shouldDock) {
+                sidebarContainer.dataset.open = 'true';
+                applyDockMode(sidebarContainer, toggleBtn, dockMode);
+            } else {
+                setSidebarOpen(sidebarContainer, toggleBtn, sidebarContainer.dataset.open !== 'false');
+            }
+        });
+
+        header.addEventListener('pointercancel', function(e) {
+            if (!dragState || e.pointerId !== dragState.pointerId) return;
+
+            dragState = null;
+            header.style.cursor = 'grab';
+            sidebarContainer.style.transition = 'transform 0.3s ease-in-out';
+            setSidebarOpen(sidebarContainer, toggleBtn, sidebarContainer.dataset.open !== 'false');
+        });
+    }
+
     // Main function responsible for building and placing our custom action button
     function createVraagButton() {
         // Prevent duplicate injections: check if our button already exists on the page
@@ -167,17 +237,16 @@ if (!window.location.href.toLowerCase().includes('crs')) {
                 // HEADER SECTION (Title & Hard Close Button)
                 var header = document.createElement('div');
                 header.style.cssText = "display: flex; justify-content: space-between; align-items: center; gap: 8px; background-color: #002B54; color: white; padding: 12px 15px; font-weight: bold; font-family: sans-serif;";
+                header.title = "Sleep de balk naar links, rechts of onderaan";
+                header.style.cursor = 'grab';
 
                 var headerTitle = document.createElement('div');
                 headerTitle.innerText = "Delta Vraag Maken";
                 headerTitle.style.cssText = "white-space: nowrap; overflow: hidden; text-overflow: ellipsis;";
 
-                var dockControls = document.createElement('div');
-                dockControls.style.cssText = "display: flex; align-items: center; gap: 4px; margin-left: auto;";
-                dockControls.appendChild(createHeaderButton('L', 'Dock links', function() { applyDockMode(sidebarContainer, toggleBtn, 'left'); }));
-                dockControls.appendChild(createHeaderButton('R', 'Dock rechts', function() { applyDockMode(sidebarContainer, toggleBtn, 'right'); }));
-                dockControls.appendChild(createHeaderButton('B', 'Dock onderaan', function() { applyDockMode(sidebarContainer, toggleBtn, 'bottom'); }));
-                dockControls.appendChild(createHeaderButton('↗', 'Open los venster', function() {
+                var headerControls = document.createElement('div');
+                headerControls.style.cssText = "display: flex; align-items: center; gap: 4px; margin-left: auto;";
+                headerControls.appendChild(createHeaderButton('↗', 'Open los venster', function() {
                     var iframe = document.getElementById('delta-moderator-sidebar-iframe');
                     var popupUrl = iframe ? iframe.src : finalUrl;
                     var popupWindow = window.open(popupUrl, 'delta-template-helper-window', 'popup=yes,width=500,height=760,left=80,top=80');
@@ -194,8 +263,9 @@ if (!window.location.href.toLowerCase().includes('crs')) {
                 // Clicking close behaves the exact same way as clicking the toggle tab (soft close)
                 closeBtn.onclick = function() { setSidebarOpen(sidebarContainer, toggleBtn, false); };
                 header.appendChild(headerTitle);
-                header.appendChild(dockControls);
+                header.appendChild(headerControls);
                 header.appendChild(closeBtn);
+                enableHeaderDrag(header, sidebarContainer, toggleBtn);
 
                 // 5. IFRAME MOUNTING
                 // Create an isolated iframe to load our template.html file
