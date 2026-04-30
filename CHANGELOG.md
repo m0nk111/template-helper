@@ -2,6 +2,9 @@
 
 ## [Unreleased]
 
+## [3.1.2] - 2026-04-30
+- **Added:** Remembered the last selected template mode so moderators can keep opening new customers directly in the answer template.
+
 ## [3.1.1] - 2026-04-30
 - **Changed:** Capitalized the form labels and copied template headings, and updated the queue option to `Internet en Vaste Telefonie`.
 

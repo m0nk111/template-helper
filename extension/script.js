@@ -7,8 +7,9 @@
  * Think of it as the brain behind the text boxes.
  */
 
-// Keeps track of which tab is currently open. It always starts on 'vraag' (Question).
-let activeTmpl = 'vraag';
+// Keeps track of which tab is currently open. It remembers the last selected mode.
+const templateModeStorageKey = 'vraag-tmpl-active-template';
+let activeTmpl = localStorage.getItem(templateModeStorageKey) === 'antwoord' ? 'antwoord' : 'vraag';
 
 // These are the exact ID names of the text boxes on the screen for each tab
 const fieldsVraag = ['wachtrij', 'klantnummer', 'klantvraag', 'vastloper', 'uitkomst'];
@@ -20,21 +21,22 @@ const fieldsAntwoord = ['antwoord', 'bron', 'vervolgstap'];
  * It hides the "Question" text boxes and shows the "Answer" text boxes, and vice versa.
  */
 function toggleTemplate() {
-  if (activeTmpl === 'vraag') {
-    // Switch to Answer mode
-    activeTmpl = 'antwoord';
-    document.getElementById('tmpl-vraag').style.display = 'none';      // Hide question fields
-    document.getElementById('tmpl-antwoord').style.display = 'block';  // Show answer fields
-    document.getElementById('pageTitle').textContent = 'Antwoord Template'; // Change title text
-    document.getElementById('switchBtn').title = 'Vraag Template';    // Change hover text of the button
-  } else {
-    // Switch back to Question mode
-    activeTmpl = 'vraag';
-    document.getElementById('tmpl-antwoord').style.display = 'none';
-    document.getElementById('tmpl-vraag').style.display = 'block';
-    document.getElementById('pageTitle').textContent = 'Vraag Template';
-    document.getElementById('switchBtn').title = 'Mod Antwoord Template';
+  setTemplateMode(activeTmpl === 'vraag' ? 'antwoord' : 'vraag', true);
+}
+
+function setTemplateMode(mode, persist) {
+  activeTmpl = mode === 'antwoord' ? 'antwoord' : 'vraag';
+
+  const isAnswerMode = activeTmpl === 'antwoord';
+  document.getElementById('tmpl-vraag').style.display = isAnswerMode ? 'none' : 'block';
+  document.getElementById('tmpl-antwoord').style.display = isAnswerMode ? 'block' : 'none';
+  document.getElementById('pageTitle').textContent = isAnswerMode ? 'Antwoord Template' : 'Vraag Template';
+  document.getElementById('switchBtn').title = isAnswerMode ? 'Vraag Template' : 'Mod Antwoord Template';
+
+  if (persist) {
+    localStorage.setItem(templateModeStorageKey, activeTmpl);
   }
+
   // Whenever we switch, update the live preview window at the bottom of the screen
   updatePreview();
 }
@@ -285,7 +287,7 @@ for (const key of fillableFields) {
 
 // 5. Connect all the main UI buttons to their respective logic functions
 renderTemplateVersion();
-updatePreview();
+setTemplateMode(activeTmpl, false);
 document.getElementById("switchBtn").addEventListener("click", toggleTemplate);
 document.getElementById("btn-copy").addEventListener("click", copyToClipboard);
 document.getElementById("btn-clear").addEventListener("click", clearForm);
