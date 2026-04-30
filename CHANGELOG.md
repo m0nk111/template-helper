@@ -1,7 +1,9 @@
 # Changelog
 
 ## [Unreleased]
-- **Experimental:** Added local question hints to the question template. The hints update while typing and nudge agents toward a complete moderator question without calling external services.
+
+## [3.1.0] - 2026-04-30
+- **Changed:** Shortened the initial question template title to `Vraag Template` and fixed queue option capitalization for `Televisie en Radio` and `Wijzigen of Opzeggen`.
 
 ## [3.0.0] - 2026-04-28
 - **Major:** Promoted sidebar docking to the default extension behavior. Drag the blue sidebar header to dock the template left, right, top, or bottom.
