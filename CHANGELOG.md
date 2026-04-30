@@ -2,6 +2,9 @@
 
 ## [Unreleased]
 
+## [3.1.1] - 2026-04-30
+- **Changed:** Capitalized the form labels and copied template headings, and updated the queue option to `Internet en Vaste Telefonie`.
+
 ## [3.1.0] - 2026-04-30
 - **Changed:** Shortened the initial question template title to `Vraag Template` and fixed queue option capitalization for `Televisie en Radio` and `Wijzigen of Opzeggen`.
 

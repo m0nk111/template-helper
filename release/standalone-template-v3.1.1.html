@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="template-version" content="3.1.0">
+  <meta name="template-version" content="3.1.1">
   <title>Vraag Template</title>
   <style>
     :root {
@@ -317,11 +317,11 @@
   <!-- VRAAG TEMPLATE -->
   <div id="tmpl-vraag">
   <div class="form-group">
-    <label>wachtrij <span class="required">*</span></label>
+    <label>Wachtrij <span class="required">*</span></label>
     <select id="wachtrij">
-      <option value="">— Kies wachtrij —</option>
+      <option value="">— Kies Wachtrij —</option>
       <optgroup label="HD">
-        <option value="Internet en vaste Telefonie">Internet en vaste Telefonie</option>
+        <option value="Internet en Vaste Telefonie">Internet en Vaste Telefonie</option>
         <option value="Televisie en Radio">Televisie en Radio</option>
         <option value="Overig Technisch">Overig Technisch</option>
       </optgroup>
@@ -338,22 +338,22 @@
   </div>
 
   <div class="form-group">
-    <label>klantnummer <span class="required">*</span></label>
+    <label>Klantnummer <span class="required">*</span></label>
     <input type="text" id="klantnummer" placeholder="Bijv. 12345678" maxlength="20" autocomplete="off">
   </div>
 
   <div class="form-group">
-    <label>klantvraag <span class="required">*</span></label>
+    <label>Klantvraag <span class="required">*</span></label>
     <div id="klantvraag" contenteditable="true" class="textarea-like" data-placeholder="Wat is de vraag van de klant? Je kunt hier ook een screenshot droppen."></div>
   </div>
 
   <div class="form-group">
-    <label>waar loop je vast <span class="required">*</span></label>
+    <label>Waar loop je vast <span class="required">*</span></label>
     <div id="vastloper" contenteditable="true" class="textarea-like" data-placeholder="Beschrijf waar je vastzit..."></div>
   </div>
 
   <div class="form-group">
-    <label>gewenste uitkomst <span class="required">*</span></label>
+    <label>Gewenste uitkomst <span class="required">*</span></label>
     <div id="uitkomst" contenteditable="true" class="textarea-like" data-placeholder="Wat wil je bereiken?"></div>
   </div>
 
@@ -362,15 +362,15 @@
   <!-- ANTWOORD TEMPLATE -->
   <div id="tmpl-antwoord" style="display: none;">
     <div class="form-group">
-      <label>antwoord <span class="required">*</span></label>
+      <label>Antwoord <span class="required">*</span></label>
       <div id="antwoord" contenteditable="true" class="textarea-like" data-placeholder="Typ hier je inhoudelijke antwoord en/of screenshot..."></div>
     </div>
     <div class="form-group">
-      <label>bron</label>
+      <label>Bron</label>
       <div id="bron" contenteditable="true" class="textarea-like" data-placeholder="Uit welk systeem komt de informatie?" style="min-height: 46px;"></div>
     </div>
     <div class="form-group">
-      <label>vervolgstap</label>
+      <label>Vervolgstap</label>
       <div id="vervolgstap" contenteditable="true" class="textarea-like" data-placeholder="Wat verwacht je nu van de agent?" style="min-height: 60px;"></div>
     </div>
   </div>
@@ -385,12 +385,12 @@
   </div>
 
   <div style="margin-top: 24px;">
-    <div class="preview-label">voorbeeld</div>
+    <div class="preview-label">Voorbeeld</div>
     <div class="preview" id="preview"></div>
   </div>
 
   <details class="rules">
-    <summary>📌 Spelregels moderator chat</summary>
+    <summary>📌 Spelregels Moderator Chat</summary>
     <ul>
       <li>Gebruik altijd dit template.</li>
       <li>Er wordt altijd met een citaat gereageerd.</li>
@@ -470,11 +470,11 @@ function buildMessageHTML() {
     const u = getCleanHTML('uitkomst');
 
     // Build the final text layout. If a box is empty, it puts '...' instead.
-    return `<b>• wachtrij:</b><br>${w || '…'}<br><br>` +
-           `<b>• klantnummer:</b><br>${k || '…'}<br><br>` +
-           `<b>• klantvraag:</b><br>${v || '…'}<br><br>` +
-           `<b>• waar loop je vast:</b><br>${l || '…'}<br><br>` +
-           `<b>• gewenste uitkomst:</b><br>${u || '…'}`;
+        return `<b>• Wachtrij:</b><br>${w || '…'}<br><br>` +
+          `<b>• Klantnummer:</b><br>${k || '…'}<br><br>` +
+          `<b>• Klantvraag:</b><br>${v || '…'}<br><br>` +
+          `<b>• Waar loop je vast:</b><br>${l || '…'}<br><br>` +
+          `<b>• Gewenste uitkomst:</b><br>${u || '…'}`;
   } else {
     // Grab text from the Answer boxes
     const a = getCleanHTML('antwoord');
@@ -482,9 +482,9 @@ function buildMessageHTML() {
     const v = getCleanHTML('vervolgstap');
     
     // The Answer template is a bit smarter: it only shows 'Bron' (Source) and 'Vervolgstap' if you actually typed something in them.
-    let msg = `<b>• antwoord:</b><br>${a || '…'}`;
-    if (b) msg += `<br><br><b>• bron:</b><br>${b}`;
-    if (v) msg += `<br><br><b>• vervolgstap:</b><br>${v}`;
+    let msg = `<b>• Antwoord:</b><br>${a || '…'}`;
+    if (b) msg += `<br><br><b>• Bron:</b><br>${b}`;
+    if (v) msg += `<br><br><b>• Vervolgstap:</b><br>${v}`;
     return msg;
   }
 }

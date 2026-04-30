@@ -60,11 +60,11 @@ function buildMessageHTML() {
     const u = getCleanHTML('uitkomst');
 
     // Build the final text layout. If a box is empty, it puts '...' instead.
-    return `<b>• wachtrij:</b><br>${w || '…'}<br><br>` +
-           `<b>• klantnummer:</b><br>${k || '…'}<br><br>` +
-           `<b>• klantvraag:</b><br>${v || '…'}<br><br>` +
-           `<b>• waar loop je vast:</b><br>${l || '…'}<br><br>` +
-           `<b>• gewenste uitkomst:</b><br>${u || '…'}`;
+        return `<b>• Wachtrij:</b><br>${w || '…'}<br><br>` +
+          `<b>• Klantnummer:</b><br>${k || '…'}<br><br>` +
+          `<b>• Klantvraag:</b><br>${v || '…'}<br><br>` +
+          `<b>• Waar loop je vast:</b><br>${l || '…'}<br><br>` +
+          `<b>• Gewenste uitkomst:</b><br>${u || '…'}`;
   } else {
     // Grab text from the Answer boxes
     const a = getCleanHTML('antwoord');
@@ -72,9 +72,9 @@ function buildMessageHTML() {
     const v = getCleanHTML('vervolgstap');
     
     // The Answer template is a bit smarter: it only shows 'Bron' (Source) and 'Vervolgstap' if you actually typed something in them.
-    let msg = `<b>• antwoord:</b><br>${a || '…'}`;
-    if (b) msg += `<br><br><b>• bron:</b><br>${b}`;
-    if (v) msg += `<br><br><b>• vervolgstap:</b><br>${v}`;
+    let msg = `<b>• Antwoord:</b><br>${a || '…'}`;
+    if (b) msg += `<br><br><b>• Bron:</b><br>${b}`;
+    if (v) msg += `<br><br><b>• Vervolgstap:</b><br>${v}`;
     return msg;
   }
 }
