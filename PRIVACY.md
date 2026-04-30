@@ -1,8 +1,8 @@
-# Privacybeleid - Delta Vraag en Antwoord Template Helper
+# Privacybeleid - Moderator Template Helper
 
 **Laatst bijgewerkt:** 30 april 2026
 
-De "Delta Vraag en Antwoord Template Helper" Chrome Extensie hecht grote waarde aan uw privacy. De extensie draait lokaal in uw browser en gebruikt gegevens alleen om het vraag- en antwoordtemplate te vullen.
+De "Moderator Template Helper" Chrome-extensie hecht grote waarde aan uw privacy. De extensie draait lokaal in uw browser en gebruikt gegevens alleen om het vraag- en antwoordtemplate te vullen.
 
 ### 1. Lokale gegevensverwerking
 De extensie kan lokaal gegevens uit het CRS-scherm lezen, zoals klantnummer en de tekst die u zelf in het notitieveld heeft ingevuld. Deze gegevens worden alleen gebruikt om het template in de zijbalk of het losse templatevenster vooraf in te vullen.

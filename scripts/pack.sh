@@ -12,7 +12,7 @@ mkdir -p "$RELEASE_DIR"
 ZIP_NAME="template-helper-v${VERSION}"
 ZIP_PATH="${RELEASE_DIR}/${ZIP_NAME}"
 
-echo "📦 Packing Delta Vraag en Antwoord Template Helper (v${VERSION})..."
+echo "📦 Packing Moderator Template Helper (v${VERSION})..."
 
 # Gooi oude zips en standalone bestanden weg
 rm -f ${RELEASE_DIR}/template-helper-*.zip

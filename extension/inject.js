@@ -8,16 +8,16 @@
 // Verify we are actually operating on the CRS domain to save browser CPU cycles
 if (!window.location.href.toLowerCase().includes('crs')) {
     // If we're on the wrong domain, halt execution to prevent throwing errors or wasting memory.
-    console.debug('Delta Vraag en Antwoord Template Helper: Not the CRS domain, halting injection.');
+    console.debug('Moderator Template Helper: Not the CRS domain, halting injection.');
 } else {
 
-    var SIDEBAR_DOCK_MODE_KEY = 'delta-template-helper-dock-mode';
+    var SIDEBAR_DOCK_MODE_KEY = 'moderator-template-helper-dock-mode';
 
     function getSavedDockMode() {
         try {
             return localStorage.getItem(SIDEBAR_DOCK_MODE_KEY) || 'right';
         } catch (storageError) {
-            console.debug('Delta Vraag en Antwoord Template Helper: Dock mode could not be read.', storageError);
+            console.debug('Moderator Template Helper: Dock mode could not be read.', storageError);
             return 'right';
         }
     }
@@ -26,7 +26,7 @@ if (!window.location.href.toLowerCase().includes('crs')) {
         try {
             localStorage.setItem(SIDEBAR_DOCK_MODE_KEY, dockMode);
         } catch (storageError) {
-            console.debug('Delta Vraag en Antwoord Template Helper: Dock mode could not be saved.', storageError);
+            console.debug('Moderator Template Helper: Dock mode could not be saved.', storageError);
         }
     }
 
@@ -147,12 +147,12 @@ if (!window.location.href.toLowerCase().includes('crs')) {
             dragState.lastX = e.clientX;
             dragState.lastY = e.clientY;
 
-            var deltaX = e.clientX - dragState.startX;
-            var deltaY = e.clientY - dragState.startY;
-            dragState.moved = dragState.moved || Math.abs(deltaX) > 8 || Math.abs(deltaY) > 8;
+            var movementX = e.clientX - dragState.startX;
+            var movementY = e.clientY - dragState.startY;
+            dragState.moved = dragState.moved || Math.abs(movementX) > 8 || Math.abs(movementY) > 8;
 
             if (dragState.moved) {
-                sidebarContainer.style.transform = 'translate(' + deltaX + 'px, ' + deltaY + 'px)';
+                sidebarContainer.style.transform = 'translate(' + movementX + 'px, ' + movementY + 'px)';
             }
         });
 
@@ -220,12 +220,12 @@ if (!window.location.href.toLowerCase().includes('crs')) {
             var finalUrl = url + '?klantnummer=' + klantnummer + '&klantvraag=' + klantvraag;
 
             // 4. SIDEBAR RENDERING LOGIC
-            var sidebarContainer = document.getElementById('delta-moderator-sidebar-container');
+            var sidebarContainer = document.getElementById('moderator-template-sidebar-container');
             if (sidebarContainer) {
                 // If sidebar is already created, just update the iframe URL with new data
-                document.getElementById('delta-moderator-sidebar-iframe').src = finalUrl;
+                document.getElementById('moderator-template-sidebar-iframe').src = finalUrl;
 
-                var toggleBtn = document.getElementById('delta-moderator-sidebar-toggle');
+                var toggleBtn = document.getElementById('moderator-template-sidebar-toggle');
                 if (toggleBtn) {
                     applyDockMode(sidebarContainer, toggleBtn, sidebarContainer.dataset.dockMode || getSavedDockMode());
                     setSidebarOpen(sidebarContainer, toggleBtn, true);
@@ -233,11 +233,11 @@ if (!window.location.href.toLowerCase().includes('crs')) {
             } else {
                 // FIRST TIME CREATION: Build the sidebar UI overlay
                 sidebarContainer = document.createElement('div');
-                sidebarContainer.id = 'delta-moderator-sidebar-container';
+                sidebarContainer.id = 'moderator-template-sidebar-container';
 
                 // --- TOGGLE TAB (Small sticky tab hanging explicitly outside the sidebar) ---
                 var toggleBtn = document.createElement('div');
-                toggleBtn.id = 'delta-moderator-sidebar-toggle';
+                toggleBtn.id = 'moderator-template-sidebar-toggle';
                 toggleBtn.title = "Verberg / Toon Vraag Template";
 
                 // Toggle animation logic linked to the CSS transform property
@@ -254,15 +254,15 @@ if (!window.location.href.toLowerCase().includes('crs')) {
                 header.style.cursor = 'grab';
 
                 var headerTitle = document.createElement('div');
-                headerTitle.innerText = "Delta Vraag Maken";
+                headerTitle.innerText = "Vraag Template";
                 headerTitle.style.cssText = "white-space: nowrap; overflow: hidden; text-overflow: ellipsis;";
 
                 var headerControls = document.createElement('div');
                 headerControls.style.cssText = "display: flex; align-items: center; gap: 4px; margin-left: auto;";
                 headerControls.appendChild(createHeaderButton('↗', 'Open los venster', function() {
-                    var iframe = document.getElementById('delta-moderator-sidebar-iframe');
+                    var iframe = document.getElementById('moderator-template-sidebar-iframe');
                     var popupUrl = iframe ? iframe.src : finalUrl;
-                    var popupWindow = window.open(popupUrl, 'delta-template-helper-window', 'popup=yes,width=500,height=760,left=80,top=80');
+                    var popupWindow = window.open(popupUrl, 'moderator-template-helper-window', 'popup=yes,width=500,height=760,left=80,top=80');
                     if (popupWindow) popupWindow.focus();
                     setSidebarOpen(sidebarContainer, toggleBtn, false);
                 }));
@@ -284,7 +284,7 @@ if (!window.location.href.toLowerCase().includes('crs')) {
                 // Create an isolated iframe to load our template.html file
                 // Using an iframe prevents the CRS page's global CSS/JS from interfering with our template
                 var iframe = document.createElement('iframe');
-                iframe.id = 'delta-moderator-sidebar-iframe';
+                iframe.id = 'moderator-template-sidebar-iframe';
                 // Allow the iframe to use the modern Clipboard API so copying text works
                 iframe.setAttribute('allow', 'clipboard-write');
                 // Load the constructed URL (including payload parameters) into the iframe

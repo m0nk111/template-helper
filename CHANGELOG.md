@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+## [3.1.4] - 2026-04-30
+- **Changed:** Neutralized Chrome Web Store-facing metadata and sidebar branding to avoid implying official company publication while preserving the existing moderator workflow.
+- **Docs:** Added guidance for using the Chrome Developer Dashboard public key instead of generating an arbitrary manifest key.
+
 ## [3.1.3] - 2026-04-30
 - **Changed:** Prepared a Chrome Web Store compliance build by removing the external logo request, unused fallback injection permissions, legacy packaged scripts, and unsafe URL autofill HTML insertion.
 - **Docs:** Updated the privacy policy and added Chrome Web Store submission notes for the compliance build.
