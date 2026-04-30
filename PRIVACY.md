@@ -1,17 +1,19 @@
 # Privacybeleid - Delta Vraag en Antwoord Template Helper
 
-**Laatst bijgewerkt:** 21 april 2026
+**Laatst bijgewerkt:** 30 april 2026
 
-De "Delta Vraag en Antwoord Template Helper" Chrome Extensie hecht grote waarde aan uw privacy. Omdat onze tool lokaal in uw browser draait, is ons privacybeleid heel eenvoudig:
+De "Delta Vraag en Antwoord Template Helper" Chrome Extensie hecht grote waarde aan uw privacy. De extensie draait lokaal in uw browser en gebruikt gegevens alleen om het vraag- en antwoordtemplate te vullen.
 
-### 1. Gegevensverzameling
-Wij verzamelen **geen** persoonsgegevens, telemetrie, analytics of andere data. Alle tekst, inhoud en instellingen die u invoert in de extensie blijven volledig lokaal op uw eigen apparaat opgeslagen.
+### 1. Lokale gegevensverwerking
+De extensie kan lokaal gegevens uit het CRS-scherm lezen, zoals klantnummer en de tekst die u zelf in het notitieveld heeft ingevuld. Deze gegevens worden alleen gebruikt om het template in de zijbalk of het losse templatevenster vooraf in te vullen.
+
+De extensie bewaart lokaal enkele gebruikersinstellingen in de browser, zoals de gekozen licht/donker-modus, dockpositie en laatst gebruikte template-modus. Deze instellingen blijven op uw eigen apparaat.
 
 ### 2. Gegevens delen
-Omdat wij geen gegevens verzamelen, delen of verkopen wij geen gegevens aan derden. Onze extensie maakt geen verbinding met externe servers of databases om gebruikersinformatie te verzenden.
+Wij verzenden, delen of verkopen geen gegevens aan derden. De extensie bevat geen analytics, tracking, advertenties of externe API-koppelingen voor gebruikersdata.
 
 ### 3. Toestemmingen
-De extensie vraagt enkel hostrechten aan voor specifieke portals (zodat de knop geïnjecteerd kan worden) en de benodigde script-rechten om de template visueel te kunnen tonen. Er wordt geenszins meegelezen met andere browseractiviteiten.
+De extensie vraagt alleen hostrechten aan voor het specifieke CRS-portaal waar de templateknop getoond moet worden. Er wordt niet meegelezen met andere websites of browseractiviteiten.
 
 ### Contact
 Voor vragen over dit privacybeleid of de broncode, kunt u terecht op onze GitHub repository.

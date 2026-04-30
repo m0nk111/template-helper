@@ -279,7 +279,7 @@ for (const key of fillableFields) {
   if (urlParams.has(key)) {
     const el = document.getElementById(key);
     if (el) {
-      if (el.tagName === 'DIV') el.innerHTML = decodeURIComponent(urlParams.get(key));
+      if (el.tagName === 'DIV') el.innerText = decodeURIComponent(urlParams.get(key));
       else el.value = decodeURIComponent(urlParams.get(key));
     }
   }

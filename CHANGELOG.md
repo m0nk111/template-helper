@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+## [3.1.3] - 2026-04-30
+- **Changed:** Prepared a Chrome Web Store compliance build by removing the external logo request, unused fallback injection permissions, legacy packaged scripts, and unsafe URL autofill HTML insertion.
+- **Docs:** Updated the privacy policy and added Chrome Web Store submission notes for the compliance build.
+
 ## [3.1.2] - 2026-04-30
 - **Added:** Remembered the last selected template mode so moderators can keep opening new customers directly in the answer template.
 
