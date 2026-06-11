@@ -24,9 +24,13 @@ Template Helper ondersteunt moderators met een vaste, snelle en consistente work
 - Volledige rich-text invoervelden voor `Klantvraag`, `Vastloper`, `Gewenste uitkomst`, `Antwoord`, `Bron` en `Vervolgstap`.
 - Screenshot/afbeelding invoer in rich-text velden inclusief formattering in de output.
 - Live preview van het uiteindelijke bericht.
+- Live preview update realtime tijdens typen/wijzigen.
 - Clipboard output met nette label-opmaak voor Teams (HTML + plain text fallback).
+- Clipboard fallback via legacy copy-flow als de moderne Clipboard API faalt.
 - Teams-tip in de UI om `Ctrl+V` te gebruiken zodat opmaak en afbeeldingen behouden blijven.
 - Validatie van verplichte velden met duidelijke foutmeldingen.
+- Validatie is mode-afhankelijk: streng op verplichte vraagvelden, minimaal `Antwoord` in antwoordmode.
+- Plakken in rich-text velden wordt naar plain text genormaliseerd (behalve afbeeldingen) voor consistente output.
 - Vooraf gedefinieerde wachtrijen voor snelle selectie.
 - Shortcut `Ctrl+Enter` (of `Cmd+Enter`) om direct te kopieren.
 - Template mode persistence: onthoudt laatst gebruikte template.
@@ -38,6 +42,7 @@ Template Helper ondersteunt moderators met een vaste, snelle en consistente work
 - 2-seconden long-press op taal-knop opent het taalmenu.
 - Taalmenu met checkbox-rotatie en brede internationale taalcatalogus.
 - Taalmenu dwingt minimaal één actieve taal af (je kunt niet alles uitvinken).
+- `Escape` sluit het taalmenu en buiten de menuzone klikken sluit het menu ook.
 - Nieuwe installaties starten met `NL` en `EN` als actieve rotatietalen.
 - UI-teksten blijven NL/EN; voor andere doeltalen blijft de UI Engels en vertaalt alleen inhoud.
 - In extension mode gebruikt de iframe `clipboard-write` permissie voor stabieler kopieren in CRS.
@@ -92,9 +97,13 @@ Template Helper provides moderators with a consistent and fast template workflow
 - Full rich-text editable fields for `Customer question`, `Where are you stuck`, `Desired outcome`, `Answer`, `Source`, and `Next step`.
 - Screenshot/image support inside rich-text fields with preserved formatting.
 - Live preview of the final outbound message.
+- Live preview updates in real time while typing/changing fields.
 - Clipboard output with clean Teams formatting (HTML + plain text fallback).
+- Clipboard fallback uses a legacy copy flow if the modern Clipboard API fails.
 - Teams tip in UI to use `Ctrl+V` so formatting and screenshots are preserved.
 - Required field validation with clear error feedback.
+- Validation is mode-aware: strict required fields in question mode, at least `Answer` in answer mode.
+- Rich-text paste is normalized to plain text (except images) for consistent output.
 - Predefined queue options for fast routing.
 - `Ctrl+Enter` (or `Cmd+Enter`) shortcut to copy instantly.
 - Template mode persistence: remembers the last used template.
@@ -106,6 +115,7 @@ Template Helper provides moderators with a consistent and fast template workflow
 - Exact 2-second long press on language button opens the language menu.
 - Language menu with checkbox-based rotation and broad international catalog.
 - Language menu enforces at least one active language (you cannot uncheck all).
+- `Escape` closes the language menu and outside-click also closes it.
 - New installs start with `NL` and `EN` enabled in rotation.
 - UI stays Dutch/English only; for other target languages, UI remains English while content is translated.
 - In extension mode, the iframe uses `clipboard-write` permission for more reliable copy behavior in CRS.

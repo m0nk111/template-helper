@@ -22,6 +22,7 @@
 - **Docs:** Updated v4.1.1 release notes to explicitly include the template mode stability bugfix in both Dutch and English sections.
 - **Docs:** Expanded README feature coverage to reflect historical core features explicitly (including CRS button injection, drag-to-dock sidebar behavior, dock persistence, and pop-out workflow).
 - **Docs:** Added additional explicit README feature bullets for template-mode stability during language switching, minimum-one-language enforcement, iframe clipboard permission behavior, and sidebar context refresh on repeated `Vraag maken` clicks.
+- **Docs:** Extended README with remaining user-facing behaviors: real-time preview updates, mode-aware validation, plain-text paste normalization, clipboard fallback flow, and language-menu close interactions (`Escape` + outside click).
 
 ## [3.1.4] - 2026-04-30
 - **Changed:** Neutralized Chrome Web Store-facing metadata and sidebar branding to avoid implying official company publication while preserving the existing moderator workflow.
