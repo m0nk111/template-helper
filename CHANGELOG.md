@@ -10,6 +10,7 @@
 - **Added:** Expanded supported interface languages to `NL`, `EN`, `DE`, `AR`, and `HI`, with language cycling on the main language switch.
 - **Changed:** Set light mode as the default visual theme while still restoring the user's last saved theme preference (`light`/`dark`) on startup.
 - **Changed:** Simplified standard UI text resources to `NL` and `EN` only; selecting any other language now keeps labels/toasts in English while translating only the filled form content to the selected target language.
+- **Docs:** Updated release notes to include both Dutch and English versions, plus explicit upgrade instructions to remove older extension installs before installing v4.1.0.
 
 ## [3.1.4] - 2026-04-30
 - **Changed:** Neutralized Chrome Web Store-facing metadata and sidebar branding to avoid implying official company publication while preserving the existing moderator workflow.

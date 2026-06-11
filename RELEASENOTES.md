@@ -1,3 +1,42 @@
+# v4.1.0 Release Notes
+
+## Nederlandse uitleg
+Deze release notes bevatten eerst de Nederlandse versie en daarna de Engelse versie.
+Als je al een oudere versie van de extensie hebt geinstalleerd, verwijder die eerst om conflicten te voorkomen.
+
+## Nederlandse versie
+
+### Changelog v4.1.0
+- **Internationale taalrotatie:** Uitgebreide taalcatalogus toegevoegd in het taalmenu, met checkboxen voor actieve talen in de rotatie.
+- **Long-press taalmenu:** De taal-knop ondersteunt nu een 2-seconden long press om het taalmenu te openen. Een korte druk blijft de normale taalwissel + vertaalflow uitvoeren.
+- **UI-taalbeleid vereenvoudigd:** Standaard UI-teksten (labels, toasts, regels, hints) blijven nu in Nederlands of Engels. Voor niet-NL/EN-doeltalen blijft de UI in het Engels, terwijl formulierinhoud wel wordt vertaald.
+- **Standaard actieve talen:** Nieuwe installaties starten met alleen `NL` en `EN` actief in de taalrotatie.
+- **Thema update:** Light mode is nu het standaardthema, terwijl de laatste opgeslagen keuze (`light` of `dark`) nog steeds automatisch wordt hersteld.
+- **Release artifact update:** Standalone release artifact `standalone-template-v4.1.0.html` gegenereerd.
+
+### Upgrade Instructies
+1. Ga in Chrome naar `chrome://extensions/`
+2. Zoek de oude Template Helper extensie
+3. Klik op **Remove (Verwijderen)** en bevestig
+4. Ga daarna verder met de installatie-instructies hieronder
+
+### Installatie Instructies
+1. Download het `.zip` bestand en pak het uit
+2. Ga in Chrome naar `chrome://extensions/`
+3. Zet rechtsboven de slider op Developer mode (Ontwikkelaarsmodus) aan
+4. Klik op Load unpacked (Uitgepakte extensie laden)
+5. Selecteer de uitgepakte map
+
+Of download `standalone-template-v[versie].html` en open dit direct in je browser.
+
+### Probleem ontdekt?
+Heb je een probleem ontdekt? Het makkelijkste is om hier op GitHub even een issue aan te maken. Op die manier kunnen we het probleem gestructureerd onderzoeken en oplossen!
+
+---
+*Deze tool is gebouwd in samenwerking met Mark B. (m0nk111) en Davey G. (windhoos).*
+
+## English version
+
 ### Changelog v4.1.0
 - **International language rotation:** Added a broad language catalog in the language menu, with checkbox-based selection for which languages are active in rotation.
 - **Long-press language menu:** The language button now supports a 2-second long press to open the language menu. A short press still performs the normal language switch + content translation flow.
@@ -5,6 +44,12 @@
 - **Default active languages:** New setups now start with only `NL` and `EN` enabled in language rotation.
 - **Theme behavior update:** Light mode is now the default visual theme, while the last saved theme (`light` or `dark`) is still restored automatically.
 - **Release artifact update:** Generated standalone release artifact `standalone-template-v4.1.0.html`.
+
+### Upgrade Instructions
+1. Open `chrome://extensions/` in Chrome
+2. Locate the old Template Helper extension
+3. Click **Remove** and confirm
+4. Continue with the installation instructions below
 
 ### Installation Instructions
 1. Download the `.zip` file and extract it
