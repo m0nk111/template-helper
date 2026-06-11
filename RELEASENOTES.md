@@ -9,6 +9,7 @@ Als je al een oudere versie van de extensie hebt geinstalleerd, verwijder die ee
 ### Changelog v4.1.0
 - **Internationale taalrotatie:** Uitgebreide taalcatalogus toegevoegd in het taalmenu, met checkboxen voor actieve talen in de rotatie.
 - **Long-press taalmenu:** De taal-knop ondersteunt nu een 2-seconden long press om het taalmenu te openen. Een korte druk blijft de normale taalwissel + vertaalflow uitvoeren.
+- **EN-only shortpress vertaling:** Als alleen `EN` actief staat en je invoer in een andere taal is (bijvoorbeeld Chinees, Swahili of iets anders), vertaalt een korte druk op de taal/vertaal-knop de ingevulde inhoud altijd naar Engels.
 - **UI-taalbeleid vereenvoudigd:** Standaard UI-teksten (labels, toasts, regels, hints) blijven nu in Nederlands of Engels. Voor niet-NL/EN-doeltalen blijft de UI in het Engels, terwijl formulierinhoud wel wordt vertaald.
 - **Standaard actieve talen:** Nieuwe installaties starten met alleen `NL` en `EN` actief in de taalrotatie.
 - **Thema update:** Light mode is nu het standaardthema, terwijl de laatste opgeslagen keuze (`light` of `dark`) nog steeds automatisch wordt hersteld.
@@ -40,6 +41,7 @@ Heb je een probleem ontdekt? Het makkelijkste is om hier op GitHub even een issu
 ### Changelog v4.1.0
 - **International language rotation:** Added a broad language catalog in the language menu, with checkbox-based selection for which languages are active in rotation.
 - **Long-press language menu:** The language button now supports a 2-second long press to open the language menu. A short press still performs the normal language switch + content translation flow.
+- **EN-only short-press translation:** If only `EN` is enabled and you type content in another language (for example Chinese, Swahili, or any other language), a short press on the language/translate button will always translate the filled content to English.
 - **UI language policy simplified:** Standard UI text (labels, toasts, rules, hints) now stays in Dutch or English only. For non-NL/EN targets, the UI stays in English while form content is translated to the selected target language.
 - **Default active languages:** New setups now start with only `NL` and `EN` enabled in language rotation.
 - **Theme behavior update:** Light mode is now the default visual theme, while the last saved theme (`light` or `dark`) is still restored automatically.
