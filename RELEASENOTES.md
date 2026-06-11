@@ -36,6 +36,10 @@ Als je al een oudere versie van de extensie hebt geinstalleerd, verwijder die ee
 
 Of download `standalone-template-v[versie].html` en open dit direct in je browser.
 
+### Volledig feature-overzicht
+Alle huidige features (niet alleen de nieuwste wijzigingen) staan in de root README:
+https://github.com/m0nk111/template-helper/blob/v4.1.1/README.md
+
 ### Probleem ontdekt?
 Heb je een probleem ontdekt? Het makkelijkste is om hier op GitHub even een issue aan te maken. Op die manier kunnen we het probleem gestructureerd onderzoeken en oplossen!
 
@@ -73,6 +77,10 @@ Heb je een probleem ontdekt? Het makkelijkste is om hier op GitHub even een issu
 5. Select the extracted folder
 
 Or download `standalone-template-v[version].html` and open it directly in your browser.
+
+### Complete Feature Overview
+For the full feature set (not only recent changes), see the root README:
+https://github.com/m0nk111/template-helper/blob/v4.1.1/README.md
 
 ### Found an issue?
 If you discovered an issue, the easiest way is to open an issue on GitHub. That helps us investigate and solve it in a structured way.

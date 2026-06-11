@@ -16,6 +16,8 @@
 - **Changed:** Simplified standard UI text resources to `NL` and `EN` only; selecting any other language now keeps labels/toasts in English while translating only the filled form content to the selected target language.
 - **Docs:** Updated release notes to include both Dutch and English versions, plus explicit upgrade instructions to remove older extension installs before installing v4.1.0.
 - **Docs:** Clarified in release notes that with `EN` as the only active language, a short press on the language button always translates filled content from any source language to English.
+- **Docs:** Rewrote root README as bilingual (Dutch + English) with a complete feature inventory covering both legacy and new functionality.
+- **Docs:** Updated release notes to explicitly link to the root README for full feature documentation.
 
 ## [3.1.4] - 2026-04-30
 - **Changed:** Neutralized Chrome Web Store-facing metadata and sidebar branding to avoid implying official company publication while preserving the existing moderator workflow.
