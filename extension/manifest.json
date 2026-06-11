@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Moderator Template Helper",
-  "version": "3.1.4",
+  "version": "4.1.0",
   "description": "Helpt moderators lokaal een vraag- of antwoordtemplate te vullen vanuit het CRS-portaal.",
   "homepage_url": "https://github.com/m0nk111/template-helper/tree/chrome-store/compliance",
   "action": {
@@ -14,7 +14,8 @@
     "128": "icon128.png"
   },
   "host_permissions": [
-    "https://crs.gw.dfnld.nl/*"
+    "https://crs.gw.dfnld.nl/*",
+    "https://translate.googleapis.com/*"
   ],
   "content_scripts": [
     {

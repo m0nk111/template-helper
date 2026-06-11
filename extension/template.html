@@ -209,6 +209,11 @@
       color: #fff;
     }
 
+    .toast-status {
+      background: var(--accent);
+      color: #fff;
+    }
+
     .toast.show {
       transform: translateX(-50%) translateY(0);
       opacity: 1;
@@ -260,6 +265,65 @@
     }
     .btn-switch:hover { opacity: 1; transform: scale(1.1); }
 
+    .language-menu {
+      position: absolute;
+      top: 54px;
+      right: 18px;
+      width: 240px;
+      padding: 10px;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      background: var(--card);
+      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35);
+      display: none;
+      z-index: 120;
+    }
+
+    .language-menu.show {
+      display: block;
+    }
+
+    .language-menu-title {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+
+    .language-menu-hint {
+      font-size: 11px;
+      color: var(--text-dim);
+      margin-bottom: 8px;
+      line-height: 1.4;
+    }
+
+    .language-menu-list {
+      display: grid;
+      gap: 6px;
+    }
+
+    .language-menu-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: var(--text);
+    }
+
+    .language-menu-item input[type="checkbox"] {
+      accent-color: var(--accent);
+      width: 14px;
+      height: 14px;
+      cursor: pointer;
+    }
+
+    .language-menu-item span {
+      display: inline-flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+    }
+
     body.light-mode {
       --bg: #f2f4f7;
       --surface: #ffffff;
@@ -305,7 +369,7 @@
   </style>
 
 </head>
-<body>
+<body class="light-mode">
 
 <div class="container">
   <div class="header-container" style="justify-content: space-between;">
@@ -314,52 +378,58 @@
       <h1 id="pageTitle">Vraag Template</h1>
     </div>
     <div class="top-actions">
-      <button class="btn-switch" id="themeBtn"  title="Wissel Licht/Donker">☀️</button>
+      <button class="btn-switch" id="themeBtn"  title="Wissel Licht/Donker">🌙</button>
       <button class="btn-switch" id="switchBtn" title="Mod Antwoord Template">🔄</button>
+      <button class="btn-switch" id="languageBtn" title="Switch Language">NL</button>
     </div>
   </div>
-  <p class="subtitle" style="margin-bottom: 24px;">Vul het formulier in en kopieer het bericht naar Teams.</p>
+  <div class="language-menu" id="languageMenu" aria-hidden="true">
+    <div class="language-menu-title" id="languageMenuTitle">Active languages</div>
+    <div class="language-menu-hint" id="languageMenuHint">Select which languages are included in rotation.</div>
+    <div class="language-menu-list" id="languageMenuList"></div>
+  </div>
+  <p class="subtitle" id="subtitleText" style="margin-bottom: 24px;">Vul het formulier in en kopieer het bericht naar Teams.</p>
 
   <!-- VRAAG TEMPLATE -->
   <div id="tmpl-vraag">
   <div class="form-group">
-    <label>Wachtrij <span class="required">*</span></label>
+    <label id="labelWachtrij">Wachtrij <span class="required">*</span></label>
     <select id="wachtrij">
-      <option value="">— Kies Wachtrij —</option>
-      <optgroup label="HD">
-        <option value="Internet en Vaste Telefonie">Internet en Vaste Telefonie</option>
-        <option value="Televisie en Radio">Televisie en Radio</option>
-        <option value="Overig Technisch">Overig Technisch</option>
+      <option id="queuePlaceholder" value="">— Kies Wachtrij —</option>
+      <optgroup id="queueGroupHd" label="HD">
+        <option id="queueInternet" value="Internet en Vaste Telefonie">Internet en Vaste Telefonie</option>
+        <option id="queueTvRadio" value="Televisie en Radio">Televisie en Radio</option>
+        <option id="queueOtherTechnical" value="Overig Technisch">Overig Technisch</option>
       </optgroup>
-      <optgroup label="SC">
-        <option value="Factuur en Betalen">Factuur en Betalen</option>
-        <option value="Wijzigen of Opzeggen">Wijzigen of Opzeggen</option>
-        <option value="Overige Service">Overige Service</option>
-        <option value="Mobiel">Mobiel</option>
-        <option value="Sales">Sales</option>
-        <option value="Prijswijziging">Prijswijziging</option>
-        <option value="Migratielijn">Migratielijn</option>
+      <optgroup id="queueGroupSc" label="SC">
+        <option id="queueBilling" value="Factuur en Betalen">Factuur en Betalen</option>
+        <option id="queueChangeCancel" value="Wijzigen of Opzeggen">Wijzigen of Opzeggen</option>
+        <option id="queueOtherService" value="Overige Service">Overige Service</option>
+        <option id="queueMobile" value="Mobiel">Mobiel</option>
+        <option id="queueSales" value="Sales">Sales</option>
+        <option id="queuePriceChange" value="Prijswijziging">Prijswijziging</option>
+        <option id="queueMigration" value="Migratielijn">Migratielijn</option>
       </optgroup>
     </select>
   </div>
 
   <div class="form-group">
-    <label>Klantnummer <span class="required">*</span></label>
+    <label id="labelKlantnummer">Klantnummer <span class="required">*</span></label>
     <input type="text" id="klantnummer" placeholder="Bijv. 12345678" maxlength="20" autocomplete="off">
   </div>
 
   <div class="form-group">
-    <label>Klantvraag <span class="required">*</span></label>
+    <label id="labelKlantvraag">Klantvraag <span class="required">*</span></label>
     <div id="klantvraag" contenteditable="true" class="textarea-like" data-placeholder="Wat is de vraag van de klant? Je kunt hier ook een screenshot droppen."></div>
   </div>
 
   <div class="form-group">
-    <label>Waar loop je vast <span class="required">*</span></label>
+    <label id="labelVastloper">Waar loop je vast <span class="required">*</span></label>
     <div id="vastloper" contenteditable="true" class="textarea-like" data-placeholder="Beschrijf waar je vastzit..."></div>
   </div>
 
   <div class="form-group">
-    <label>Gewenste uitkomst <span class="required">*</span></label>
+    <label id="labelUitkomst">Gewenste uitkomst <span class="required">*</span></label>
     <div id="uitkomst" contenteditable="true" class="textarea-like" data-placeholder="Wat wil je bereiken?"></div>
   </div>
 
@@ -368,15 +438,15 @@
   <!-- ANTWOORD TEMPLATE -->
   <div id="tmpl-antwoord" style="display: none;">
     <div class="form-group">
-      <label>Antwoord <span class="required">*</span></label>
+      <label id="labelAntwoord">Antwoord <span class="required">*</span></label>
       <div id="antwoord" contenteditable="true" class="textarea-like" data-placeholder="Typ hier je inhoudelijke antwoord en/of screenshot..."></div>
     </div>
     <div class="form-group">
-      <label>Bron</label>
+      <label id="labelBron">Bron</label>
       <div id="bron" contenteditable="true" class="textarea-like" data-placeholder="Uit welk systeem komt de informatie?" style="min-height: 46px;"></div>
     </div>
     <div class="form-group">
-      <label>Vervolgstap</label>
+      <label id="labelVervolgstap">Vervolgstap</label>
       <div id="vervolgstap" contenteditable="true" class="textarea-like" data-placeholder="Wat verwacht je nu van de agent?" style="min-height: 60px;"></div>
     </div>
   </div>
@@ -386,32 +456,33 @@
     <button class="btn-clear" id="btn-clear">Wissen</button>
   </div>
 
-  <div style="font-size: 12px; color: var(--text-dim); text-align: center; margin-top: 12px; font-style: italic;">
+  <div id="teamsTip" style="font-size: 12px; color: var(--text-dim); text-align: center; margin-top: 12px; font-style: italic;">
     💡 <strong>Tip Teams:</strong> Gebruik altijd <strong>Ctrl+V</strong> bij het plakken. (De Rechtermuisknop -> "Plakken" filtert alle opmaak en screenshots weg!)
   </div>
 
   <div style="margin-top: 24px;">
-    <div class="preview-label">Voorbeeld</div>
+    <div class="preview-label" id="previewLabel">Voorbeeld</div>
     <div class="preview" id="preview"></div>
   </div>
 
   <details class="rules">
-    <summary>📌 Spelregels Moderator Chat</summary>
+    <summary id="rulesSummary">📌 Spelregels Moderator Chat</summary>
     <ul>
-      <li>Gebruik altijd dit template.</li>
-      <li>Er wordt altijd met een citaat gereageerd.</li>
-      <li>Alleen een moderator reageert op een vraag.</li>
-      <li>Houd je vraag duidelijk en to-the-point.</li>
-      <li>Reageer als de moderator om extra informatie vraagt.</li>
-      <li>Geen discussies, social talk of privéberichten.</li>
-      <li>Verbeter anderen niet in de chat — signaleer bij je TM of senior.</li>
+      <li id="rule1">Gebruik altijd dit template.</li>
+      <li id="rule2">Er wordt altijd met een citaat gereageerd.</li>
+      <li id="rule3">Alleen een moderator reageert op een vraag.</li>
+      <li id="rule4">Houd je vraag duidelijk en to-the-point.</li>
+      <li id="rule5">Reageer als de moderator om extra informatie vraagt.</li>
+      <li id="rule6">Geen discussies, social talk of privéberichten.</li>
+      <li id="rule7">Verbeter anderen niet in de chat — signaleer bij je TM of senior.</li>
     </ul>
   </details>
   <div style="font-size:10px; color:#bbbbbb; text-align:center; padding-top:15px; padding-bottom:5px; user-select:none; font-family:monospace; cursor:default;">built by Mark B. en Davey G. | versie: <span id="templateVersion">v-</span></div>
 </div>
 
-<div class="toast" id="toast">✅ Gekopieerd!<br><span style="font-size:11px;opacity:0.8;">(Gebruik Ctrl+V om te plakken in Teams)</span></div>
+<div class="toast" id="toast">✅ Gekopieerd!<br><span id="toastHint" style="font-size:11px;opacity:0.8;">(Gebruik Ctrl+V om te plakken in Teams)</span></div>
 <div class="toast toast-error" id="toast-error">⚠️ Let op: vul alle verplichte velden in!</div>
+<div class="toast toast-status" id="toast-status"></div>
 
 <script src="script.js"></script>
 

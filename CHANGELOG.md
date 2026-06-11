@@ -2,6 +2,15 @@
 
 ## [Unreleased]
 
+- **Added:** Introduced a persistent language toggle (`NL/EN`) in the template UI for Dutch and English moderators.
+- **Changed:** Localized form labels, placeholders, help text, rules, toasts, and generated clipboard output based on the selected language.
+- **Changed:** Standardized persistence so theme mode, template mode, and language mode are all remembered between sessions.
+- **Added:** Added a `Translate filled fields` action that uses Google Translate to convert form content to the currently selected template language (`NL/EN`).
+- **Changed:** Language switch now handles full form translation and content translation in one action; removed the separate translate button.
+- **Added:** Expanded supported interface languages to `NL`, `EN`, `DE`, `AR`, and `HI`, with language cycling on the main language switch.
+- **Changed:** Set light mode as the default visual theme while still restoring the user's last saved theme preference (`light`/`dark`) on startup.
+- **Changed:** Simplified standard UI text resources to `NL` and `EN` only; selecting any other language now keeps labels/toasts in English while translating only the filled form content to the selected target language.
+
 ## [3.1.4] - 2026-04-30
 - **Changed:** Neutralized Chrome Web Store-facing metadata and sidebar branding to avoid implying official company publication while preserving the existing moderator workflow.
 - **Docs:** Added guidance for using the Chrome Developer Dashboard public key instead of generating an arbitrary manifest key.
