@@ -11,8 +11,16 @@ Template Helper ondersteunt moderators met een vaste, snelle en consistente work
 ### Complete featurelijst
 - Twee template modes: `Vraag Template` en `Antwoord Template`.
 - Werkt als Chrome extensie in CRS en als standalone HTML buiten CRS.
+- Injecteert een blauwe `Vraag maken` knop direct bij het CRS-invoerveld.
+- Leest automatisch `Klantnummer` en notitie uit CRS en prefilt relevante templatevelden.
 - In extension mode opent de template direct vanuit de workflow in een in-app zijpaneel.
 - Docking-ondersteuning voor zijpaneel (links, rechts, boven, onder) met bewaarde positie.
+- Drag-to-dock: sleep de blauwe sidebar-header om live te docken naar links, rechts, boven of onder.
+- Sidebar toggle-tab om snel te verbergen/tonen zonder context te verliezen.
+- Pop-out knop (`↗`) om de template los in een apart venster te openen.
+- Dock mode persistence: onthoudt de laatst gebruikte dock-positie.
+- SPA-resilience: injectie herstelt automatisch bij dynamische CRS redraws.
+- Domeinbeperking: injectie draait alleen op CRS-URL's.
 - Volledige rich-text invoervelden voor `Klantvraag`, `Vastloper`, `Gewenste uitkomst`, `Antwoord`, `Bron` en `Vervolgstap`.
 - Screenshot/afbeelding invoer in rich-text velden inclusief formattering in de output.
 - Live preview van het uiteindelijke bericht.
@@ -67,8 +75,16 @@ Template Helper provides moderators with a consistent and fast template workflow
 ### Full feature set
 - Two template modes: `Question Template` and `Answer Template`.
 - Works as a Chrome extension in CRS and as standalone HTML outside CRS.
+- Injects a blue `Vraag maken` action button directly near the CRS input area.
+- Automatically reads `Customer number` and note context from CRS and pre-fills relevant template fields.
 - In extension mode, the template opens directly from workflow context in an in-app sidebar.
 - Sidebar docking support (left, right, top, bottom) with persisted dock position.
+- Drag-to-dock: drag the blue sidebar header to dock live to left, right, top, or bottom.
+- Sidebar toggle tab for fast hide/show without losing context.
+- Pop-out button (`↗`) to open the template in a detached window.
+- Dock mode persistence: remembers last used dock placement.
+- SPA resilience: button/sidebar injection auto-recovers on dynamic CRS redraws.
+- Domain scoping: injection runs only on CRS URLs.
 - Full rich-text editable fields for `Customer question`, `Where are you stuck`, `Desired outcome`, `Answer`, `Source`, and `Next step`.
 - Screenshot/image support inside rich-text fields with preserved formatting.
 - Live preview of the final outbound message.
