@@ -9,6 +9,15 @@ const languageStorageKey = 'vraag-tmpl-language';
 const enabledLanguagesStorageKey = 'vraag-tmpl-enabled-languages';
 const googleTranslateEndpoint = 'https://translate.googleapis.com/translate_a/single';
 const languageLongPressMs = 2000;
+const translateRequestMaxChars = 5000;
+const translateChunkSoftLimit = 4200;
+const translateMinRequestIntervalMs = 700;
+const translateRequestTimeoutMs = 12000;
+const translateMaxRetryAttempts = 2;
+const translateBackoffBaseMs = 900;
+const translateRateLimitCooldownMs = 60000;
+const translateNetworkCooldownMs = 8000;
+const translateMaxRequestsPerRun = 12;
 
 const languageCatalog = [
   { code: 'af', name: 'Afrikaans' },
@@ -198,6 +207,9 @@ const fieldsVraag = ['wachtrij', 'klantnummer', 'klantvraag', 'vastloper', 'uitk
 const fieldsAntwoord = ['antwoord', 'bron', 'vervolgstap'];
 const richTextFields = ['klantvraag', 'vastloper', 'uitkomst', 'antwoord', 'bron', 'vervolgstap'];
 const translationCache = new Map();
+let translateQueue = Promise.resolve();
+let lastTranslateRequestAt = 0;
+let translateBlockedUntil = 0;
 
 const i18n = {
   nl: {
@@ -262,6 +274,10 @@ const i18n = {
       busy: '⏳ Taal wisselen en inhoud vertalen...',
       success: '✅ Interface en invulvakken vertaald.',
       empty: 'ℹ️ Taal gewijzigd. Geen ingevulde tekst gevonden om te vertalen.',
+      tooLarge: '⚠️ Te veel tekst om veilig in één keer te vertalen. Kort de inhoud in of vertaal in delen.',
+      rateLimited: '⚠️ Google Translate blokkeert tijdelijk (429). Wacht ongeveer een minuut en probeer opnieuw.',
+      network: '⚠️ Netwerkfout tijdens vertalen. Probeer het zo opnieuw.',
+      cooldown: '⚠️ Vertalen is tijdelijk gepauzeerd. Probeer over {seconds}s opnieuw.',
       failed: '⚠️ Interface gewijzigd, maar inhoud vertalen is mislukt.'
     },
     outputLabels: {
@@ -337,6 +353,10 @@ const i18n = {
       busy: '⏳ Switching language and translating content...',
       success: '✅ Interface and filled fields translated.',
       empty: 'ℹ️ Language switched. No filled text found to translate.',
+      tooLarge: '⚠️ Too much text to translate safely in one run. Shorten the text or translate in smaller parts.',
+      rateLimited: '⚠️ Google Translate temporarily blocked requests (429). Please wait about one minute and try again.',
+      network: '⚠️ Network issue during translation. Please try again shortly.',
+      cooldown: '⚠️ Translation is temporarily paused. Try again in {seconds}s.',
       failed: '⚠️ Interface switched, but content translation failed.'
     },
     outputLabels: {
@@ -370,7 +390,7 @@ function persistEnabledLanguages() {
 
 function getRotationLanguages() {
   const rotation = supportedLanguages.filter((code) => enabledLanguages.includes(code));
-  return rotation.length ? rotation : [...supportedLanguages];
+  return rotation.length ? rotation : [...defaultEnabledLanguages];
 }
 
 function isLanguageMenuOpen() {
@@ -617,13 +637,116 @@ function showErrorToast(message, durationMs) {
   }, durationMs);
 }
 
-async function translateWithGoogle(text, targetLanguage) {
-  const normalized = (text || '').trim();
-  if (!normalized) return text;
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
 
-  const cacheKey = `${targetLanguage}|${normalized}`;
-  if (translationCache.has(cacheKey)) {
-    return translationCache.get(cacheKey);
+function createTranslateError(code, message, extra) {
+  const err = new Error(message);
+  err.name = 'TranslateGuardError';
+  err.code = code;
+  if (extra && typeof extra === 'object') {
+    Object.assign(err, extra);
+  }
+  return err;
+}
+
+function isTranslateError(error, code) {
+  if (!error || error.name !== 'TranslateGuardError') return false;
+  if (!code) return true;
+  return error.code === code;
+}
+
+function splitTextIntoTranslateChunks(text, maxChars) {
+  const source = text || '';
+  if (!source) return [];
+  if (source.length <= maxChars) return [source];
+
+  const chunks = [];
+  let index = 0;
+  const minBoundary = Math.floor(maxChars * 0.55);
+
+  while (index < source.length) {
+    let end = Math.min(index + maxChars, source.length);
+
+    if (end < source.length) {
+      let splitAt = -1;
+      for (let cursor = end - 1; cursor >= index + minBoundary; cursor -= 1) {
+        const char = source[cursor];
+        if (char === '\n' || char === ' ' || char === '.' || char === '!' || char === '?' || char === ';' || char === ',' || char === ':') {
+          splitAt = cursor + 1;
+          break;
+        }
+      }
+
+      if (splitAt !== -1) {
+        end = splitAt;
+      }
+    }
+
+    const chunk = source.slice(index, end);
+    chunks.push(chunk);
+    index = end;
+  }
+
+  return chunks;
+}
+
+function estimateTranslateRequestsForText(text) {
+  const normalized = (text || '').trim();
+  if (!normalized) return 0;
+  return splitTextIntoTranslateChunks(normalized, translateChunkSoftLimit).length;
+}
+
+function estimateTranslateRequestsForCurrentInput() {
+  let count = 0;
+
+  for (const id of richTextFields) {
+    const el = document.getElementById(id);
+    if (!el) continue;
+
+    const textNodes = collectTranslatableTextNodes(el);
+    for (const node of textNodes) {
+      count += estimateTranslateRequestsForText(node.nodeValue);
+      if (count > translateMaxRequestsPerRun) {
+        return count;
+      }
+    }
+  }
+
+  return count;
+}
+
+async function enqueueTranslateRequest(task) {
+  const execute = async () => {
+    const now = Date.now();
+    if (translateBlockedUntil > now) {
+      const retryAfterMs = translateBlockedUntil - now;
+      throw createTranslateError('TRANSLATE_COOLDOWN', 'Translation temporarily paused.', {
+        retryAfterMs,
+        retryAfterSeconds: Math.max(1, Math.ceil(retryAfterMs / 1000))
+      });
+    }
+
+    const delayMs = Math.max(0, translateMinRequestIntervalMs - (now - lastTranslateRequestAt));
+    if (delayMs > 0) {
+      await sleep(delayMs);
+    }
+
+    lastTranslateRequestAt = Date.now();
+    return task();
+  };
+
+  const next = translateQueue.then(execute, execute);
+  translateQueue = next.catch(() => {});
+  return next;
+}
+
+async function performTranslateRequest(chunk, targetLanguage) {
+  if (chunk.length > translateRequestMaxChars) {
+    throw createTranslateError('TRANSLATE_TOO_LARGE', 'Translation chunk exceeds 5000 characters.', {
+      chunkLength: chunk.length
+    });
   }
 
   const url = new URL(googleTranslateEndpoint);
@@ -631,20 +754,136 @@ async function translateWithGoogle(text, targetLanguage) {
   url.searchParams.set('sl', 'auto');
   url.searchParams.set('tl', targetLanguage);
   url.searchParams.set('dt', 't');
-  url.searchParams.set('q', normalized);
+  url.searchParams.set('q', chunk);
 
-  const response = await fetch(url.toString(), { method: 'GET' });
-  if (!response.ok) {
-    throw new Error(`Translate request failed with status ${response.status}`);
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), translateRequestTimeoutMs);
+
+  try {
+    const response = await fetch(url.toString(), {
+      method: 'GET',
+      signal: controller.signal
+    });
+
+    if (response.status === 429) {
+      translateBlockedUntil = Date.now() + translateRateLimitCooldownMs;
+      throw createTranslateError('TRANSLATE_RATE_LIMIT', 'Google Translate rate limit reached (429).');
+    }
+
+    if (response.status === 400) {
+      throw createTranslateError('TRANSLATE_BAD_REQUEST', 'Google Translate rejected the request (400).', {
+        status: 400
+      });
+    }
+
+    if (!response.ok) {
+      throw createTranslateError('TRANSLATE_HTTP', `Translate request failed with status ${response.status}.`, {
+        status: response.status
+      });
+    }
+
+    const data = await response.json();
+    return Array.isArray(data?.[0])
+      ? data[0].map((part) => (Array.isArray(part) ? part[0] : '')).join('')
+      : chunk;
+  } catch (error) {
+    if (error && error.name === 'AbortError') {
+      translateBlockedUntil = Date.now() + translateNetworkCooldownMs;
+      throw createTranslateError('TRANSLATE_NETWORK', 'Translate request timed out.');
+    }
+
+    if (isTranslateError(error)) {
+      throw error;
+    }
+
+    translateBlockedUntil = Date.now() + translateNetworkCooldownMs;
+    throw createTranslateError('TRANSLATE_NETWORK', 'Translate request failed due to a network issue.');
+  } finally {
+    clearTimeout(timeoutId);
+  }
+}
+
+function shouldRetryTranslateError(error) {
+  if (!isTranslateError(error)) return false;
+  if (error.code === 'TRANSLATE_NETWORK') return true;
+  if (error.code === 'TRANSLATE_HTTP' && Number(error.status) >= 500) return true;
+  return false;
+}
+
+async function translateChunkWithRetry(chunk, targetLanguage) {
+  let attempt = 0;
+
+  while (attempt <= translateMaxRetryAttempts) {
+    try {
+      return await enqueueTranslateRequest(() => performTranslateRequest(chunk, targetLanguage));
+    } catch (error) {
+      if (!shouldRetryTranslateError(error) || attempt === translateMaxRetryAttempts) {
+        throw error;
+      }
+
+      const backoffMs = translateBackoffBaseMs * Math.pow(2, attempt) + Math.floor(Math.random() * 240);
+      await sleep(backoffMs);
+      attempt += 1;
+    }
   }
 
-  const data = await response.json();
-  const translated = Array.isArray(data?.[0])
-    ? data[0].map((part) => (Array.isArray(part) ? part[0] : '')).join('')
-    : normalized;
+  throw createTranslateError('TRANSLATE_NETWORK', 'Translate retries exhausted.');
+}
 
-  translationCache.set(cacheKey, translated);
-  return translated;
+function getTranslateErrorMessage(error, langPack) {
+  if (isTranslateError(error, 'TRANSLATE_TOO_LARGE') || isTranslateError(error, 'TRANSLATE_BAD_REQUEST')) {
+    return langPack.translateStatus.tooLarge;
+  }
+
+  if (isTranslateError(error, 'TRANSLATE_RATE_LIMIT')) {
+    return langPack.translateStatus.rateLimited;
+  }
+
+  if (isTranslateError(error, 'TRANSLATE_COOLDOWN')) {
+    const seconds = Math.max(1, Number(error.retryAfterSeconds) || 1);
+    return langPack.translateStatus.cooldown.replace('{seconds}', String(seconds));
+  }
+
+  if (isTranslateError(error, 'TRANSLATE_NETWORK')) {
+    return langPack.translateStatus.network;
+  }
+
+  return langPack.translateStatus.failed;
+}
+
+async function translateWithGoogle(text, targetLanguage) {
+  const normalized = (text || '').trim();
+  if (!normalized) return text;
+
+  if (normalized.length > translateRequestMaxChars * translateMaxRequestsPerRun) {
+    throw createTranslateError('TRANSLATE_TOO_LARGE', 'Source text exceeds safe translation capacity.', {
+      sourceLength: normalized.length
+    });
+  }
+
+  const chunks = splitTextIntoTranslateChunks(normalized, translateChunkSoftLimit);
+  if (!chunks.length) return text;
+
+  if (chunks.length > translateMaxRequestsPerRun) {
+    throw createTranslateError('TRANSLATE_TOO_LARGE', 'Too many translation requests required.', {
+      estimatedRequests: chunks.length
+    });
+  }
+
+  const translatedChunks = [];
+  for (const chunk of chunks) {
+    const cacheKey = `${targetLanguage}|${chunk}`;
+    if (translationCache.has(cacheKey)) {
+      translatedChunks.push(translationCache.get(cacheKey));
+      continue;
+    }
+
+    const translatedChunk = await translateChunkWithRetry(chunk, targetLanguage);
+    translationCache.set(cacheKey, translatedChunk);
+    translatedChunks.push(translatedChunk);
+  }
+
+  return translatedChunks.join('');
 }
 
 async function translatePreservingWhitespace(text, targetLanguage) {
@@ -692,6 +931,13 @@ async function translateEditableDivById(id, targetLanguage) {
   if (!textNodes.length) return false;
 
   for (const node of textNodes) {
+    const raw = node.nodeValue || '';
+    if (raw.length > translateRequestMaxChars * translateMaxRequestsPerRun) {
+      throw createTranslateError('TRANSLATE_TOO_LARGE', 'Single text node exceeds safe translation capacity.', {
+        sourceLength: raw.length
+      });
+    }
+
     node.nodeValue = await translatePreservingWhitespace(node.nodeValue, targetLanguage);
   }
 
@@ -718,6 +964,13 @@ async function switchLanguageAndTranslate() {
   showStatusToast(statusPack.translateStatus.busy, 1500);
 
   try {
+    const estimate = estimateTranslateRequestsForCurrentInput();
+    if (estimate > translateMaxRequestsPerRun) {
+      throw createTranslateError('TRANSLATE_TOO_LARGE', 'Too many translation requests needed for current input.', {
+        estimatedRequests: estimate
+      });
+    }
+
     applyLanguage(nextLang, true);
 
     let changed = false;
@@ -734,8 +987,8 @@ async function switchLanguageAndTranslate() {
     } else {
       showStatusToast(nextPack.translateStatus.success, 3200);
     }
-  } catch {
-    showErrorToast(getLangPack().translateStatus.failed, 5000);
+  } catch (error) {
+    showErrorToast(getTranslateErrorMessage(error, getLangPack()), 5200);
   } finally {
     isLanguageSwitching = false;
     document.getElementById('languageBtn').disabled = false;

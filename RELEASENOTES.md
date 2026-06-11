@@ -1,10 +1,16 @@
-# v4.1.0 Release Notes
+# v4.1.1 Release Notes
 
 ## Nederlandse uitleg
 Deze release notes bevatten eerst de Nederlandse versie en daarna de Engelse versie.
 Als je al een oudere versie van de extensie hebt geinstalleerd, verwijder die eerst om conflicten te voorkomen.
 
 ## Nederlandse versie
+
+### Changelog v4.1.1
+- **Vertaling endpoint beveiligd:** De vertaalfunctie achter de taalswitch-knop is nu beschermd tegen de bekende limieten van `translate.googleapis.com/translate_a/single`.
+- **5000-tekens grens afgevangen:** Lange teksten worden proactief opgesplitst in veilige delen voordat er een request wordt verstuurd, zodat `HTTP 400` op te grote payloads wordt voorkomen.
+- **Rate-limit bescherming (`429`):** Vertaalverzoeken lopen via een queue met throttle, retry + backoff en een tijdelijke cooldown bij misbruikdetectie, zodat de UI stabiel blijft.
+- **Graceful error handling:** Bij `429`, netwerkfouten of tijdelijke blokkades krijgt de gebruiker duidelijke status/toast feedback in plaats van een crash of vastlopende flow.
 
 ### Changelog v4.1.0
 - **Internationale taalrotatie:** Uitgebreide taalcatalogus toegevoegd in het taalmenu, met checkboxen voor actieve talen in de rotatie.
@@ -37,6 +43,12 @@ Heb je een probleem ontdekt? Het makkelijkste is om hier op GitHub even een issu
 *Deze tool is gebouwd in samenwerking met Mark B. (m0nk111) en Davey G. (windhoos).*
 
 ## English version
+
+### Changelog v4.1.1
+- **Translation endpoint hardening:** The translation flow behind the language switch button is now protected against known limits of `translate.googleapis.com/translate_a/single`.
+- **5000-character guardrail:** Long input is proactively split into safe chunks before requests are sent, preventing direct `HTTP 400` failures on oversized payloads.
+- **Rate-limit protection (`429`):** Translation requests now run through a throttled queue with retry + backoff and temporary cooldown behavior when abuse detection triggers.
+- **Graceful error handling:** On `429`, network failures, or temporary blocks, users get clear status/toast feedback instead of UI crashes or stuck flows.
 
 ### Changelog v4.1.0
 - **International language rotation:** Added a broad language catalog in the language menu, with checkbox-based selection for which languages are active in rotation.

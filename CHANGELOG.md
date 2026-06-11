@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+- **Changed:** Bumped release version to `4.1.1`.
+- **Added:** Hardened Google Translate integration with proactive payload splitting, request throttling, queued execution, retry/backoff, and temporary cooldown handling for `429` and network failures.
+- **Added:** Guardrails for translate-request sizing and per-run request caps to avoid endpoint abuse and prevent UI crashes on large input.
+
 - **Added:** Introduced a persistent language toggle (`NL/EN`) in the template UI for Dutch and English moderators.
 - **Changed:** Localized form labels, placeholders, help text, rules, toasts, and generated clipboard output based on the selected language.
 - **Changed:** Standardized persistence so theme mode, template mode, and language mode are all remembered between sessions.
