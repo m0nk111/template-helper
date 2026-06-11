@@ -5,6 +5,8 @@
 - **Changed:** Bumped release version to `4.1.1`.
 - **Added:** Hardened Google Translate integration with proactive payload splitting, request throttling, queued execution, retry/backoff, and temporary cooldown handling for `429` and network failures.
 - **Added:** Guardrails for translate-request sizing and per-run request caps to avoid endpoint abuse and prevent UI crashes on large input.
+- **Added:** Implemented optional Microsoft/Azure Translator provider path (disabled by default; Google remains active).
+- **Added:** Added optional Azure Translator configuration keys via `localStorage` (`provider`, `key`, `region`, `endpoint`).
 
 - **Added:** Introduced a persistent language toggle (`NL/EN`) in the template UI for Dutch and English moderators.
 - **Changed:** Localized form labels, placeholders, help text, rules, toasts, and generated clipboard output based on the selected language.
@@ -23,6 +25,7 @@
 - **Docs:** Expanded README feature coverage to reflect historical core features explicitly (including CRS button injection, drag-to-dock sidebar behavior, dock persistence, and pop-out workflow).
 - **Docs:** Added additional explicit README feature bullets for template-mode stability during language switching, minimum-one-language enforcement, iframe clipboard permission behavior, and sidebar context refresh on repeated `Vraag maken` clicks.
 - **Docs:** Extended README with remaining user-facing behaviors: real-time preview updates, mode-aware validation, plain-text paste normalization, clipboard fallback flow, and language-menu close interactions (`Escape` + outside click).
+- **Changed:** Expanded extension host permissions to include optional Azure Translator endpoint access.
 
 ## [3.1.4] - 2026-04-30
 - **Changed:** Neutralized Chrome Web Store-facing metadata and sidebar branding to avoid implying official company publication while preserving the existing moderator workflow.

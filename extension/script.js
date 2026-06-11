@@ -7,7 +7,12 @@ const templateModeStorageKey = 'vraag-tmpl-active-template';
 const themeStorageKey = 'vraag-tmpl-theme';
 const languageStorageKey = 'vraag-tmpl-language';
 const enabledLanguagesStorageKey = 'vraag-tmpl-enabled-languages';
+const translationProviderStorageKey = 'vraag-tmpl-translate-provider';
+const azureTranslatorKeyStorageKey = 'vraag-tmpl-azure-translator-key';
+const azureTranslatorRegionStorageKey = 'vraag-tmpl-azure-translator-region';
+const azureTranslatorEndpointStorageKey = 'vraag-tmpl-azure-translator-endpoint';
 const googleTranslateEndpoint = 'https://translate.googleapis.com/translate_a/single';
+const azureTranslatorDefaultEndpoint = 'https://api.cognitive.microsofttranslator.com/translate';
 const languageLongPressMs = 2000;
 const translateRequestMaxChars = 5000;
 const translateChunkSoftLimit = 4200;
@@ -276,6 +281,7 @@ const i18n = {
       empty: 'ℹ️ Taal gewijzigd. Geen ingevulde tekst gevonden om te vertalen.',
       tooLarge: '⚠️ Te veel tekst om veilig in één keer te vertalen. Kort de inhoud in of vertaal in delen.',
       rateLimited: '⚠️ Google Translate blokkeert tijdelijk (429). Wacht ongeveer een minuut en probeer opnieuw.',
+      providerAuth: '⚠️ Azure Translator is geconfigureerd, maar key/region lijkt ongeldig. Controleer je instellingen of gebruik Google.',
       network: '⚠️ Netwerkfout tijdens vertalen. Probeer het zo opnieuw.',
       cooldown: '⚠️ Vertalen is tijdelijk gepauzeerd. Probeer over {seconds}s opnieuw.',
       failed: '⚠️ Interface gewijzigd, maar inhoud vertalen is mislukt.'
@@ -355,6 +361,7 @@ const i18n = {
       empty: 'ℹ️ Language switched. No filled text found to translate.',
       tooLarge: '⚠️ Too much text to translate safely in one run. Shorten the text or translate in smaller parts.',
       rateLimited: '⚠️ Google Translate temporarily blocked requests (429). Please wait about one minute and try again.',
+      providerAuth: '⚠️ Azure Translator is configured, but key/region appears invalid. Check your settings or switch back to Google.',
       network: '⚠️ Network issue during translation. Please try again shortly.',
       cooldown: '⚠️ Translation is temporarily paused. Try again in {seconds}s.',
       failed: '⚠️ Interface switched, but content translation failed.'
@@ -644,6 +651,77 @@ function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+function safeGetStorageValue(key) {
+  try {
+    return localStorage.getItem(key);
+  } catch {
+    return null;
+  }
+}
+
+function getConfiguredTranslationProvider() {
+  const raw = (safeGetStorageValue(translationProviderStorageKey) || 'google').trim().toLowerCase();
+  if (raw === 'azure' || raw === 'microsoft' || raw === 'ms') {
+    return 'azure';
+  }
+  return 'google';
+}
+
+function normalizeAzureEndpoint(endpoint) {
+  const raw = (endpoint || '').trim();
+  if (!raw) return azureTranslatorDefaultEndpoint;
+
+  const withoutTrailingSlash = raw.replace(/\/+$/, '');
+  if (withoutTrailingSlash.endsWith('/translate')) {
+    return withoutTrailingSlash;
+  }
+
+  return `${withoutTrailingSlash}/translate`;
+}
+
+function getAzureTranslatorConfig() {
+  return {
+    endpoint: normalizeAzureEndpoint(safeGetStorageValue(azureTranslatorEndpointStorageKey)),
+    key: (safeGetStorageValue(azureTranslatorKeyStorageKey) || '').trim(),
+    region: (safeGetStorageValue(azureTranslatorRegionStorageKey) || '').trim()
+  };
+}
+
+function canUseAzureTranslator(config) {
+  return Boolean(config && config.endpoint && config.key && config.region);
+}
+
+function getTranslationProviderContext() {
+  const configuredProvider = getConfiguredTranslationProvider();
+  if (configuredProvider !== 'azure') {
+    return { provider: 'google' };
+  }
+
+  const azureConfig = getAzureTranslatorConfig();
+  if (!canUseAzureTranslator(azureConfig)) {
+    // Azure path is optional and disabled unless fully configured.
+    return { provider: 'google' };
+  }
+
+  return {
+    provider: 'azure',
+    azureConfig
+  };
+}
+
+function normalizeTargetLanguageForProvider(targetLanguage, provider) {
+  if (provider !== 'azure') {
+    return targetLanguage;
+  }
+
+  const azureCodeMap = {
+    'zh-CN': 'zh-Hans',
+    'zh-TW': 'zh-Hant'
+  };
+
+  return azureCodeMap[targetLanguage] || targetLanguage;
+}
+
 function createTranslateError(code, message, extra) {
   const err = new Error(message);
   err.name = 'TranslateGuardError';
@@ -745,13 +823,7 @@ async function enqueueTranslateRequest(task) {
   return next;
 }
 
-async function performTranslateRequest(chunk, targetLanguage) {
-  if (chunk.length > translateRequestMaxChars) {
-    throw createTranslateError('TRANSLATE_TOO_LARGE', 'Translation chunk exceeds 5000 characters.', {
-      chunkLength: chunk.length
-    });
-  }
-
+async function performGoogleTranslateRequest(chunk, targetLanguage, signal) {
   const url = new URL(googleTranslateEndpoint);
   url.searchParams.set('client', 'gtx');
   url.searchParams.set('sl', 'auto');
@@ -759,36 +831,102 @@ async function performTranslateRequest(chunk, targetLanguage) {
   url.searchParams.set('dt', 't');
   url.searchParams.set('q', chunk);
 
+  const response = await fetch(url.toString(), {
+    method: 'GET',
+    signal
+  });
+
+  if (response.status === 429) {
+    translateBlockedUntil = Date.now() + translateRateLimitCooldownMs;
+    throw createTranslateError('TRANSLATE_RATE_LIMIT', 'Google Translate rate limit reached (429).');
+  }
+
+  if (response.status === 400) {
+    throw createTranslateError('TRANSLATE_BAD_REQUEST', 'Google Translate rejected the request (400).', {
+      status: 400
+    });
+  }
+
+  if (!response.ok) {
+    throw createTranslateError('TRANSLATE_HTTP', `Translate request failed with status ${response.status}.`, {
+      status: response.status
+    });
+  }
+
+  const data = await response.json();
+  return Array.isArray(data?.[0])
+    ? data[0].map((part) => (Array.isArray(part) ? part[0] : '')).join('')
+    : chunk;
+}
+
+async function performAzureTranslateRequest(chunk, targetLanguage, azureConfig, signal) {
+  const url = new URL(azureConfig.endpoint);
+  url.searchParams.set('api-version', '3.0');
+  url.searchParams.set('to', targetLanguage);
+
+  const response = await fetch(url.toString(), {
+    method: 'POST',
+    signal,
+    headers: {
+      'Content-Type': 'application/json',
+      'Ocp-Apim-Subscription-Key': azureConfig.key,
+      'Ocp-Apim-Subscription-Region': azureConfig.region
+    },
+    body: JSON.stringify([{ text: chunk }])
+  });
+
+  if (response.status === 429) {
+    translateBlockedUntil = Date.now() + translateRateLimitCooldownMs;
+    throw createTranslateError('TRANSLATE_RATE_LIMIT', 'Azure Translator rate limit reached (429).');
+  }
+
+  if (response.status === 401 || response.status === 403) {
+    throw createTranslateError('TRANSLATE_PROVIDER_AUTH', 'Azure Translator credentials were rejected.', {
+      status: response.status
+    });
+  }
+
+  if (response.status === 400) {
+    throw createTranslateError('TRANSLATE_BAD_REQUEST', 'Azure Translator rejected the request (400).', {
+      status: 400
+    });
+  }
+
+  if (!response.ok) {
+    throw createTranslateError('TRANSLATE_HTTP', `Translate request failed with status ${response.status}.`, {
+      status: response.status
+    });
+  }
+
+  const data = await response.json();
+  if (!Array.isArray(data) || !Array.isArray(data[0]?.translations) || !data[0].translations.length) {
+    return chunk;
+  }
+
+  return data[0].translations.map((entry) => entry?.text || '').join('');
+}
+
+async function performTranslateRequest(chunk, targetLanguage, providerContext) {
+  if (chunk.length > translateRequestMaxChars) {
+    throw createTranslateError('TRANSLATE_TOO_LARGE', 'Translation chunk exceeds 5000 characters.', {
+      chunkLength: chunk.length
+    });
+  }
+
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), translateRequestTimeoutMs);
 
   try {
-    const response = await fetch(url.toString(), {
-      method: 'GET',
-      signal: controller.signal
-    });
-
-    if (response.status === 429) {
-      translateBlockedUntil = Date.now() + translateRateLimitCooldownMs;
-      throw createTranslateError('TRANSLATE_RATE_LIMIT', 'Google Translate rate limit reached (429).');
+    if (providerContext.provider === 'azure') {
+      return await performAzureTranslateRequest(
+        chunk,
+        targetLanguage,
+        providerContext.azureConfig,
+        controller.signal
+      );
     }
 
-    if (response.status === 400) {
-      throw createTranslateError('TRANSLATE_BAD_REQUEST', 'Google Translate rejected the request (400).', {
-        status: 400
-      });
-    }
-
-    if (!response.ok) {
-      throw createTranslateError('TRANSLATE_HTTP', `Translate request failed with status ${response.status}.`, {
-        status: response.status
-      });
-    }
-
-    const data = await response.json();
-    return Array.isArray(data?.[0])
-      ? data[0].map((part) => (Array.isArray(part) ? part[0] : '')).join('')
-      : chunk;
+    return await performGoogleTranslateRequest(chunk, targetLanguage, controller.signal);
   } catch (error) {
     if (error && error.name === 'AbortError') {
       translateBlockedUntil = Date.now() + translateNetworkCooldownMs;
@@ -813,12 +951,12 @@ function shouldRetryTranslateError(error) {
   return false;
 }
 
-async function translateChunkWithRetry(chunk, targetLanguage) {
+async function translateChunkWithRetry(chunk, targetLanguage, providerContext) {
   let attempt = 0;
 
   while (attempt <= translateMaxRetryAttempts) {
     try {
-      return await enqueueTranslateRequest(() => performTranslateRequest(chunk, targetLanguage));
+      return await enqueueTranslateRequest(() => performTranslateRequest(chunk, targetLanguage, providerContext));
     } catch (error) {
       if (!shouldRetryTranslateError(error) || attempt === translateMaxRetryAttempts) {
         throw error;
@@ -838,6 +976,10 @@ function getTranslateErrorMessage(error, langPack) {
     return langPack.translateStatus.tooLarge;
   }
 
+  if (isTranslateError(error, 'TRANSLATE_PROVIDER_AUTH')) {
+    return langPack.translateStatus.providerAuth;
+  }
+
   if (isTranslateError(error, 'TRANSLATE_RATE_LIMIT')) {
     return langPack.translateStatus.rateLimited;
   }
@@ -854,9 +996,13 @@ function getTranslateErrorMessage(error, langPack) {
   return langPack.translateStatus.failed;
 }
 
-async function translateWithGoogle(text, targetLanguage) {
+async function translateTextViaProvider(text, targetLanguage) {
   const normalized = (text || '').trim();
   if (!normalized) return text;
+
+  const providerContext = getTranslationProviderContext();
+  const provider = providerContext.provider;
+  const effectiveTargetLanguage = normalizeTargetLanguageForProvider(targetLanguage, provider);
 
   if (normalized.length > translateRequestMaxChars * translateMaxRequestsPerRun) {
     throw createTranslateError('TRANSLATE_TOO_LARGE', 'Source text exceeds safe translation capacity.', {
@@ -875,13 +1021,13 @@ async function translateWithGoogle(text, targetLanguage) {
 
   const translatedChunks = [];
   for (const chunk of chunks) {
-    const cacheKey = `${targetLanguage}|${chunk}`;
+    const cacheKey = `${provider}|${effectiveTargetLanguage}|${chunk}`;
     if (translationCache.has(cacheKey)) {
       translatedChunks.push(translationCache.get(cacheKey));
       continue;
     }
 
-    const translatedChunk = await translateChunkWithRetry(chunk, targetLanguage);
+    const translatedChunk = await translateChunkWithRetry(chunk, effectiveTargetLanguage, providerContext);
     translationCache.set(cacheKey, translatedChunk);
     translatedChunks.push(translatedChunk);
   }
@@ -897,7 +1043,7 @@ async function translatePreservingWhitespace(text, targetLanguage) {
 
   if (!middle) return source;
 
-  const translated = await translateWithGoogle(middle, targetLanguage);
+  const translated = await translateTextViaProvider(middle, targetLanguage);
   return `${leading}${translated}${trailing}`;
 }
 

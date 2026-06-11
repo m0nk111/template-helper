@@ -15,7 +15,8 @@
   },
   "host_permissions": [
     "https://crs.gw.dfnld.nl/*",
-    "https://translate.googleapis.com/*"
+    "https://translate.googleapis.com/*",
+    "https://*.cognitive.microsofttranslator.com/*"
   ],
   "content_scripts": [
     {

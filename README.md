@@ -58,6 +58,7 @@ Template Helper ondersteunt moderators met een vaste, snelle en consistente work
 - Retry met exponential backoff bij tijdelijke fouten.
 - Cooldown bij `429` rate limit en bij netwerk/time-out problemen.
 - Duidelijke status- en fouttoasts in plaats van crashende UI-flow.
+- Optionele Microsoft/Azure Translator provider is geimplementeerd, maar **standaard uit**; Google blijft default actief.
 
 ### Installatie
 1. Download de nieuwste release-asset op [GitHub Releases](https://github.com/m0nk111/template-helper/releases/latest).
@@ -75,6 +76,15 @@ Template Helper ondersteunt moderators met een vaste, snelle en consistente work
 - Maak release artifacts via `scripts/pack.sh`.
 - Output komt in `release/` als versiegebonden ZIP en standalone HTML.
 - Lokale test: laad `extension/` als unpacked extension in Chrome Developer mode.
+- Optionele Azure provider (niet standaard actief) kan handmatig worden geactiveerd via `localStorage` keys:
+
+```javascript
+localStorage.setItem('vraag-tmpl-translate-provider', 'azure');
+localStorage.setItem('vraag-tmpl-azure-translator-key', '<your-azure-key>');
+localStorage.setItem('vraag-tmpl-azure-translator-region', '<your-azure-region>');
+// Optional override; default is https://api.cognitive.microsofttranslator.com/translate
+localStorage.setItem('vraag-tmpl-azure-translator-endpoint', 'https://api.cognitive.microsofttranslator.com/translate');
+```
 
 ## English version
 
@@ -131,6 +141,7 @@ Template Helper provides moderators with a consistent and fast template workflow
 - Retry with exponential backoff on transient failures.
 - Cooldown behavior for `429` rate limits and network/timeout incidents.
 - Clear status/error toasts instead of UI crashes or stuck translation flow.
+- Optional Microsoft/Azure Translator provider is implemented, but **disabled by default**; Google remains the active default.
 
 ### Installation
 1. Download the latest release asset from [GitHub Releases](https://github.com/m0nk111/template-helper/releases/latest).
@@ -148,3 +159,12 @@ Template Helper provides moderators with a consistent and fast template workflow
 - Build release artifacts via `scripts/pack.sh`.
 - Artifacts are written to `release/` as versioned ZIP and standalone HTML.
 - Local testing: load `extension/` as an unpacked extension in Chrome Developer mode.
+- Optional Azure provider (inactive by default) can be enabled manually using `localStorage` keys:
+
+```javascript
+localStorage.setItem('vraag-tmpl-translate-provider', 'azure');
+localStorage.setItem('vraag-tmpl-azure-translator-key', '<your-azure-key>');
+localStorage.setItem('vraag-tmpl-azure-translator-region', '<your-azure-region>');
+// Optional override; default is https://api.cognitive.microsofttranslator.com/translate
+localStorage.setItem('vraag-tmpl-azure-translator-endpoint', 'https://api.cognitive.microsofttranslator.com/translate');
+```
