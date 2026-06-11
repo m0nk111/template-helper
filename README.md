@@ -33,11 +33,15 @@ Template Helper ondersteunt moderators met een vaste, snelle en consistente work
 - Theme persistence: onthoudt `light` of `dark`; default is light mode.
 - Language persistence: onthoudt laatst gekozen taal.
 - Korte druk op taal-knop: wisselt taal en vertaalt ingevulde inhoud.
+- Taalwissel behoudt expliciet de huidige template mode (`Vraag` of `Antwoord`) en voorkomt onbedoelde mode flips.
 - EN-only gedrag: met alleen `EN` actief wordt invoer uit andere talen altijd naar Engels vertaald.
 - 2-seconden long-press op taal-knop opent het taalmenu.
 - Taalmenu met checkbox-rotatie en brede internationale taalcatalogus.
+- Taalmenu dwingt minimaal één actieve taal af (je kunt niet alles uitvinken).
 - Nieuwe installaties starten met `NL` en `EN` als actieve rotatietalen.
 - UI-teksten blijven NL/EN; voor andere doeltalen blijft de UI Engels en vertaalt alleen inhoud.
+- In extension mode gebruikt de iframe `clipboard-write` permissie voor stabieler kopieren in CRS.
+- Herhaald klikken op `Vraag maken` hergebruikt de bestaande sidebar en ververst de context/prefill.
 - URL-prefill ondersteuning voor kernvelden via query parameters.
 - Lokale text-beautifier voor geselecteerde talen bij blur.
 - Versie-weergave in de footer (manifest/meta fallback).
@@ -97,11 +101,15 @@ Template Helper provides moderators with a consistent and fast template workflow
 - Theme persistence: remembers `light` or `dark`; default is light mode.
 - Language persistence: remembers the last selected language.
 - Short press on language button: switches language and translates filled content.
+- Language switching explicitly keeps the current template mode (`Question` or `Answer`) and prevents unintended mode flips.
 - EN-only behavior: with only `EN` active, content in any source language is translated to English.
 - Exact 2-second long press on language button opens the language menu.
 - Language menu with checkbox-based rotation and broad international catalog.
+- Language menu enforces at least one active language (you cannot uncheck all).
 - New installs start with `NL` and `EN` enabled in rotation.
 - UI stays Dutch/English only; for other target languages, UI remains English while content is translated.
+- In extension mode, the iframe uses `clipboard-write` permission for more reliable copy behavior in CRS.
+- Repeated clicks on `Vraag maken` reuse the existing sidebar and refresh context/prefill.
 - URL prefill support for core fields via query parameters.
 - Local text beautifier on blur for selected languages.
 - Footer version rendering with manifest/meta fallback.
