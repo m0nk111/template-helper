@@ -18,6 +18,7 @@
 - **Docs:** Clarified in release notes that with `EN` as the only active language, a short press on the language button always translates filled content from any source language to English.
 - **Docs:** Rewrote root README as bilingual (Dutch + English) with a complete feature inventory covering both legacy and new functionality.
 - **Docs:** Updated release notes to explicitly link to the root README for full feature documentation.
+- **Fixed:** Language switching no longer changes template mode; switching language now keeps the current `Vraag`/`Antwoord` mode stable.
 
 ## [3.1.4] - 2026-04-30
 - **Changed:** Neutralized Chrome Web Store-facing metadata and sidebar branding to avoid implying official company publication while preserving the existing moderator workflow.

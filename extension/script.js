@@ -556,11 +556,14 @@ function applyLanguage(language, persist) {
   }
 
   const langPack = getLangPack();
+  const isAnswerMode = activeTmpl === 'antwoord';
 
   document.documentElement.lang = activeLang;
   document.documentElement.dir = isRtlLanguage(activeLang) ? 'rtl' : 'ltr';
 
   document.getElementById('subtitleText').textContent = langPack.subtitle;
+  document.getElementById('pageTitle').textContent = isAnswerMode ? langPack.pageTitleAntwoord : langPack.pageTitleVraag;
+  document.getElementById('switchBtn').title = isAnswerMode ? langPack.switchToVraagTitle : langPack.switchToAntwoordTitle;
 
   document.getElementById('labelWachtrij').innerHTML = `${langPack.labels.wachtrij} <span class="required">*</span>`;
   document.getElementById('labelKlantnummer').innerHTML = `${langPack.labels.klantnummer} <span class="required">*</span>`;
@@ -615,7 +618,7 @@ function applyLanguage(language, persist) {
   document.getElementById('themeBtn').title = langPack.buttons.themeTitle;
 
   renderLanguageMenu();
-  setTemplateMode(activeTmpl, false);
+  updatePreview();
 }
 
 function showStatusToast(message, durationMs) {
@@ -956,10 +959,16 @@ async function switchLanguageAndTranslate() {
 
   const previousLang = activeLang;
   const nextLang = getNextLanguage(previousLang);
+  const modeBeforeSwitch = activeTmpl;
   const statusPack = previousLang === 'nl' ? i18n.nl : i18n.en;
+  const languageButton = document.getElementById('languageBtn');
+  const switchButton = document.getElementById('switchBtn');
 
   isLanguageSwitching = true;
-  document.getElementById('languageBtn').disabled = true;
+  languageButton.disabled = true;
+  if (switchButton) {
+    switchButton.disabled = true;
+  }
 
   showStatusToast(statusPack.translateStatus.busy, 1500);
 
@@ -972,6 +981,7 @@ async function switchLanguageAndTranslate() {
     }
 
     applyLanguage(nextLang, true);
+    setTemplateMode(modeBeforeSwitch, false);
 
     let changed = false;
     for (const id of richTextFields) {
@@ -991,7 +1001,10 @@ async function switchLanguageAndTranslate() {
     showErrorToast(getTranslateErrorMessage(error, getLangPack()), 5200);
   } finally {
     isLanguageSwitching = false;
-    document.getElementById('languageBtn').disabled = false;
+    languageButton.disabled = false;
+    if (switchButton) {
+      switchButton.disabled = false;
+    }
   }
 }
 
@@ -1232,6 +1245,7 @@ for (const key of ['wachtrij', 'klantnummer', 'klantvraag', 'vastloper', 'uitkom
 
 renderTemplateVersion();
 applyLanguage(activeLang, false);
+setTemplateMode(activeTmpl, false);
 document.getElementById('switchBtn').addEventListener('click', toggleTemplate);
 document.getElementById('btn-copy').addEventListener('click', copyToClipboard);
 document.getElementById('btn-clear').addEventListener('click', clearForm);
