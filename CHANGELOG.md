@@ -2,6 +2,14 @@
 
 ## [Unreleased]
 
+## [4.1.2] - 2026-07-03
+
+- **Fixed:** Plain `Enter` in rich-text fields (`Klantvraag`, `Vastloper`, `Gewenste uitkomst`, `Antwoord`, `Bron`, `Vervolgstap`) no longer creates nested `<div>` blocks that stack extra blank lines when read back as text. `Enter` now inserts a single `<br>` line break, matching `Shift+Enter` behavior exactly, so line breaks stay stable through editing, translation, and clipboard output.
+- **Fixed:** Pasting multi-line plain text no longer produces `<div>`-per-line structure; pasted line breaks are now inserted as `<br>` for consistency with typed input.
+- **Changed:** Bumped release version to `4.1.2`.
+
+## [4.1.1]
+
 - **Changed:** Bumped release version to `4.1.1`.
 - **Added:** Hardened Google Translate integration with proactive payload splitting, request throttling, queued execution, retry/backoff, and temporary cooldown handling for `429` and network failures.
 - **Added:** Guardrails for translate-request sizing and per-run request caps to avoid endpoint abuse and prevent UI crashes on large input.

@@ -51,6 +51,10 @@ Template Helper ondersteunt moderators met een vaste, snelle en consistente work
 - Lokale text-beautifier voor geselecteerde talen bij blur.
 - Versie-weergave in de footer (manifest/meta fallback).
 
+### Enter-toets bugfix (v4.1.2)
+- Een gewone `Enter` in een tekstveld voegt nu altijd een enkele nette regelafbreking toe (zelfde gedrag als `Shift+Enter`), in plaats van een geneste `<div>` die regeleinden liet "stapelen" bij bewerken, vertalen of kopieren.
+- Plakken van meerdere regels gebruikt dezelfde consistente regelafbreking.
+
 ### Vertalen hardening (v4.1.1)
 - Bescherming tegen Google Translate 5000-tekenslimiet per request.
 - Proactieve chunking van langere teksten in veilige delen.
@@ -133,6 +137,10 @@ Template Helper provides moderators with a consistent and fast template workflow
 - URL prefill support for core fields via query parameters.
 - Local text beautifier on blur for selected languages.
 - Footer version rendering with manifest/meta fallback.
+
+### Enter key bugfix (v4.1.2)
+- A plain `Enter` in a rich-text field now always inserts a single clean line break (same behavior as `Shift+Enter`), instead of a nested `<div>` that caused line breaks to "stack" during editing, translation, or copying.
+- Pasting multiple lines uses the same consistent line break behavior.
 
 ### Translation hardening (v4.1.1)
 - Protection against the Google Translate 5000-character request hard limit.
