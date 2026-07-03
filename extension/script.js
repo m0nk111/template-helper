@@ -1281,6 +1281,19 @@ function clearForm() {
   updatePreview();
 }
 
+function insertPlainTextAsLineBreaks(text) {
+  const lines = (text || '').split(/\r\n|\r|\n/);
+
+  lines.forEach((line, index) => {
+    if (index > 0) {
+      document.execCommand('insertLineBreak');
+    }
+    if (line) {
+      document.execCommand('insertText', false, line);
+    }
+  });
+}
+
 document.querySelectorAll('div[contenteditable="true"]').forEach((el) => {
   el.addEventListener('paste', function(e) {
     const clipboardData = e.clipboardData || window.clipboardData;
@@ -1290,7 +1303,19 @@ document.querySelectorAll('div[contenteditable="true"]').forEach((el) => {
 
     e.preventDefault();
     const text = clipboardData.getData('text/plain');
-    document.execCommand('insertText', false, text);
+    insertPlainTextAsLineBreaks(text);
+  });
+
+  // Plain Enter creates a new block-level <div> in contenteditable, which
+  // stacks extra blank lines when read back as text (each <div> boundary
+  // plus its own <br> counts as a line break). Force Enter to behave like
+  // Shift+Enter (a single <br>) so line breaks stay consistent everywhere,
+  // including translation.
+  el.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' && !e.shiftKey && !e.ctrlKey && !e.metaKey) {
+      e.preventDefault();
+      document.execCommand('insertLineBreak');
+    }
   });
 });
 
