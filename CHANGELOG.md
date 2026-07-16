@@ -3,6 +3,7 @@
 ## [Unreleased]
 
 - **Added:** Live CRS-to-TCC note synchronization now updates an unchanged template note automatically and asks the user whether to use CRS or retain the template note when local edits conflict.
+- **Added:** Compact screenshot buttons now capture the visible CRS window, temporarily hide the template sidebar, and add the image directly to V&A customer question, V&A answer, or TCC screenshots.
 
 ## [4.2.0] - 2026-07-16
 

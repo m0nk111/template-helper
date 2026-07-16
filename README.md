@@ -16,6 +16,7 @@ Template Helper ondersteunt moderators met een vaste, snelle en consistente work
 - Leest automatisch `Klantnummer` en notitie uit CRS en prefilt relevante templatevelden.
 - TCC-verzoek hergebruikt dezelfde CRS-prefill voor klantnummer en notitie.
 - Tijdens een actief TCC-verzoek wordt de CRS-notitie live gesynchroniseerd; na een lokale template-aanpassing kies je expliciet of de nieuwe CRS-notitie de template-notitie mag overschrijven.
+- Met de compacte `📸`-knop naast Klantvraag, Antwoord en TCC Screenshots maak je in de CRS-sidebar zonder toetsenbord een screenshot van het zichtbare CRS-venster; de sidebar wordt tijdelijk verborgen en de afbeelding wordt direct aan het gekozen veld toegevoegd.
 - In extension mode opent de template direct vanuit de workflow in een in-app zijpaneel.
 - Docking-ondersteuning voor zijpaneel (links, rechts, boven, onder) met bewaarde positie.
 - Drag-to-dock: sleep de blauwe sidebar-header om live te docken naar links, rechts, boven of onder.
@@ -81,7 +82,7 @@ Template Helper ondersteunt moderators met een vaste, snelle en consistente work
 3. Installeer daarna pas de nieuwe versie.
 
 ### Ontwikkelaar informatie
-- Single source of truth: bewerk alleen `extension/template.html` en `extension/script.js`.
+- Single source of truth: bewerk de bronbestanden in `extension/`, waaronder `template.html`, `script.js`, `inject.js`, `background.js` en `manifest.json`.
 - Genereer standalone via `scripts/build-standalone.sh`.
 - Maak release artifacts via `scripts/pack.sh`.
 - Output komt in `release/` als versiegebonden ZIP en standalone HTML.
@@ -109,6 +110,7 @@ Template Helper provides moderators with a consistent and fast template workflow
 - Automatically reads `Customer number` and note context from CRS and pre-fills relevant template fields.
 - TCC request reuses the same CRS prefill for customer number and note.
 - During an active TCC request, the CRS note stays synchronized live; after a local template edit, users explicitly choose whether a newer CRS note may overwrite the template note.
+- The compact `📸` button next to Customer question, Answer, and TCC Screenshots captures the visible CRS window from the CRS sidebar without keyboard input; the sidebar is briefly hidden and the image is added directly to the selected field.
 - In extension mode, the template opens directly from workflow context in an in-app sidebar.
 - Sidebar docking support (left, right, top, bottom) with persisted dock position.
 - Drag-to-dock: drag the blue sidebar header to dock live to left, right, top, or bottom.

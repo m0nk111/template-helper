@@ -14,6 +14,15 @@ if (!window.location.href.toLowerCase().includes('crs')) {
     var SIDEBAR_DOCK_MODE_KEY = 'moderator-template-helper-dock-mode';
     var CRS_NOTE_UPDATE_MESSAGE_TYPE = 'template-helper:crs-note-update';
     var CRS_NOTE_SYNC_DELAY_MS = 300;
+    var TEMPLATE_SCREENSHOT_REQUEST_MESSAGE_TYPE = 'template-helper:screenshot-request';
+    var TEMPLATE_SCREENSHOT_RESULT_MESSAGE_TYPE = 'template-helper:screenshot-result';
+    var TEMPLATE_SCREENSHOT_ERROR_MESSAGE_TYPE = 'template-helper:screenshot-error';
+    var CAPTURE_SCREENSHOT_MESSAGE_TYPE = 'template-helper:capture-screenshot';
+    var SCREENSHOT_TARGET_FIELDS = ['klantvraag', 'antwoord', 'tccScreenshots'];
+    var CRS_SCREENSHOT_CAPTURE_TIMEOUT_MS = 9000;
+    var isScreenshotCaptureInProgress = false;
+    var activeScreenshotCaptureRequestId = null;
+    var screenshotCaptureTimeoutId = null;
 
     function getSavedDockMode() {
         try {
@@ -221,6 +230,120 @@ if (!window.location.href.toLowerCase().includes('crs')) {
         notitieEl.dataset.templateHelperLiveSync = 'true';
         notitieEl.addEventListener('input', queueNoteSync);
     }
+
+    function hasExactMessageKeys(data, keys) {
+        return !!data && typeof data === 'object' && !Array.isArray(data) &&
+            Object.keys(data).length === keys.length &&
+            keys.every(function(key) {
+                return Object.prototype.hasOwnProperty.call(data, key);
+            });
+    }
+
+    function getTemplateIframe() {
+        return document.getElementById('moderator-template-sidebar-iframe');
+    }
+
+    function getTemplateOrigin(iframe) {
+        try {
+            return new URL(iframe.src).origin;
+        } catch (originError) {
+            console.debug('Moderator Template Helper: Template origin could not be resolved.', originError);
+            return null;
+        }
+    }
+
+    function sendScreenshotResponse(iframe, data) {
+        var templateOrigin = getTemplateOrigin(iframe);
+        if (!templateOrigin || !iframe.contentWindow) return;
+
+        iframe.contentWindow.postMessage(data, templateOrigin);
+    }
+
+    function sendScreenshotError(iframe, request, errorCode) {
+        sendScreenshotResponse(iframe, {
+            type: TEMPLATE_SCREENSHOT_ERROR_MESSAGE_TYPE,
+            targetField: request.targetField,
+            requestId: request.requestId,
+            errorCode: errorCode
+        });
+    }
+
+    function finishScreenshotCapture(sidebarContainer, previousVisibility, requestId) {
+        if (activeScreenshotCaptureRequestId !== requestId) return false;
+
+        clearTimeout(screenshotCaptureTimeoutId);
+        screenshotCaptureTimeoutId = null;
+        sidebarContainer.style.visibility = previousVisibility;
+        activeScreenshotCaptureRequestId = null;
+        isScreenshotCaptureInProgress = false;
+        return true;
+    }
+
+    function captureCrsScreenshot(iframe, request) {
+        if (isScreenshotCaptureInProgress) {
+            sendScreenshotError(iframe, request, 'capture-in-progress');
+            return;
+        }
+
+        var sidebarContainer = document.getElementById('moderator-template-sidebar-container');
+        if (!sidebarContainer) {
+            sendScreenshotError(iframe, request, 'sidebar-unavailable');
+            return;
+        }
+
+        isScreenshotCaptureInProgress = true;
+        activeScreenshotCaptureRequestId = request.requestId;
+        var previousVisibility = sidebarContainer.style.visibility;
+        sidebarContainer.style.visibility = 'hidden';
+
+        screenshotCaptureTimeoutId = setTimeout(function() {
+            if (!finishScreenshotCapture(sidebarContainer, previousVisibility, request.requestId)) return;
+            sendScreenshotError(iframe, request, 'capture-timeout');
+        }, CRS_SCREENSHOT_CAPTURE_TIMEOUT_MS);
+
+        window.requestAnimationFrame(function() {
+            window.requestAnimationFrame(function() {
+                try {
+                    chrome.runtime.sendMessage({ type: CAPTURE_SCREENSHOT_MESSAGE_TYPE }, function(response) {
+                        if (!finishScreenshotCapture(sidebarContainer, previousVisibility, request.requestId)) return;
+
+                        if (chrome.runtime.lastError || !response || response.ok !== true || typeof response.imageDataUrl !== 'string') {
+                            sendScreenshotError(iframe, request, 'capture-failed');
+                            return;
+                        }
+
+                        sendScreenshotResponse(iframe, {
+                            type: TEMPLATE_SCREENSHOT_RESULT_MESSAGE_TYPE,
+                            targetField: request.targetField,
+                            requestId: request.requestId,
+                            imageDataUrl: response.imageDataUrl
+                        });
+                    });
+                } catch (captureError) {
+                    if (!finishScreenshotCapture(sidebarContainer, previousVisibility, request.requestId)) return;
+                    console.debug('Moderator Template Helper: Screenshot capture could not be requested.', captureError);
+                    sendScreenshotError(iframe, request, 'capture-failed');
+                }
+            });
+        });
+    }
+
+    window.addEventListener('message', function(event) {
+        var iframe = getTemplateIframe();
+        if (!iframe || event.source !== iframe.contentWindow) return;
+
+        var templateOrigin = getTemplateOrigin(iframe);
+        if (!templateOrigin || event.origin !== templateOrigin) return;
+
+        var data = event.data;
+        if (!hasExactMessageKeys(data, ['type', 'targetField', 'requestId']) ||
+            data.type !== TEMPLATE_SCREENSHOT_REQUEST_MESSAGE_TYPE ||
+            !SCREENSHOT_TARGET_FIELDS.includes(data.targetField) ||
+            typeof data.requestId !== 'string' ||
+            data.requestId.length < 8 || data.requestId.length > 100) return;
+
+        captureCrsScreenshot(iframe, data);
+    });
 
     // Main function responsible for building and placing our custom action button
     function createVraagButton() {

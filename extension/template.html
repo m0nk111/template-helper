@@ -346,6 +346,52 @@
     }
     .btn-switch:hover { opacity: 1; transform: scale(1.1); }
 
+    .field-label-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+
+    .field-label-row label {
+      margin-bottom: 0;
+    }
+
+    .btn-capture-screenshot {
+      flex: 0 0 auto;
+      width: 28px;
+      height: 28px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      background: transparent;
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      font-size: 14px;
+      line-height: 1;
+      opacity: 0.72;
+    }
+
+    .btn-capture-screenshot:hover:not(:disabled) {
+      opacity: 1;
+      border-color: var(--accent);
+      transform: scale(1.06);
+    }
+
+    .btn-capture-screenshot:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+      opacity: 1;
+    }
+
+    .btn-capture-screenshot:disabled {
+      cursor: wait;
+      opacity: 0.4;
+    }
+
     .tcc-short-field {
       min-height: 46px;
     }
@@ -562,7 +608,10 @@
   </div>
 
   <div class="form-group">
-    <label id="labelKlantvraag">Klantvraag <span class="required">*</span></label>
+    <div class="field-label-row">
+      <label id="labelKlantvraag">Klantvraag <span class="required">*</span></label>
+      <button class="btn-capture-screenshot" type="button" data-screenshot-target="klantvraag" title="Maak screenshot van CRS" aria-label="Maak screenshot van CRS">📸</button>
+    </div>
     <div id="klantvraag" contenteditable="true" class="textarea-like" data-placeholder="Wat is de vraag van de klant? Je kunt hier ook een screenshot droppen."></div>
   </div>
 
@@ -581,7 +630,10 @@
   <!-- ANTWOORD TEMPLATE -->
   <div id="tmpl-antwoord" style="display: none;">
     <div class="form-group">
-      <label id="labelAntwoord">Antwoord <span class="required">*</span></label>
+      <div class="field-label-row">
+        <label id="labelAntwoord">Antwoord <span class="required">*</span></label>
+        <button class="btn-capture-screenshot" type="button" data-screenshot-target="antwoord" title="Maak screenshot van CRS" aria-label="Maak screenshot van CRS">📸</button>
+      </div>
       <div id="antwoord" contenteditable="true" class="textarea-like" data-placeholder="Typ hier je inhoudelijke antwoord en/of screenshot..."></div>
     </div>
     <div class="form-group">
@@ -605,7 +657,10 @@
       <div id="tccNotitie" contenteditable="true" role="textbox" aria-multiline="true" aria-labelledby="labelTccNotitie" aria-required="true" class="textarea-like" data-placeholder="Plak hier de notitie uit CRS."></div>
     </div>
     <div class="form-group">
-      <label id="labelTccScreenshots">Screenshots <span class="required">*</span></label>
+      <div class="field-label-row">
+        <label id="labelTccScreenshots">Screenshots <span class="required">*</span></label>
+        <button class="btn-capture-screenshot" type="button" data-screenshot-target="tccScreenshots" title="Maak screenshot van CRS" aria-label="Maak screenshot van CRS">📸</button>
+      </div>
       <div id="tccScreenshots" contenteditable="true" role="textbox" aria-multiline="true" aria-labelledby="labelTccScreenshots" aria-required="true" class="textarea-like" data-placeholder="Plak of drop screenshots hier."></div>
     </div>
   </div>
@@ -661,7 +716,7 @@
 
 <div class="toast" id="toast">✅ Gekopieerd!<br><span id="toastHint" style="font-size:11px;opacity:0.8;">(Gebruik Ctrl+V om te plakken in Teams)</span></div>
 <div class="toast toast-error" id="toast-error">⚠️ Let op: vul alle verplichte velden in!</div>
-<div class="toast toast-status" id="toast-status"></div>
+<div class="toast toast-status" id="toast-status" role="status" aria-live="polite"></div>
 <div class="crs-note-conflict-dialog" id="crsNoteConflictDialog" role="dialog" aria-modal="true" aria-labelledby="crsNoteConflictTitle" aria-describedby="crsNoteConflictDescription" hidden>
   <div class="crs-note-conflict-panel">
     <h2 class="crs-note-conflict-title" id="crsNoteConflictTitle">Notitie uit CRS gebruiken?</h2>

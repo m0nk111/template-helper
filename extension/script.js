@@ -220,6 +220,12 @@ const allRichTextFields = [...richTextFields, ...richTextFieldsTcc];
 const crsOrigin = 'https://crs.gw.dfnld.nl';
 const crsNoteUpdateMessageType = 'template-helper:crs-note-update';
 const crsNoteMaxLength = 50000;
+const crsScreenshotRequestMessageType = 'template-helper:screenshot-request';
+const crsScreenshotResultMessageType = 'template-helper:screenshot-result';
+const crsScreenshotErrorMessageType = 'template-helper:screenshot-error';
+const screenshotTargetFields = ['klantvraag', 'antwoord', 'tccScreenshots'];
+const screenshotDataUrlMaxLength = 20 * 1024 * 1024;
+const screenshotRequestTimeoutMs = 10000;
 const translationCache = new Map();
 let translateQueue = Promise.resolve();
 let lastTranslateRequestAt = 0;
@@ -229,6 +235,7 @@ let hasManualTccNoteChange = false;
 let isApplyingCrsTccNote = false;
 let pendingCrsTccNote = null;
 let lastIgnoredCrsTccNote = null;
+let pendingScreenshotRequest = null;
 
 const i18n = {
   nl: {
@@ -289,6 +296,7 @@ const i18n = {
     buttons: {
       copy: '📋 Kopieer naar klembord',
       clear: 'Wissen',
+      captureScreenshot: 'Maak screenshot van CRS',
       languageTitle: 'Wissel taal en vertaal inhoud',
       themeTitle: 'Wissel Licht/Donker'
     },
@@ -317,6 +325,13 @@ const i18n = {
       cooldown: '⚠️ Vertalen is tijdelijk gepauzeerd. Probeer over {seconds}s opnieuw.',
       failed: '⚠️ Interface gewijzigd, maar inhoud vertalen is mislukt.'
     },
+    screenshotStatus: {
+      capturing: '📸 Screenshot van CRS maken...',
+      added: '📸 Screenshot toegevoegd.',
+      failed: '⚠️ Screenshot maken is mislukt. Probeer opnieuw.',
+      unavailable: '⚠️ Screenshots maken werkt alleen vanuit CRS.'
+    },
+    screenshotAlt: 'CRS-schermafbeelding',
     outputLabels: {
       wachtrij: 'Wachtrij',
       klantnummer: 'Klantnummer',
@@ -394,6 +409,7 @@ const i18n = {
     buttons: {
       copy: '📋 Copy to clipboard',
       clear: 'Clear',
+      captureScreenshot: 'Capture screenshot from CRS',
       languageTitle: 'Switch language and translate content',
       themeTitle: 'Switch Light/Dark'
     },
@@ -422,6 +438,13 @@ const i18n = {
       cooldown: '⚠️ Translation is temporarily paused. Try again in {seconds}s.',
       failed: '⚠️ Interface switched, but content translation failed.'
     },
+    screenshotStatus: {
+      capturing: '📸 Capturing screenshot from CRS...',
+      added: '📸 Screenshot added.',
+      failed: '⚠️ Screenshot capture failed. Try again.',
+      unavailable: '⚠️ Screenshot capture only works from CRS.'
+    },
+    screenshotAlt: 'CRS screenshot',
     outputLabels: {
       wachtrij: 'Queue',
       klantnummer: 'Customer number',
@@ -741,6 +764,10 @@ function applyLanguage(language, persist) {
   document.getElementById('languageBtn').textContent = languageLabels[activeLang] || activeLang.toUpperCase();
   document.getElementById('languageBtn').title = langPack.buttons.languageTitle;
   document.getElementById('themeBtn').title = langPack.buttons.themeTitle;
+  document.querySelectorAll('.btn-capture-screenshot').forEach((button) => {
+    button.title = langPack.buttons.captureScreenshot;
+    button.setAttribute('aria-label', langPack.buttons.captureScreenshot);
+  });
 
   renderLanguageMenu();
   renderTemplateState();
@@ -826,6 +853,110 @@ function handleTccNotitieInput() {
 
   hasManualTccNoteChange = true;
   lastIgnoredCrsTccNote = null;
+}
+
+function hasExactMessageKeys(data, keys) {
+  return !!data && typeof data === 'object' && !Array.isArray(data) &&
+    Object.keys(data).length === keys.length &&
+    keys.every((key) => Object.prototype.hasOwnProperty.call(data, key));
+}
+
+function createScreenshotRequestId() {
+  if (window.crypto && typeof window.crypto.randomUUID === 'function') {
+    return window.crypto.randomUUID();
+  }
+
+  return `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+}
+
+function setScreenshotCaptureButtonsDisabled(disabled) {
+  document.querySelectorAll('.btn-capture-screenshot').forEach((button) => {
+    button.disabled = disabled;
+  });
+}
+
+function clearPendingScreenshotRequest() {
+  if (pendingScreenshotRequest && pendingScreenshotRequest.timeoutId) {
+    clearTimeout(pendingScreenshotRequest.timeoutId);
+  }
+
+  pendingScreenshotRequest = null;
+  setScreenshotCaptureButtonsDisabled(false);
+}
+
+function isValidScreenshotDataUrl(dataUrl) {
+  return typeof dataUrl === 'string' &&
+    dataUrl.length > 0 &&
+    dataUrl.length <= screenshotDataUrlMaxLength &&
+    /^data:image\/png;base64,[a-z0-9+/=]+$/i.test(dataUrl);
+}
+
+function appendScreenshotToField(targetField, dataUrl) {
+  const field = document.getElementById(targetField);
+  if (!field || !screenshotTargetFields.includes(targetField)) return false;
+
+  if (field.childNodes.length) {
+    field.appendChild(document.createElement('br'));
+  }
+
+  const image = document.createElement('img');
+  image.src = dataUrl;
+  image.alt = getLangPack().screenshotAlt;
+  field.appendChild(image);
+  field.classList.remove('error');
+  field.setAttribute('aria-invalid', 'false');
+  updatePreview();
+  return true;
+}
+
+function requestCrsScreenshot(event) {
+  const targetField = event.currentTarget.dataset.screenshotTarget;
+  if (!screenshotTargetFields.includes(targetField) || pendingScreenshotRequest) return;
+
+  const status = getLangPack().screenshotStatus;
+  if (window.parent === window) {
+    showStatusToast(status.unavailable, 3200);
+    return;
+  }
+
+  const requestId = createScreenshotRequestId();
+  pendingScreenshotRequest = { requestId, targetField, timeoutId: null };
+  setScreenshotCaptureButtonsDisabled(true);
+  showStatusToast(status.capturing, screenshotRequestTimeoutMs);
+
+  pendingScreenshotRequest.timeoutId = setTimeout(() => {
+    if (!pendingScreenshotRequest || pendingScreenshotRequest.requestId !== requestId) return;
+    clearPendingScreenshotRequest();
+    showStatusToast(getLangPack().screenshotStatus.failed, 3600);
+  }, screenshotRequestTimeoutMs);
+
+  window.parent.postMessage({
+    type: crsScreenshotRequestMessageType,
+    targetField,
+    requestId
+  }, crsOrigin);
+}
+
+function handleCrsScreenshotMessage(data) {
+  const request = pendingScreenshotRequest;
+  if (!request || data.requestId !== request.requestId || data.targetField !== request.targetField) return;
+
+  const isResult = data.type === crsScreenshotResultMessageType &&
+    hasExactMessageKeys(data, ['type', 'targetField', 'requestId', 'imageDataUrl']) &&
+    isValidScreenshotDataUrl(data.imageDataUrl);
+  const isError = data.type === crsScreenshotErrorMessageType &&
+    hasExactMessageKeys(data, ['type', 'targetField', 'requestId', 'errorCode']) &&
+    typeof data.errorCode === 'string' && data.errorCode.length <= 80;
+
+  if (!isResult && !isError) return;
+
+  clearPendingScreenshotRequest();
+  if (!isResult || !appendScreenshotToField(data.targetField, data.imageDataUrl)) {
+    showStatusToast(getLangPack().screenshotStatus.failed, 3600);
+    return;
+  }
+
+  showStatusToast(getLangPack().screenshotStatus.added, 2600);
 }
 
 function sleep(ms) {
@@ -1494,6 +1625,8 @@ async function copyToClipboard() {
 function clearForm() {
   const allFields = [...fieldsVraag, ...fieldsAntwoord, ...fieldsTccVraag, ...fieldsTccAntwoord];
 
+  clearPendingScreenshotRequest();
+
   for (const id of allFields) {
     const el = document.getElementById(id);
     if (el.tagName === 'DIV') {
@@ -1672,6 +1805,9 @@ document.getElementById('switchBtn').addEventListener('click', toggleTemplate);
 document.getElementById('domainBtn').addEventListener('click', toggleDomain);
 document.getElementById('btn-copy').addEventListener('click', copyToClipboard);
 document.getElementById('btn-clear').addEventListener('click', clearForm);
+document.querySelectorAll('.btn-capture-screenshot').forEach((button) => {
+  button.addEventListener('click', requestCrsScreenshot);
+});
 
 document.getElementById('crsNoteConflictUse').addEventListener('click', () => {
   if (pendingCrsTccNote !== null && isActiveTccRequest()) {
@@ -1713,9 +1849,13 @@ window.addEventListener('message', (event) => {
 
   const data = event.data;
   if (!data || typeof data !== 'object' || Array.isArray(data)) return;
-  if (Object.keys(data).length !== 2 ||
-    !Object.prototype.hasOwnProperty.call(data, 'type') ||
-    !Object.prototype.hasOwnProperty.call(data, 'note') ||
+
+  if (data.type === crsScreenshotResultMessageType || data.type === crsScreenshotErrorMessageType) {
+    handleCrsScreenshotMessage(data);
+    return;
+  }
+
+  if (!hasExactMessageKeys(data, ['type', 'note']) ||
     data.type !== crsNoteUpdateMessageType ||
     typeof data.note !== 'string' ||
     data.note.length > crsNoteMaxLength) return;

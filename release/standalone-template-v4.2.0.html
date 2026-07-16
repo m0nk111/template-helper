@@ -346,6 +346,52 @@
     }
     .btn-switch:hover { opacity: 1; transform: scale(1.1); }
 
+    .field-label-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+
+    .field-label-row label {
+      margin-bottom: 0;
+    }
+
+    .btn-capture-screenshot {
+      flex: 0 0 auto;
+      width: 28px;
+      height: 28px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      background: transparent;
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      font-size: 14px;
+      line-height: 1;
+      opacity: 0.72;
+    }
+
+    .btn-capture-screenshot:hover:not(:disabled) {
+      opacity: 1;
+      border-color: var(--accent);
+      transform: scale(1.06);
+    }
+
+    .btn-capture-screenshot:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+      opacity: 1;
+    }
+
+    .btn-capture-screenshot:disabled {
+      cursor: wait;
+      opacity: 0.4;
+    }
+
     .tcc-short-field {
       min-height: 46px;
     }
@@ -562,7 +608,10 @@
   </div>
 
   <div class="form-group">
-    <label id="labelKlantvraag">Klantvraag <span class="required">*</span></label>
+    <div class="field-label-row">
+      <label id="labelKlantvraag">Klantvraag <span class="required">*</span></label>
+      <button class="btn-capture-screenshot" type="button" data-screenshot-target="klantvraag" title="Maak screenshot van CRS" aria-label="Maak screenshot van CRS">📸</button>
+    </div>
     <div id="klantvraag" contenteditable="true" class="textarea-like" data-placeholder="Wat is de vraag van de klant? Je kunt hier ook een screenshot droppen."></div>
   </div>
 
@@ -581,7 +630,10 @@
   <!-- ANTWOORD TEMPLATE -->
   <div id="tmpl-antwoord" style="display: none;">
     <div class="form-group">
-      <label id="labelAntwoord">Antwoord <span class="required">*</span></label>
+      <div class="field-label-row">
+        <label id="labelAntwoord">Antwoord <span class="required">*</span></label>
+        <button class="btn-capture-screenshot" type="button" data-screenshot-target="antwoord" title="Maak screenshot van CRS" aria-label="Maak screenshot van CRS">📸</button>
+      </div>
       <div id="antwoord" contenteditable="true" class="textarea-like" data-placeholder="Typ hier je inhoudelijke antwoord en/of screenshot..."></div>
     </div>
     <div class="form-group">
@@ -605,7 +657,10 @@
       <div id="tccNotitie" contenteditable="true" role="textbox" aria-multiline="true" aria-labelledby="labelTccNotitie" aria-required="true" class="textarea-like" data-placeholder="Plak hier de notitie uit CRS."></div>
     </div>
     <div class="form-group">
-      <label id="labelTccScreenshots">Screenshots <span class="required">*</span></label>
+      <div class="field-label-row">
+        <label id="labelTccScreenshots">Screenshots <span class="required">*</span></label>
+        <button class="btn-capture-screenshot" type="button" data-screenshot-target="tccScreenshots" title="Maak screenshot van CRS" aria-label="Maak screenshot van CRS">📸</button>
+      </div>
       <div id="tccScreenshots" contenteditable="true" role="textbox" aria-multiline="true" aria-labelledby="labelTccScreenshots" aria-required="true" class="textarea-like" data-placeholder="Plak of drop screenshots hier."></div>
     </div>
   </div>
@@ -661,7 +716,7 @@
 
 <div class="toast" id="toast">✅ Gekopieerd!<br><span id="toastHint" style="font-size:11px;opacity:0.8;">(Gebruik Ctrl+V om te plakken in Teams)</span></div>
 <div class="toast toast-error" id="toast-error">⚠️ Let op: vul alle verplichte velden in!</div>
-<div class="toast toast-status" id="toast-status"></div>
+<div class="toast toast-status" id="toast-status" role="status" aria-live="polite"></div>
 <div class="crs-note-conflict-dialog" id="crsNoteConflictDialog" role="dialog" aria-modal="true" aria-labelledby="crsNoteConflictTitle" aria-describedby="crsNoteConflictDescription" hidden>
   <div class="crs-note-conflict-panel">
     <h2 class="crs-note-conflict-title" id="crsNoteConflictTitle">Notitie uit CRS gebruiken?</h2>
@@ -896,6 +951,12 @@ const allRichTextFields = [...richTextFields, ...richTextFieldsTcc];
 const crsOrigin = 'https://crs.gw.dfnld.nl';
 const crsNoteUpdateMessageType = 'template-helper:crs-note-update';
 const crsNoteMaxLength = 50000;
+const crsScreenshotRequestMessageType = 'template-helper:screenshot-request';
+const crsScreenshotResultMessageType = 'template-helper:screenshot-result';
+const crsScreenshotErrorMessageType = 'template-helper:screenshot-error';
+const screenshotTargetFields = ['klantvraag', 'antwoord', 'tccScreenshots'];
+const screenshotDataUrlMaxLength = 20 * 1024 * 1024;
+const screenshotRequestTimeoutMs = 10000;
 const translationCache = new Map();
 let translateQueue = Promise.resolve();
 let lastTranslateRequestAt = 0;
@@ -905,6 +966,7 @@ let hasManualTccNoteChange = false;
 let isApplyingCrsTccNote = false;
 let pendingCrsTccNote = null;
 let lastIgnoredCrsTccNote = null;
+let pendingScreenshotRequest = null;
 
 const i18n = {
   nl: {
@@ -965,6 +1027,7 @@ const i18n = {
     buttons: {
       copy: '📋 Kopieer naar klembord',
       clear: 'Wissen',
+      captureScreenshot: 'Maak screenshot van CRS',
       languageTitle: 'Wissel taal en vertaal inhoud',
       themeTitle: 'Wissel Licht/Donker'
     },
@@ -993,6 +1056,13 @@ const i18n = {
       cooldown: '⚠️ Vertalen is tijdelijk gepauzeerd. Probeer over {seconds}s opnieuw.',
       failed: '⚠️ Interface gewijzigd, maar inhoud vertalen is mislukt.'
     },
+    screenshotStatus: {
+      capturing: '📸 Screenshot van CRS maken...',
+      added: '📸 Screenshot toegevoegd.',
+      failed: '⚠️ Screenshot maken is mislukt. Probeer opnieuw.',
+      unavailable: '⚠️ Screenshots maken werkt alleen vanuit CRS.'
+    },
+    screenshotAlt: 'CRS-schermafbeelding',
     outputLabels: {
       wachtrij: 'Wachtrij',
       klantnummer: 'Klantnummer',
@@ -1070,6 +1140,7 @@ const i18n = {
     buttons: {
       copy: '📋 Copy to clipboard',
       clear: 'Clear',
+      captureScreenshot: 'Capture screenshot from CRS',
       languageTitle: 'Switch language and translate content',
       themeTitle: 'Switch Light/Dark'
     },
@@ -1098,6 +1169,13 @@ const i18n = {
       cooldown: '⚠️ Translation is temporarily paused. Try again in {seconds}s.',
       failed: '⚠️ Interface switched, but content translation failed.'
     },
+    screenshotStatus: {
+      capturing: '📸 Capturing screenshot from CRS...',
+      added: '📸 Screenshot added.',
+      failed: '⚠️ Screenshot capture failed. Try again.',
+      unavailable: '⚠️ Screenshot capture only works from CRS.'
+    },
+    screenshotAlt: 'CRS screenshot',
     outputLabels: {
       wachtrij: 'Queue',
       klantnummer: 'Customer number',
@@ -1417,6 +1495,10 @@ function applyLanguage(language, persist) {
   document.getElementById('languageBtn').textContent = languageLabels[activeLang] || activeLang.toUpperCase();
   document.getElementById('languageBtn').title = langPack.buttons.languageTitle;
   document.getElementById('themeBtn').title = langPack.buttons.themeTitle;
+  document.querySelectorAll('.btn-capture-screenshot').forEach((button) => {
+    button.title = langPack.buttons.captureScreenshot;
+    button.setAttribute('aria-label', langPack.buttons.captureScreenshot);
+  });
 
   renderLanguageMenu();
   renderTemplateState();
@@ -1502,6 +1584,110 @@ function handleTccNotitieInput() {
 
   hasManualTccNoteChange = true;
   lastIgnoredCrsTccNote = null;
+}
+
+function hasExactMessageKeys(data, keys) {
+  return !!data && typeof data === 'object' && !Array.isArray(data) &&
+    Object.keys(data).length === keys.length &&
+    keys.every((key) => Object.prototype.hasOwnProperty.call(data, key));
+}
+
+function createScreenshotRequestId() {
+  if (window.crypto && typeof window.crypto.randomUUID === 'function') {
+    return window.crypto.randomUUID();
+  }
+
+  return `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+}
+
+function setScreenshotCaptureButtonsDisabled(disabled) {
+  document.querySelectorAll('.btn-capture-screenshot').forEach((button) => {
+    button.disabled = disabled;
+  });
+}
+
+function clearPendingScreenshotRequest() {
+  if (pendingScreenshotRequest && pendingScreenshotRequest.timeoutId) {
+    clearTimeout(pendingScreenshotRequest.timeoutId);
+  }
+
+  pendingScreenshotRequest = null;
+  setScreenshotCaptureButtonsDisabled(false);
+}
+
+function isValidScreenshotDataUrl(dataUrl) {
+  return typeof dataUrl === 'string' &&
+    dataUrl.length > 0 &&
+    dataUrl.length <= screenshotDataUrlMaxLength &&
+    /^data:image\/png;base64,[a-z0-9+/=]+$/i.test(dataUrl);
+}
+
+function appendScreenshotToField(targetField, dataUrl) {
+  const field = document.getElementById(targetField);
+  if (!field || !screenshotTargetFields.includes(targetField)) return false;
+
+  if (field.childNodes.length) {
+    field.appendChild(document.createElement('br'));
+  }
+
+  const image = document.createElement('img');
+  image.src = dataUrl;
+  image.alt = getLangPack().screenshotAlt;
+  field.appendChild(image);
+  field.classList.remove('error');
+  field.setAttribute('aria-invalid', 'false');
+  updatePreview();
+  return true;
+}
+
+function requestCrsScreenshot(event) {
+  const targetField = event.currentTarget.dataset.screenshotTarget;
+  if (!screenshotTargetFields.includes(targetField) || pendingScreenshotRequest) return;
+
+  const status = getLangPack().screenshotStatus;
+  if (window.parent === window) {
+    showStatusToast(status.unavailable, 3200);
+    return;
+  }
+
+  const requestId = createScreenshotRequestId();
+  pendingScreenshotRequest = { requestId, targetField, timeoutId: null };
+  setScreenshotCaptureButtonsDisabled(true);
+  showStatusToast(status.capturing, screenshotRequestTimeoutMs);
+
+  pendingScreenshotRequest.timeoutId = setTimeout(() => {
+    if (!pendingScreenshotRequest || pendingScreenshotRequest.requestId !== requestId) return;
+    clearPendingScreenshotRequest();
+    showStatusToast(getLangPack().screenshotStatus.failed, 3600);
+  }, screenshotRequestTimeoutMs);
+
+  window.parent.postMessage({
+    type: crsScreenshotRequestMessageType,
+    targetField,
+    requestId
+  }, crsOrigin);
+}
+
+function handleCrsScreenshotMessage(data) {
+  const request = pendingScreenshotRequest;
+  if (!request || data.requestId !== request.requestId || data.targetField !== request.targetField) return;
+
+  const isResult = data.type === crsScreenshotResultMessageType &&
+    hasExactMessageKeys(data, ['type', 'targetField', 'requestId', 'imageDataUrl']) &&
+    isValidScreenshotDataUrl(data.imageDataUrl);
+  const isError = data.type === crsScreenshotErrorMessageType &&
+    hasExactMessageKeys(data, ['type', 'targetField', 'requestId', 'errorCode']) &&
+    typeof data.errorCode === 'string' && data.errorCode.length <= 80;
+
+  if (!isResult && !isError) return;
+
+  clearPendingScreenshotRequest();
+  if (!isResult || !appendScreenshotToField(data.targetField, data.imageDataUrl)) {
+    showStatusToast(getLangPack().screenshotStatus.failed, 3600);
+    return;
+  }
+
+  showStatusToast(getLangPack().screenshotStatus.added, 2600);
 }
 
 function sleep(ms) {
@@ -2170,6 +2356,8 @@ async function copyToClipboard() {
 function clearForm() {
   const allFields = [...fieldsVraag, ...fieldsAntwoord, ...fieldsTccVraag, ...fieldsTccAntwoord];
 
+  clearPendingScreenshotRequest();
+
   for (const id of allFields) {
     const el = document.getElementById(id);
     if (el.tagName === 'DIV') {
@@ -2348,6 +2536,9 @@ document.getElementById('switchBtn').addEventListener('click', toggleTemplate);
 document.getElementById('domainBtn').addEventListener('click', toggleDomain);
 document.getElementById('btn-copy').addEventListener('click', copyToClipboard);
 document.getElementById('btn-clear').addEventListener('click', clearForm);
+document.querySelectorAll('.btn-capture-screenshot').forEach((button) => {
+  button.addEventListener('click', requestCrsScreenshot);
+});
 
 document.getElementById('crsNoteConflictUse').addEventListener('click', () => {
   if (pendingCrsTccNote !== null && isActiveTccRequest()) {
@@ -2389,9 +2580,13 @@ window.addEventListener('message', (event) => {
 
   const data = event.data;
   if (!data || typeof data !== 'object' || Array.isArray(data)) return;
-  if (Object.keys(data).length !== 2 ||
-    !Object.prototype.hasOwnProperty.call(data, 'type') ||
-    !Object.prototype.hasOwnProperty.call(data, 'note') ||
+
+  if (data.type === crsScreenshotResultMessageType || data.type === crsScreenshotErrorMessageType) {
+    handleCrsScreenshotMessage(data);
+    return;
+  }
+
+  if (!hasExactMessageKeys(data, ['type', 'note']) ||
     data.type !== crsNoteUpdateMessageType ||
     typeof data.note !== 'string' ||
     data.note.length > crsNoteMaxLength) return;
