@@ -217,10 +217,18 @@ const fieldsTccVraag = ['tccKlantnummer', 'tccNotitie', 'tccScreenshots'];
 const fieldsTccAntwoord = ['tccNogControleren', 'tccAanvullen', 'tccAkkoord'];
 const richTextFieldsTcc = ['tccNotitie', 'tccScreenshots', 'tccNogControleren', 'tccAanvullen'];
 const allRichTextFields = [...richTextFields, ...richTextFieldsTcc];
+const crsOrigin = 'https://crs.gw.dfnld.nl';
+const crsNoteUpdateMessageType = 'template-helper:crs-note-update';
+const crsNoteMaxLength = 50000;
 const translationCache = new Map();
 let translateQueue = Promise.resolve();
 let lastTranslateRequestAt = 0;
 let translateBlockedUntil = 0;
+let lastCrsSuppliedTccNote = '';
+let hasManualTccNoteChange = false;
+let isApplyingCrsTccNote = false;
+let pendingCrsTccNote = null;
+let lastIgnoredCrsTccNote = null;
 
 const i18n = {
   nl: {
@@ -625,6 +633,10 @@ function setTemplateMode(mode, persist) {
     localStorage.setItem(templateModeStorageKey, activeTmpl);
   }
 
+  if (!isActiveTccRequest()) {
+    closeCrsNoteConflictDialog(false);
+  }
+
   renderTemplateState();
   updatePreview();
 }
@@ -634,6 +646,10 @@ function setDomainMode(domain, persist) {
 
   if (persist) {
     localStorage.setItem(templateDomainStorageKey, activeDomain);
+  }
+
+  if (!isActiveTccRequest()) {
+    closeCrsNoteConflictDialog(false);
   }
 
   renderTemplateState();
@@ -748,6 +764,68 @@ function showErrorToast(message, durationMs) {
     errorToast.classList.remove('show');
     errorToast.textContent = getLangPack().toastError;
   }, durationMs);
+}
+
+function isActiveTccRequest() {
+  return activeDomain === 'tcc' && activeTmpl === 'vraag';
+}
+
+function applyCrsTccNote(note) {
+  const tccNotitie = document.getElementById('tccNotitie');
+  isApplyingCrsTccNote = true;
+  tccNotitie.textContent = note;
+  isApplyingCrsTccNote = false;
+  lastCrsSuppliedTccNote = note;
+  hasManualTccNoteChange = false;
+  lastIgnoredCrsTccNote = null;
+  updatePreview();
+}
+
+function closeCrsNoteConflictDialog(returnFocus) {
+  const dialog = document.getElementById('crsNoteConflictDialog');
+  if (!dialog) return;
+
+  dialog.hidden = true;
+  pendingCrsTccNote = null;
+
+  if (returnFocus && isActiveTccRequest()) {
+    document.getElementById('tccNotitie').focus();
+  }
+}
+
+function showCrsNoteConflictDialog(note) {
+  pendingCrsTccNote = note;
+
+  const dialog = document.getElementById('crsNoteConflictDialog');
+  if (!dialog || !dialog.hidden) return;
+
+  dialog.hidden = false;
+  document.getElementById('crsNoteConflictKeep').focus();
+}
+
+function handleCrsNoteUpdate(note) {
+  if (!isActiveTccRequest()) return;
+
+  const tccNotitie = document.getElementById('tccNotitie');
+  if (!hasManualTccNoteChange) {
+    if (note === lastCrsSuppliedTccNote && note === tccNotitie.textContent) {
+      updatePreview();
+      return;
+    }
+    applyCrsTccNote(note);
+    return;
+  }
+
+  if (note === tccNotitie.textContent || note === lastIgnoredCrsTccNote) return;
+
+  showCrsNoteConflictDialog(note);
+}
+
+function handleTccNotitieInput() {
+  if (isApplyingCrsTccNote) return;
+
+  hasManualTccNoteChange = true;
+  lastIgnoredCrsTccNote = null;
 }
 
 function sleep(ms) {
@@ -1427,6 +1505,10 @@ function clearForm() {
     }
     el.classList.remove('error');
   }
+  lastCrsSuppliedTccNote = '';
+  hasManualTccNoteChange = false;
+  lastIgnoredCrsTccNote = null;
+  closeCrsNoteConflictDialog(false);
   updateTccAgreementValue();
   updatePreview();
 }
@@ -1475,6 +1557,8 @@ for (const id of [...fieldsVraag, ...fieldsAntwoord, ...fieldsTccVraag, ...field
   el.addEventListener('input', updatePreview);
   el.addEventListener('change', updatePreview);
 }
+
+document.getElementById('tccNotitie').addEventListener('input', handleTccNotitieInput);
 
 document.getElementById('tccAkkoord').addEventListener('change', () => {
   updateTccAgreementValue();
@@ -1574,7 +1658,10 @@ if (urlParams.has('klantnummer')) {
 }
 
 if (urlParams.has('klantvraag')) {
-  document.getElementById('tccNotitie').innerText = decodeURIComponent(urlParams.get('klantvraag'));
+  const crsPrefillNote = decodeURIComponent(urlParams.get('klantvraag'));
+  document.getElementById('tccNotitie').textContent = crsPrefillNote;
+  lastCrsSuppliedTccNote = crsPrefillNote;
+  hasManualTccNoteChange = false;
 }
 
 renderTemplateVersion();
@@ -1585,6 +1672,56 @@ document.getElementById('switchBtn').addEventListener('click', toggleTemplate);
 document.getElementById('domainBtn').addEventListener('click', toggleDomain);
 document.getElementById('btn-copy').addEventListener('click', copyToClipboard);
 document.getElementById('btn-clear').addEventListener('click', clearForm);
+
+document.getElementById('crsNoteConflictUse').addEventListener('click', () => {
+  if (pendingCrsTccNote !== null && isActiveTccRequest()) {
+    applyCrsTccNote(pendingCrsTccNote);
+  }
+  closeCrsNoteConflictDialog(true);
+});
+
+document.getElementById('crsNoteConflictKeep').addEventListener('click', () => {
+  if (pendingCrsTccNote !== null) {
+    lastIgnoredCrsTccNote = pendingCrsTccNote;
+  }
+  closeCrsNoteConflictDialog(true);
+});
+
+document.getElementById('crsNoteConflictDialog').addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    e.preventDefault();
+    document.getElementById('crsNoteConflictKeep').click();
+    return;
+  }
+
+  if (e.key !== 'Tab') return;
+
+  e.preventDefault();
+  const buttons = [
+    document.getElementById('crsNoteConflictUse'),
+    document.getElementById('crsNoteConflictKeep')
+  ];
+  const currentIndex = buttons.indexOf(document.activeElement);
+  const nextIndex = e.shiftKey
+    ? (currentIndex <= 0 ? buttons.length - 1 : currentIndex - 1)
+    : (currentIndex === buttons.length - 1 ? 0 : currentIndex + 1);
+  buttons[nextIndex].focus();
+});
+
+window.addEventListener('message', (event) => {
+  if (event.origin !== crsOrigin || event.source !== window.parent) return;
+
+  const data = event.data;
+  if (!data || typeof data !== 'object' || Array.isArray(data)) return;
+  if (Object.keys(data).length !== 2 ||
+    !Object.prototype.hasOwnProperty.call(data, 'type') ||
+    !Object.prototype.hasOwnProperty.call(data, 'note') ||
+    data.type !== crsNoteUpdateMessageType ||
+    typeof data.note !== 'string' ||
+    data.note.length > crsNoteMaxLength) return;
+
+  handleCrsNoteUpdate(data.note);
+});
 
 function applyLocalTextBeautifier(e) {
   if (!['nl', 'en', 'de'].includes(activeLang)) return;

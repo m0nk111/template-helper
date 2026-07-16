@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- **Added:** Live CRS-to-TCC note synchronization now updates an unchanged template note automatically and asks the user whether to use CRS or retain the template note when local edits conflict.
+
 ## [4.2.0] - 2026-07-16
 
 - **Added:** Introduced Ticket Check Chat (TCC) request and answer templates alongside the existing V&A templates, with a persistent V&A/TCC domain switch and the existing request/answer switch reused within each domain.

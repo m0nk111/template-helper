@@ -12,6 +12,8 @@ if (!window.location.href.toLowerCase().includes('crs')) {
 } else {
 
     var SIDEBAR_DOCK_MODE_KEY = 'moderator-template-helper-dock-mode';
+    var CRS_NOTE_UPDATE_MESSAGE_TYPE = 'template-helper:crs-note-update';
+    var CRS_NOTE_SYNC_DELAY_MS = 300;
 
     function getSavedDockMode() {
         try {
@@ -185,15 +187,52 @@ if (!window.location.href.toLowerCase().includes('crs')) {
         });
     }
 
+    function sendCrsNoteUpdate(note) {
+        var iframe = document.getElementById('moderator-template-sidebar-iframe');
+        if (!iframe || !iframe.contentWindow) return;
+
+        try {
+            var templateOrigin = new URL(iframe.src).origin;
+            iframe.contentWindow.postMessage({
+                type: CRS_NOTE_UPDATE_MESSAGE_TYPE,
+                note: String(note || '')
+            }, templateOrigin);
+        } catch (messageError) {
+            console.debug('Moderator Template Helper: CRS note could not be synchronized.', messageError);
+        }
+    }
+
+    function sendCurrentCrsNoteUpdate() {
+        var notitieEl = document.getElementById('IWMEMO_SCRIPT_EIGENINPUT');
+        sendCrsNoteUpdate(notitieEl ? notitieEl.value : '');
+    }
+
+    function attachLiveCrsNoteSync(notitieEl) {
+        if (notitieEl.dataset.templateHelperLiveSync === 'true') return;
+
+        var syncTimer = null;
+        var queueNoteSync = function() {
+            clearTimeout(syncTimer);
+            syncTimer = setTimeout(function() {
+                sendCrsNoteUpdate(notitieEl.value || '');
+            }, CRS_NOTE_SYNC_DELAY_MS);
+        };
+
+        notitieEl.dataset.templateHelperLiveSync = 'true';
+        notitieEl.addEventListener('input', queueNoteSync);
+    }
+
     // Main function responsible for building and placing our custom action button
     function createVraagButton() {
-        // Prevent duplicate injections: check if our button already exists on the page
-        if (document.getElementById('moderator-vraag-btn')) return;
-
         // TARGET ACQUISITION: Find the specific text area where the CRM loads user input
         var targetArea = document.getElementById('IWMEMO_SCRIPT_EIGENINPUT');
         // If the textarea hasn't loaded yet (or we're on the wrong page within CRS), abort
         if (!targetArea) return;
+
+        attachLiveCrsNoteSync(targetArea);
+
+        // Prevent duplicate injections: check if our button already exists on the page
+        if (document.getElementById('moderator-vraag-btn')) return;
 
         // 2. BUTTON CREATION
         // Create our custom "Create Question" (Vraag Maken) button dynamically
@@ -287,6 +326,7 @@ if (!window.location.href.toLowerCase().includes('crs')) {
                 iframe.id = 'moderator-template-sidebar-iframe';
                 // Allow the iframe to use the modern Clipboard API so copying text works
                 iframe.setAttribute('allow', 'clipboard-write');
+                iframe.addEventListener('load', sendCurrentCrsNoteUpdate);
                 // Load the constructed URL (including payload parameters) into the iframe
                 iframe.src = finalUrl;
                 iframe.style.cssText = "flex-grow: 1; border: none; width: 100%; height: 100%; background: #f4f6f8;";

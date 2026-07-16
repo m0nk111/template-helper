@@ -15,6 +15,7 @@ Template Helper ondersteunt moderators met een vaste, snelle en consistente work
 - Injecteert een blauwe `Vraag maken` knop direct bij het CRS-invoerveld.
 - Leest automatisch `Klantnummer` en notitie uit CRS en prefilt relevante templatevelden.
 - TCC-verzoek hergebruikt dezelfde CRS-prefill voor klantnummer en notitie.
+- Tijdens een actief TCC-verzoek wordt de CRS-notitie live gesynchroniseerd; na een lokale template-aanpassing kies je expliciet of de nieuwe CRS-notitie de template-notitie mag overschrijven.
 - In extension mode opent de template direct vanuit de workflow in een in-app zijpaneel.
 - Docking-ondersteuning voor zijpaneel (links, rechts, boven, onder) met bewaarde positie.
 - Drag-to-dock: sleep de blauwe sidebar-header om live te docken naar links, rechts, boven of onder.
@@ -107,6 +108,7 @@ Template Helper provides moderators with a consistent and fast template workflow
 - Injects a blue `Vraag maken` action button directly near the CRS input area.
 - Automatically reads `Customer number` and note context from CRS and pre-fills relevant template fields.
 - TCC request reuses the same CRS prefill for customer number and note.
+- During an active TCC request, the CRS note stays synchronized live; after a local template edit, users explicitly choose whether a newer CRS note may overwrite the template note.
 - In extension mode, the template opens directly from workflow context in an in-app sidebar.
 - Sidebar docking support (left, right, top, bottom) with persisted dock position.
 - Drag-to-dock: drag the blue sidebar header to dock live to left, right, top, or bottom.
