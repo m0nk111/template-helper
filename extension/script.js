@@ -921,6 +921,12 @@ function createScreenshotItem(dataUrl) {
   removeButton.addEventListener('click', (event) => {
     event.preventDefault();
     event.stopPropagation();
+    const precedingNode = screenshotItem.previousSibling;
+    if (precedingNode?.nodeName === 'BR') {
+      precedingNode.remove();
+    } else if (screenshotItem.nextSibling?.nodeName === 'BR') {
+      screenshotItem.nextSibling.remove();
+    }
     screenshotItem.remove();
     updatePreview();
   });
