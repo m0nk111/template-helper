@@ -4,6 +4,7 @@
  */
 
 const templateModeStorageKey = 'vraag-tmpl-active-template';
+const templateDomainStorageKey = 'vraag-tmpl-active-domain';
 const themeStorageKey = 'vraag-tmpl-theme';
 const languageStorageKey = 'vraag-tmpl-language';
 const enabledLanguagesStorageKey = 'vraag-tmpl-enabled-languages';
@@ -193,6 +194,7 @@ function loadEnabledLanguages() {
 }
 
 let activeTmpl = localStorage.getItem(templateModeStorageKey) === 'antwoord' ? 'antwoord' : 'vraag';
+let activeDomain = localStorage.getItem(templateDomainStorageKey) === 'tcc' ? 'tcc' : 'va';
 let activeLang = supportedLanguages.includes(localStorage.getItem(languageStorageKey))
   ? localStorage.getItem(languageStorageKey)
   : 'nl';
@@ -211,6 +213,10 @@ if (!enabledLanguages.includes(activeLang)) {
 const fieldsVraag = ['wachtrij', 'klantnummer', 'klantvraag', 'vastloper', 'uitkomst'];
 const fieldsAntwoord = ['antwoord', 'bron', 'vervolgstap'];
 const richTextFields = ['klantvraag', 'vastloper', 'uitkomst', 'antwoord', 'bron', 'vervolgstap'];
+const fieldsTccVraag = ['tccKlantnummer', 'tccNotitie', 'tccScreenshots'];
+const fieldsTccAntwoord = ['tccNogControleren', 'tccAanvullen', 'tccAkkoord'];
+const richTextFieldsTcc = ['tccNotitie', 'tccScreenshots', 'tccNogControleren', 'tccAanvullen'];
+const allRichTextFields = [...richTextFields, ...richTextFieldsTcc];
 const translationCache = new Map();
 let translateQueue = Promise.resolve();
 let lastTranslateRequestAt = 0;
@@ -220,8 +226,14 @@ const i18n = {
   nl: {
     pageTitleVraag: 'Vraag Template',
     pageTitleAntwoord: 'Antwoord Template',
+    pageTitleTccVraag: 'Ticketcontrole Verzoek',
+    pageTitleTccAntwoord: 'Ticketcontrole Antwoord',
     switchToVraagTitle: 'Vraag Template',
     switchToAntwoordTitle: 'Mod Antwoord Template',
+    switchToTccVraagTitle: 'TCC Verzoek Template',
+    switchToTccAntwoordTitle: 'TCC Antwoord Template',
+    switchToVaTitle: 'Wissel naar V&A',
+    switchToTccTitle: 'Wissel naar Ticket Check Chat',
     subtitle: 'Vul het formulier in en kopieer het bericht naar Teams.',
     labels: {
       wachtrij: 'Wachtrij',
@@ -231,7 +243,13 @@ const i18n = {
       uitkomst: 'Gewenste uitkomst',
       antwoord: 'Antwoord',
       bron: 'Bron',
-      vervolgstap: 'Vervolgstap'
+      vervolgstap: 'Vervolgstap',
+      tccKlantnummer: 'Klantnummer',
+      tccNotitie: 'Notitie',
+      tccScreenshots: 'Screenshots',
+      tccNogControleren: 'Nog controleren',
+      tccAanvullen: 'Aanvullen in ticket',
+      tccAkkoord: 'Akkoord'
     },
     placeholders: {
       klantnummer: 'Bijv. 12345678',
@@ -240,7 +258,12 @@ const i18n = {
       uitkomst: 'Wat wil je bereiken?',
       antwoord: 'Typ hier je inhoudelijke antwoord en/of screenshot...',
       bron: 'Uit welk systeem komt de informatie?',
-      vervolgstap: 'Wat verwacht je nu van de agent?'
+      vervolgstap: 'Wat verwacht je nu van de agent?',
+      tccKlantnummer: 'Bijv. 12345678',
+      tccNotitie: 'Plak hier de notitie uit CRS.',
+      tccScreenshots: 'Plak of drop screenshots hier.',
+      tccNogControleren: 'Nog te controleren punt...',
+      tccAanvullen: 'Wat moet in het ticket worden aangevuld?'
     },
     queue: {
       placeholder: '— Kies Wachtrij —',
@@ -294,14 +317,28 @@ const i18n = {
       uitkomst: 'Gewenste uitkomst',
       antwoord: 'Antwoord',
       bron: 'Bron',
-      vervolgstap: 'Vervolgstap'
+      vervolgstap: 'Vervolgstap',
+      tccKlantnummer: 'Klantnummer',
+      tccNotitie: 'Notitie',
+      tccScreenshots: 'Screenshots',
+      tccNogControleren: 'Nog controleren',
+      tccAanvullen: 'Aanvullen in ticket',
+      tccAkkoord: 'Akkoord',
+      agreementYes: 'ja',
+      agreementNo: 'nee'
     }
   },
   en: {
     pageTitleVraag: 'Question Template',
     pageTitleAntwoord: 'Answer Template',
+    pageTitleTccVraag: 'Ticket Check Request',
+    pageTitleTccAntwoord: 'Ticket Check Answer',
     switchToVraagTitle: 'Question Template',
     switchToAntwoordTitle: 'Moderator Answer Template',
+    switchToTccVraagTitle: 'Ticket Check Request Template',
+    switchToTccAntwoordTitle: 'Ticket Check Answer Template',
+    switchToVaTitle: 'Switch to Q&A',
+    switchToTccTitle: 'Switch to Ticket Check Chat',
     subtitle: 'Fill in the form and copy the message to Teams.',
     labels: {
       wachtrij: 'Queue',
@@ -311,7 +348,13 @@ const i18n = {
       uitkomst: 'Desired outcome',
       antwoord: 'Answer',
       bron: 'Source',
-      vervolgstap: 'Next step'
+      vervolgstap: 'Next step',
+      tccKlantnummer: 'Customer number',
+      tccNotitie: 'Note',
+      tccScreenshots: 'Screenshots',
+      tccNogControleren: 'Still to check',
+      tccAanvullen: 'Add to ticket',
+      tccAkkoord: 'Approved'
     },
     placeholders: {
       klantnummer: 'For example: 12345678',
@@ -320,7 +363,12 @@ const i18n = {
       uitkomst: 'What would you like to achieve?',
       antwoord: 'Type your substantive answer and/or screenshot here...',
       bron: 'Which system is this information from?',
-      vervolgstap: 'What do you expect from the agent now?'
+      vervolgstap: 'What do you expect from the agent now?',
+      tccKlantnummer: 'For example: 12345678',
+      tccNotitie: 'Paste the note from CRS here.',
+      tccScreenshots: 'Paste or drop screenshots here.',
+      tccNogControleren: 'Item still to check...',
+      tccAanvullen: 'What should be added to the ticket?'
     },
     queue: {
       placeholder: '— Select Queue —',
@@ -374,7 +422,15 @@ const i18n = {
       uitkomst: 'Desired outcome',
       antwoord: 'Answer',
       bron: 'Source',
-      vervolgstap: 'Next step'
+      vervolgstap: 'Next step',
+      tccKlantnummer: 'Customer number',
+      tccNotitie: 'Note',
+      tccScreenshots: 'Screenshots',
+      tccNogControleren: 'Still to check',
+      tccAanvullen: 'Add to ticket',
+      tccAkkoord: 'Approved',
+      agreementYes: 'yes',
+      agreementNo: 'no'
     }
   }
 };
@@ -533,26 +589,63 @@ function onLanguageButtonMouseLeave() {
   clearLanguagePressTimer();
 }
 
-function setTemplateMode(mode, persist) {
-  activeTmpl = mode === 'antwoord' ? 'antwoord' : 'vraag';
-
+function renderTemplateState() {
   const langPack = getLangPack();
+  const isTccDomain = activeDomain === 'tcc';
   const isAnswerMode = activeTmpl === 'antwoord';
 
-  document.getElementById('tmpl-vraag').style.display = isAnswerMode ? 'none' : 'block';
-  document.getElementById('tmpl-antwoord').style.display = isAnswerMode ? 'block' : 'none';
-  document.getElementById('pageTitle').textContent = isAnswerMode ? langPack.pageTitleAntwoord : langPack.pageTitleVraag;
-  document.getElementById('switchBtn').title = isAnswerMode ? langPack.switchToVraagTitle : langPack.switchToAntwoordTitle;
+  document.getElementById('tmpl-vraag').style.display = !isTccDomain && !isAnswerMode ? 'block' : 'none';
+  document.getElementById('tmpl-antwoord').style.display = !isTccDomain && isAnswerMode ? 'block' : 'none';
+  document.getElementById('tmpl-tcc-vraag').style.display = isTccDomain && !isAnswerMode ? 'block' : 'none';
+  document.getElementById('tmpl-tcc-antwoord').style.display = isTccDomain && isAnswerMode ? 'block' : 'none';
+
+  const pageTitle = isTccDomain
+    ? (isAnswerMode ? langPack.pageTitleTccAntwoord : langPack.pageTitleTccVraag)
+    : (isAnswerMode ? langPack.pageTitleAntwoord : langPack.pageTitleVraag);
+  const switchTitle = isTccDomain
+    ? (isAnswerMode ? langPack.switchToTccVraagTitle : langPack.switchToTccAntwoordTitle)
+    : (isAnswerMode ? langPack.switchToVraagTitle : langPack.switchToAntwoordTitle);
+
+  document.getElementById('pageTitle').textContent = pageTitle;
+  document.getElementById('switchBtn').title = switchTitle;
+
+  const domainButton = document.getElementById('domainBtn');
+  const domainTitle = isTccDomain ? langPack.switchToVaTitle : langPack.switchToTccTitle;
+  domainButton.textContent = isTccDomain ? 'TCC' : 'V&A';
+  domainButton.title = domainTitle;
+  domainButton.setAttribute('aria-label', domainTitle);
+  domainButton.setAttribute('aria-pressed', String(isTccDomain));
+  domainButton.classList.toggle('tcc-active', isTccDomain);
+}
+
+function setTemplateMode(mode, persist) {
+  activeTmpl = mode === 'antwoord' ? 'antwoord' : 'vraag';
 
   if (persist) {
     localStorage.setItem(templateModeStorageKey, activeTmpl);
   }
 
+  renderTemplateState();
+  updatePreview();
+}
+
+function setDomainMode(domain, persist) {
+  activeDomain = domain === 'tcc' ? 'tcc' : 'va';
+
+  if (persist) {
+    localStorage.setItem(templateDomainStorageKey, activeDomain);
+  }
+
+  renderTemplateState();
   updatePreview();
 }
 
 function toggleTemplate() {
   setTemplateMode(activeTmpl === 'vraag' ? 'antwoord' : 'vraag', true);
+}
+
+function toggleDomain() {
+  setDomainMode(activeDomain === 'va' ? 'tcc' : 'va', true);
 }
 
 function applyLanguage(language, persist) {
@@ -563,14 +656,11 @@ function applyLanguage(language, persist) {
   }
 
   const langPack = getLangPack();
-  const isAnswerMode = activeTmpl === 'antwoord';
 
   document.documentElement.lang = activeLang;
   document.documentElement.dir = isRtlLanguage(activeLang) ? 'rtl' : 'ltr';
 
   document.getElementById('subtitleText').textContent = langPack.subtitle;
-  document.getElementById('pageTitle').textContent = isAnswerMode ? langPack.pageTitleAntwoord : langPack.pageTitleVraag;
-  document.getElementById('switchBtn').title = isAnswerMode ? langPack.switchToVraagTitle : langPack.switchToAntwoordTitle;
 
   document.getElementById('labelWachtrij').innerHTML = `${langPack.labels.wachtrij} <span class="required">*</span>`;
   document.getElementById('labelKlantnummer').innerHTML = `${langPack.labels.klantnummer} <span class="required">*</span>`;
@@ -581,6 +671,12 @@ function applyLanguage(language, persist) {
   document.getElementById('labelAntwoord').innerHTML = `${langPack.labels.antwoord} <span class="required">*</span>`;
   document.getElementById('labelBron').textContent = langPack.labels.bron;
   document.getElementById('labelVervolgstap').textContent = langPack.labels.vervolgstap;
+  document.getElementById('labelTccKlantnummer').innerHTML = `${langPack.labels.tccKlantnummer} <span class="required">*</span>`;
+  document.getElementById('labelTccNotitie').innerHTML = `${langPack.labels.tccNotitie} <span class="required">*</span>`;
+  document.getElementById('labelTccScreenshots').innerHTML = `${langPack.labels.tccScreenshots} <span class="required">*</span>`;
+  document.getElementById('labelTccNogControleren').textContent = langPack.labels.tccNogControleren;
+  document.getElementById('labelTccAanvullen').textContent = langPack.labels.tccAanvullen;
+  document.getElementById('labelTccAkkoord').textContent = langPack.labels.tccAkkoord;
 
   document.getElementById('klantnummer').placeholder = langPack.placeholders.klantnummer;
   document.getElementById('klantvraag').setAttribute('data-placeholder', langPack.placeholders.klantvraag);
@@ -589,6 +685,12 @@ function applyLanguage(language, persist) {
   document.getElementById('antwoord').setAttribute('data-placeholder', langPack.placeholders.antwoord);
   document.getElementById('bron').setAttribute('data-placeholder', langPack.placeholders.bron);
   document.getElementById('vervolgstap').setAttribute('data-placeholder', langPack.placeholders.vervolgstap);
+  document.getElementById('tccKlantnummer').placeholder = langPack.placeholders.tccKlantnummer;
+  document.getElementById('tccNotitie').setAttribute('data-placeholder', langPack.placeholders.tccNotitie);
+  document.getElementById('tccScreenshots').setAttribute('data-placeholder', langPack.placeholders.tccScreenshots);
+  document.getElementById('tccNogControleren').setAttribute('data-placeholder', langPack.placeholders.tccNogControleren);
+  document.getElementById('tccAanvullen').setAttribute('data-placeholder', langPack.placeholders.tccAanvullen);
+  updateTccAgreementValue();
 
   document.getElementById('queuePlaceholder').textContent = langPack.queue.placeholder;
   document.getElementById('queueInternet').textContent = langPack.queue.internet;
@@ -625,6 +727,7 @@ function applyLanguage(language, persist) {
   document.getElementById('themeBtn').title = langPack.buttons.themeTitle;
 
   renderLanguageMenu();
+  renderTemplateState();
   updatePreview();
 }
 
@@ -782,7 +885,7 @@ function estimateTranslateRequestsForText(text) {
 function estimateTranslateRequestsForCurrentInput() {
   let count = 0;
 
-  for (const id of richTextFields) {
+  for (const id of getActiveRichTextFields()) {
     const el = document.getElementById(id);
     if (!el) continue;
 
@@ -1100,20 +1203,38 @@ function getNextLanguage(current) {
   return rotationLanguages[(currentIndex + 1) % rotationLanguages.length];
 }
 
+function getActiveRichTextFields() {
+  return activeDomain === 'tcc' ? richTextFieldsTcc : richTextFields;
+}
+
+function updateTccAgreementValue() {
+  const agreementToggle = document.getElementById('tccAkkoord');
+  const agreementValue = document.getElementById('tccAkkoordValue');
+  if (!agreementToggle || !agreementValue) return;
+
+  const labels = getLangPack().outputLabels;
+  agreementValue.textContent = agreementToggle.checked ? labels.agreementYes : labels.agreementNo;
+}
+
 async function switchLanguageAndTranslate() {
   if (isLanguageSwitching) return;
 
   const previousLang = activeLang;
   const nextLang = getNextLanguage(previousLang);
   const modeBeforeSwitch = activeTmpl;
+  const domainBeforeSwitch = activeDomain;
   const statusPack = previousLang === 'nl' ? i18n.nl : i18n.en;
   const languageButton = document.getElementById('languageBtn');
   const switchButton = document.getElementById('switchBtn');
+  const domainButton = document.getElementById('domainBtn');
 
   isLanguageSwitching = true;
   languageButton.disabled = true;
   if (switchButton) {
     switchButton.disabled = true;
+  }
+  if (domainButton) {
+    domainButton.disabled = true;
   }
 
   showStatusToast(statusPack.translateStatus.busy, 1500);
@@ -1127,10 +1248,11 @@ async function switchLanguageAndTranslate() {
     }
 
     applyLanguage(nextLang, true);
+  setDomainMode(domainBeforeSwitch, false);
     setTemplateMode(modeBeforeSwitch, false);
 
     let changed = false;
-    for (const id of richTextFields) {
+  for (const id of getActiveRichTextFields()) {
       const didChange = await translateEditableDivById(id, nextLang);
       changed = changed || didChange;
     }
@@ -1151,6 +1273,9 @@ async function switchLanguageAndTranslate() {
     if (switchButton) {
       switchButton.disabled = false;
     }
+    if (domainButton) {
+      domainButton.disabled = false;
+    }
   }
 }
 
@@ -1161,6 +1286,27 @@ function buildMessageHTML() {
   };
 
   const labels = getLangPack().outputLabels;
+
+  if (activeDomain === 'tcc') {
+    if (activeTmpl === 'vraag') {
+      const klantnummer = document.getElementById('tccKlantnummer').value.trim();
+      const notitie = getCleanHTML('tccNotitie');
+      const screenshots = getCleanHTML('tccScreenshots');
+
+      return `<b>• ${labels.tccKlantnummer}:</b><br>${klantnummer || '…'}<br><br>` +
+        `<b>• ${labels.tccNotitie}:</b><br>${notitie || '…'}<br><br>` +
+        `<b>• ${labels.tccScreenshots}:</b><br>${screenshots || '…'}`;
+    }
+
+    const check = getCleanHTML('tccNogControleren') || '-';
+    const aanvullen = getCleanHTML('tccAanvullen') || '-';
+    const agreementToggle = document.getElementById('tccAkkoord');
+    const akkoord = agreementToggle.checked ? labels.agreementYes : labels.agreementNo;
+
+    return `<b>• ${labels.tccNogControleren}:</b><br>${check}<br><br>` +
+      `<b>• ${labels.tccAanvullen}:</b><br>${aanvullen}<br><br>` +
+      `<b>• ${labels.tccAkkoord}:</b><br>${akkoord}`;
+  }
 
   if (activeTmpl === 'vraag') {
     const queueSelect = document.getElementById('wachtrij');
@@ -1194,9 +1340,9 @@ function updatePreview() {
 }
 
 function validate() {
-  const required = activeTmpl === 'vraag'
-    ? ['wachtrij', 'klantnummer', 'klantvraag', 'vastloper', 'uitkomst']
-    : ['antwoord'];
+  const required = activeDomain === 'tcc'
+    ? (activeTmpl === 'vraag' ? fieldsTccVraag : [])
+    : (activeTmpl === 'vraag' ? fieldsVraag : ['antwoord']);
 
   let ok = true;
 
@@ -1213,6 +1359,7 @@ function validate() {
     }
 
     el.classList.toggle('error', empty);
+    el.setAttribute('aria-invalid', String(empty));
     if (empty) ok = false;
   }
 
@@ -1267,17 +1414,20 @@ async function copyToClipboard() {
 }
 
 function clearForm() {
-  const allFields = [...fieldsVraag, ...fieldsAntwoord];
+  const allFields = [...fieldsVraag, ...fieldsAntwoord, ...fieldsTccVraag, ...fieldsTccAntwoord];
 
   for (const id of allFields) {
     const el = document.getElementById(id);
     if (el.tagName === 'DIV') {
       el.innerHTML = '';
+    } else if (el.type === 'checkbox') {
+      el.checked = false;
     } else {
       el.value = '';
     }
     el.classList.remove('error');
   }
+  updateTccAgreementValue();
   updatePreview();
 }
 
@@ -1319,12 +1469,17 @@ document.querySelectorAll('div[contenteditable="true"]').forEach((el) => {
   });
 });
 
-for (const id of [...fieldsVraag, ...fieldsAntwoord]) {
+for (const id of [...fieldsVraag, ...fieldsAntwoord, ...fieldsTccVraag, ...fieldsTccAntwoord]) {
   const el = document.getElementById(id);
   if (!el) continue;
   el.addEventListener('input', updatePreview);
   el.addEventListener('change', updatePreview);
 }
+
+document.getElementById('tccAkkoord').addEventListener('change', () => {
+  updateTccAgreementValue();
+  updatePreview();
+});
 
 document.addEventListener('keydown', (e) => {
   if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
@@ -1414,10 +1569,20 @@ for (const key of ['wachtrij', 'klantnummer', 'klantvraag', 'vastloper', 'uitkom
   }
 }
 
+if (urlParams.has('klantnummer')) {
+  document.getElementById('tccKlantnummer').value = decodeURIComponent(urlParams.get('klantnummer'));
+}
+
+if (urlParams.has('klantvraag')) {
+  document.getElementById('tccNotitie').innerText = decodeURIComponent(urlParams.get('klantvraag'));
+}
+
 renderTemplateVersion();
 applyLanguage(activeLang, false);
+setDomainMode(activeDomain, false);
 setTemplateMode(activeTmpl, false);
 document.getElementById('switchBtn').addEventListener('click', toggleTemplate);
+document.getElementById('domainBtn').addEventListener('click', toggleDomain);
 document.getElementById('btn-copy').addEventListener('click', copyToClipboard);
 document.getElementById('btn-clear').addEventListener('click', clearForm);
 
@@ -1444,7 +1609,7 @@ function applyLocalTextBeautifier(e) {
   }
 }
 
-for (const id of richTextFields) {
+for (const id of allRichTextFields) {
   const el = document.getElementById(id);
   if (!el) continue;
   el.addEventListener('blur', applyLocalTextBeautifier);

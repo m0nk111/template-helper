@@ -9,10 +9,12 @@ It is built to reduce copy mistakes, keep formatting consistent, and speed up CR
 Template Helper ondersteunt moderators met een vaste, snelle en consistente workflow voor vraag- en antwoordtemplates.
 
 ### Complete featurelijst
-- Twee template modes: `Vraag Template` en `Antwoord Template`.
+- Vier templateweergaven: V&A `Vraag Template` en `Antwoord Template`, plus TCC `Ticketcontrole Verzoek` en `Ticketcontrole Antwoord`.
+- Een compacte domeinswitch wisselt tussen Technische Kennis V&A en Ticket Check Chat (TCC); de bestaande templateknop wisselt binnen het actieve domein tussen verzoek en antwoord.
 - Werkt als Chrome extensie in CRS en als standalone HTML buiten CRS.
 - Injecteert een blauwe `Vraag maken` knop direct bij het CRS-invoerveld.
 - Leest automatisch `Klantnummer` en notitie uit CRS en prefilt relevante templatevelden.
+- TCC-verzoek hergebruikt dezelfde CRS-prefill voor klantnummer en notitie.
 - In extension mode opent de template direct vanuit de workflow in een in-app zijpaneel.
 - Docking-ondersteuning voor zijpaneel (links, rechts, boven, onder) met bewaarde positie.
 - Drag-to-dock: sleep de blauwe sidebar-header om live te docken naar links, rechts, boven of onder.
@@ -23,21 +25,24 @@ Template Helper ondersteunt moderators met een vaste, snelle en consistente work
 - Domeinbeperking: injectie draait alleen op CRS-URL's.
 - Volledige rich-text invoervelden voor `Klantvraag`, `Vastloper`, `Gewenste uitkomst`, `Antwoord`, `Bron` en `Vervolgstap`.
 - Screenshot/afbeelding invoer in rich-text velden inclusief formattering in de output.
+- TCC-verzoek bevat klantnummer, notitie en verplichte screenshots; TCC-antwoord bevat één controlepunt, aanvulling in ticket en een `Akkoord`-schuifje.
+- Lege TCC-antwoordregels worden in de Teams-output als `-` weergegeven; Akkoord start op `nee`.
 - Live preview van het uiteindelijke bericht.
 - Live preview update realtime tijdens typen/wijzigen.
 - Clipboard output met nette label-opmaak voor Teams (HTML + plain text fallback).
 - Clipboard fallback via legacy copy-flow als de moderne Clipboard API faalt.
 - Teams-tip in de UI om `Ctrl+V` te gebruiken zodat opmaak en afbeeldingen behouden blijven.
 - Validatie van verplichte velden met duidelijke foutmeldingen.
-- Validatie is mode-afhankelijk: streng op verplichte vraagvelden, minimaal `Antwoord` in antwoordmode.
+- Validatie is mode-afhankelijk: V&A houdt de bestaande verplichte velden, TCC-verzoek vereist klantnummer, notitie en screenshots, en TCC-antwoord heeft optionele tekstvelden.
 - Plakken in rich-text velden wordt naar plain text genormaliseerd (behalve afbeeldingen) voor consistente output.
 - Vooraf gedefinieerde wachtrijen voor snelle selectie.
 - Shortcut `Ctrl+Enter` (of `Cmd+Enter`) om direct te kopieren.
 - Template mode persistence: onthoudt laatst gebruikte template.
+- Domein-persistence: onthoudt de laatst gebruikte V&A- of TCC-weergave.
 - Theme persistence: onthoudt `light` of `dark`; default is light mode.
 - Language persistence: onthoudt laatst gekozen taal.
 - Korte druk op taal-knop: wisselt taal en vertaalt ingevulde inhoud.
-- Taalwissel behoudt expliciet de huidige template mode (`Vraag` of `Antwoord`) en voorkomt onbedoelde mode flips.
+- Taalwissel behoudt expliciet de huidige V&A/TCC- en verzoek/antwoord-weergave, vertaalt actieve rich-text inhoud en voorkomt onbedoelde mode flips.
 - EN-only gedrag: met alleen `EN` actief wordt invoer uit andere talen altijd naar Engels vertaald.
 - 2-seconden long-press op taal-knop opent het taalmenu.
 - Taalmenu met checkbox-rotatie en brede internationale taalcatalogus.
@@ -47,7 +52,7 @@ Template Helper ondersteunt moderators met een vaste, snelle en consistente work
 - UI-teksten blijven NL/EN; voor andere doeltalen blijft de UI Engels en vertaalt alleen inhoud.
 - In extension mode gebruikt de iframe `clipboard-write` permissie voor stabieler kopieren in CRS.
 - Herhaald klikken op `Vraag maken` hergebruikt de bestaande sidebar en ververst de context/prefill.
-- URL-prefill ondersteuning voor kernvelden via query parameters.
+- URL-prefill ondersteuning voor kernvelden via query parameters, inclusief TCC-klantnummer en -notitie.
 - Lokale text-beautifier voor geselecteerde talen bij blur.
 - Versie-weergave in de footer (manifest/meta fallback).
 
@@ -96,10 +101,12 @@ localStorage.setItem('vraag-tmpl-azure-translator-endpoint', 'https://api.cognit
 Template Helper provides moderators with a consistent and fast template workflow for both question and answer handoff.
 
 ### Full feature set
-- Two template modes: `Question Template` and `Answer Template`.
+- Four template views: V&A `Question Template` and `Answer Template`, plus TCC `Ticket Check Request` and `Ticket Check Answer`.
+- A compact domain switch changes between Technical Knowledge Q&A and Ticket Check Chat (TCC); the existing template button switches between request and answer within the active domain.
 - Works as a Chrome extension in CRS and as standalone HTML outside CRS.
 - Injects a blue `Vraag maken` action button directly near the CRS input area.
 - Automatically reads `Customer number` and note context from CRS and pre-fills relevant template fields.
+- TCC request reuses the same CRS prefill for customer number and note.
 - In extension mode, the template opens directly from workflow context in an in-app sidebar.
 - Sidebar docking support (left, right, top, bottom) with persisted dock position.
 - Drag-to-dock: drag the blue sidebar header to dock live to left, right, top, or bottom.
@@ -110,21 +117,24 @@ Template Helper provides moderators with a consistent and fast template workflow
 - Domain scoping: injection runs only on CRS URLs.
 - Full rich-text editable fields for `Customer question`, `Where are you stuck`, `Desired outcome`, `Answer`, `Source`, and `Next step`.
 - Screenshot/image support inside rich-text fields with preserved formatting.
+- TCC request includes customer number, note, and required screenshots; TCC answer includes one check item, ticket additions, and an `Approved` switch.
+- Empty TCC answer lines render as `-` in the Teams output; Approved starts as `no`.
 - Live preview of the final outbound message.
 - Live preview updates in real time while typing/changing fields.
 - Clipboard output with clean Teams formatting (HTML + plain text fallback).
 - Clipboard fallback uses a legacy copy flow if the modern Clipboard API fails.
 - Teams tip in UI to use `Ctrl+V` so formatting and screenshots are preserved.
 - Required field validation with clear error feedback.
-- Validation is mode-aware: strict required fields in question mode, at least `Answer` in answer mode.
+- Validation is mode-aware: V&A keeps its existing required fields, TCC request requires customer number, note, and screenshots, while TCC answer text fields are optional.
 - Rich-text paste is normalized to plain text (except images) for consistent output.
 - Predefined queue options for fast routing.
 - `Ctrl+Enter` (or `Cmd+Enter`) shortcut to copy instantly.
 - Template mode persistence: remembers the last used template.
+- Domain persistence: remembers the last used V&A or TCC view.
 - Theme persistence: remembers `light` or `dark`; default is light mode.
 - Language persistence: remembers the last selected language.
 - Short press on language button: switches language and translates filled content.
-- Language switching explicitly keeps the current template mode (`Question` or `Answer`) and prevents unintended mode flips.
+- Language switching explicitly keeps the current V&A/TCC and request/answer view, translates active rich-text content, and prevents unintended mode flips.
 - EN-only behavior: with only `EN` active, content in any source language is translated to English.
 - Exact 2-second long press on language button opens the language menu.
 - Language menu with checkbox-based rotation and broad international catalog.
@@ -134,7 +144,7 @@ Template Helper provides moderators with a consistent and fast template workflow
 - UI stays Dutch/English only; for other target languages, UI remains English while content is translated.
 - In extension mode, the iframe uses `clipboard-write` permission for more reliable copy behavior in CRS.
 - Repeated clicks on `Vraag maken` reuse the existing sidebar and refresh context/prefill.
-- URL prefill support for core fields via query parameters.
+- URL prefill support for core fields via query parameters, including TCC customer number and note.
 - Local text beautifier on blur for selected languages.
 - Footer version rendering with manifest/meta fallback.
 

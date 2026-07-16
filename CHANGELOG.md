@@ -2,6 +2,12 @@
 
 ## [Unreleased]
 
+## [4.2.0] - 2026-07-16
+
+- **Added:** Introduced Ticket Check Chat (TCC) request and answer templates alongside the existing V&A templates, with a persistent V&A/TCC domain switch and the existing request/answer switch reused within each domain.
+- **Added:** TCC request supports CRS-prefilled customer number and note plus required screenshots; TCC answer supports one optional check item, ticket additions, and a localized `Akkoord`/`Approved` toggle that defaults to no.
+- **Added:** TCC fields participate in live preview, Teams clipboard output, clear/reset behavior, and the existing language-translation workflow. Empty TCC answer content renders as `-`.
+
 ## [4.1.2] - 2026-07-03
 
 - **Fixed:** Plain `Enter` in rich-text fields (`Klantvraag`, `Vastloper`, `Gewenste uitkomst`, `Antwoord`, `Bron`, `Vervolgstap`) no longer creates nested `<div>` blocks that stack extra blank lines when read back as text. `Enter` now inserts a single `<br>` line break, matching `Shift+Enter` behavior exactly, so line breaks stay stable through editing, translation, and clipboard output.

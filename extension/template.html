@@ -59,6 +59,25 @@
       line-height: 1;
     }
 
+    .brand-mark.domain-switch {
+      border: 0;
+      cursor: pointer;
+      font-family: inherit;
+      transition: background-color 0.2s, color 0.2s, transform 0.2s;
+    }
+
+    .brand-mark.domain-switch:hover { transform: scale(1.06); }
+
+    .brand-mark.domain-switch:focus-visible {
+      outline: 2px solid var(--text);
+      outline-offset: 2px;
+    }
+
+    .brand-mark.domain-switch.tcc-active {
+      background: var(--green);
+      color: #ffffff;
+    }
+
     h1 {
       font-size: 20px;
       font-weight: 600;
@@ -265,6 +284,68 @@
     }
     .btn-switch:hover { opacity: 1; transform: scale(1.1); }
 
+    .tcc-short-field {
+      min-height: 46px;
+    }
+
+    .tcc-toggle-control {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      margin: 0;
+      color: var(--text);
+      cursor: pointer;
+      text-transform: none;
+      letter-spacing: normal;
+    }
+
+    .tcc-toggle-control input {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      margin: -1px;
+      opacity: 0;
+    }
+
+    .tcc-toggle-track {
+      width: 42px;
+      height: 24px;
+      padding: 3px;
+      border-radius: 12px;
+      background: var(--border);
+      transition: background-color 0.2s;
+    }
+
+    .tcc-toggle-thumb {
+      display: block;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: var(--surface);
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+      transition: transform 0.2s;
+    }
+
+    .tcc-toggle-control input:checked + .tcc-toggle-track {
+      background: var(--green);
+    }
+
+    .tcc-toggle-control input:checked + .tcc-toggle-track .tcc-toggle-thumb {
+      transform: translateX(18px);
+    }
+
+    .tcc-toggle-control input:focus-visible + .tcc-toggle-track {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+
+    .tcc-toggle-value {
+      min-width: 28px;
+      font-size: 14px;
+      color: var(--text);
+      text-transform: lowercase;
+    }
+
     .language-menu {
       position: absolute;
       top: 54px;
@@ -374,7 +455,7 @@
 <div class="container">
   <div class="header-container" style="justify-content: space-between;">
     <div style="display: flex; align-items: center; gap: 16px;">
-      <div class="brand-mark" aria-label="Template Helper">V&amp;A</div>
+      <button class="brand-mark domain-switch" id="domainBtn" type="button" title="Wissel naar Ticket Check Chat" aria-label="Wissel naar Ticket Check Chat" aria-pressed="false">V&amp;A</button>
       <h1 id="pageTitle">Vraag Template</h1>
     </div>
     <div class="top-actions">
@@ -448,6 +529,42 @@
     <div class="form-group">
       <label id="labelVervolgstap">Vervolgstap</label>
       <div id="vervolgstap" contenteditable="true" class="textarea-like" data-placeholder="Wat verwacht je nu van de agent?" style="min-height: 60px;"></div>
+    </div>
+  </div>
+
+  <!-- TCC VERZOEK TEMPLATE -->
+  <div id="tmpl-tcc-vraag" style="display: none;">
+    <div class="form-group">
+      <label id="labelTccKlantnummer">Klantnummer <span class="required">*</span></label>
+      <input type="text" id="tccKlantnummer" placeholder="Bijv. 12345678" maxlength="20" autocomplete="off" aria-labelledby="labelTccKlantnummer" aria-required="true">
+    </div>
+    <div class="form-group">
+      <label id="labelTccNotitie">Notitie <span class="required">*</span></label>
+      <div id="tccNotitie" contenteditable="true" role="textbox" aria-multiline="true" aria-labelledby="labelTccNotitie" aria-required="true" class="textarea-like" data-placeholder="Plak hier de notitie uit CRS."></div>
+    </div>
+    <div class="form-group">
+      <label id="labelTccScreenshots">Screenshots <span class="required">*</span></label>
+      <div id="tccScreenshots" contenteditable="true" role="textbox" aria-multiline="true" aria-labelledby="labelTccScreenshots" aria-required="true" class="textarea-like" data-placeholder="Plak of drop screenshots hier."></div>
+    </div>
+  </div>
+
+  <!-- TCC ANTWOORD TEMPLATE -->
+  <div id="tmpl-tcc-antwoord" style="display: none;">
+    <div class="form-group">
+      <label id="labelTccNogControleren">Nog controleren</label>
+      <div id="tccNogControleren" contenteditable="true" role="textbox" aria-multiline="true" aria-labelledby="labelTccNogControleren" class="textarea-like tcc-short-field" data-placeholder="Nog te controleren punt..."></div>
+    </div>
+    <div class="form-group">
+      <label id="labelTccAanvullen">Aanvullen in ticket</label>
+      <div id="tccAanvullen" contenteditable="true" role="textbox" aria-multiline="true" aria-labelledby="labelTccAanvullen" class="textarea-like" data-placeholder="Wat moet in het ticket worden aangevuld?"></div>
+    </div>
+    <div class="form-group">
+      <span class="toggle-caption" id="labelTccAkkoord">Akkoord</span>
+      <label class="tcc-toggle-control" for="tccAkkoord">
+        <input id="tccAkkoord" type="checkbox" role="switch" aria-labelledby="labelTccAkkoord tccAkkoordValue">
+        <span class="tcc-toggle-track" aria-hidden="true"><span class="tcc-toggle-thumb"></span></span>
+        <span class="tcc-toggle-value" id="tccAkkoordValue" aria-live="polite">nee</span>
+      </label>
     </div>
   </div>
 
