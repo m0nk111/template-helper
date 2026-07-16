@@ -16,11 +16,9 @@
   "background": {
     "service_worker": "background.js"
   },
-  "permissions": [
-    "activeTab"
-  ],
+  "permissions": [],
   "host_permissions": [
-    "https://crs.gw.dfnld.nl/*",
+    "<all_urls>",
     "https://translate.googleapis.com/*",
     "https://*.cognitive.microsofttranslator.com/*"
   ],

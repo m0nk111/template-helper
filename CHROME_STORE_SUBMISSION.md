@@ -24,8 +24,9 @@ Suggested short description:
 
 ## Permissions Justification
 
-- `host_permissions`: required only for `https://crs.gw.dfnld.nl/*` so the helper button can be injected into the CRS portal.
-- No broad host access is requested.
+- `host_permissions`: `https://crs.gw.dfnld.nl/*` limits helper injection and template communication to the CRS portal. `<all_urls>` is required by Chrome's `tabs.captureVisibleTab()` API for the user-requested CRS screenshot feature.
+- Screenshot capture remains restricted in code: the service worker accepts requests only from the active CRS tab and the content script is injected only on CRS.
+- The extension does not read, inject into, or capture other websites.
 - The compliance package does not request broad runtime script-injection permissions.
 
 ## Extension ID / Manifest Key
@@ -68,7 +69,6 @@ This branch removes likely review triggers:
 - external company logo request from `template.html`
 - unused legacy content script
 - unused fallback background worker
-- broad fallback injection permissions
 - clipboard read iframe permission
 - URL parameter HTML insertion into contenteditable fields
 - official-company-style naming in Store-facing metadata

@@ -13,6 +13,11 @@ function isCaptureRequest(message) {
     Object.keys(message).length === 1 && message.type === CAPTURE_SCREENSHOT_MESSAGE_TYPE;
 }
 
+function getCaptureErrorCode() {
+  const errorMessage = chrome.runtime.lastError?.message || '';
+  return /permission/i.test(errorMessage) ? 'capture-permission-denied' : 'capture-failed';
+}
+
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (!isCaptureRequest(message)) return;
 
@@ -24,7 +29,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
   chrome.tabs.captureVisibleTab(senderTab.windowId, { format: 'png' }, (imageDataUrl) => {
     if (chrome.runtime.lastError || typeof imageDataUrl !== 'string' || imageDataUrl.length > MAX_SCREENSHOT_DATA_URL_LENGTH) {
-      sendResponse({ ok: false, errorCode: 'capture-failed' });
+      sendResponse({ ok: false, errorCode: getCaptureErrorCode() });
       return;
     }
 

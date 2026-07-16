@@ -19,6 +19,14 @@ if (!window.location.href.toLowerCase().includes('crs')) {
     var TEMPLATE_SCREENSHOT_ERROR_MESSAGE_TYPE = 'template-helper:screenshot-error';
     var CAPTURE_SCREENSHOT_MESSAGE_TYPE = 'template-helper:capture-screenshot';
     var SCREENSHOT_TARGET_FIELDS = ['klantvraag', 'antwoord', 'tccScreenshots'];
+    var SCREENSHOT_CAPTURE_ERROR_CODES = [
+        'capture-failed',
+        'capture-in-progress',
+        'capture-permission-denied',
+        'capture-timeout',
+        'invalid-capture-context',
+        'sidebar-unavailable'
+    ];
     var CRS_SCREENSHOT_CAPTURE_TIMEOUT_MS = 9000;
     var isScreenshotCaptureInProgress = false;
     var activeScreenshotCaptureRequestId = null;
@@ -260,11 +268,12 @@ if (!window.location.href.toLowerCase().includes('crs')) {
     }
 
     function sendScreenshotError(iframe, request, errorCode) {
+        var safeErrorCode = SCREENSHOT_CAPTURE_ERROR_CODES.includes(errorCode) ? errorCode : 'capture-failed';
         sendScreenshotResponse(iframe, {
             type: TEMPLATE_SCREENSHOT_ERROR_MESSAGE_TYPE,
             targetField: request.targetField,
             requestId: request.requestId,
-            errorCode: errorCode
+            errorCode: safeErrorCode
         });
     }
 
@@ -308,7 +317,10 @@ if (!window.location.href.toLowerCase().includes('crs')) {
                         if (!finishScreenshotCapture(sidebarContainer, previousVisibility, request.requestId)) return;
 
                         if (chrome.runtime.lastError || !response || response.ok !== true || typeof response.imageDataUrl !== 'string') {
-                            sendScreenshotError(iframe, request, 'capture-failed');
+                            var errorCode = response && typeof response.errorCode === 'string'
+                                ? response.errorCode
+                                : 'capture-failed';
+                            sendScreenshotError(iframe, request, errorCode);
                             return;
                         }
 
