@@ -4,15 +4,16 @@ cd "$(dirname "$0")/.."
 
 # Lees altijd de versie direct uit het manifest
 VERSION=$(python3 -c "import json; print(json.load(open('extension/manifest.json', encoding='utf-8')).get('version', '1.0.0'))")
+RELEASE_VERSION=$(python3 -c "import json; manifest=json.load(open('extension/manifest.json', encoding='utf-8')); print(manifest.get('version_name', manifest.get('version', '1.0.0')))" )
 
 # Map voor release artifacts
 RELEASE_DIR="release"
 mkdir -p "$RELEASE_DIR"
 
-ZIP_NAME="template-helper-v${VERSION}"
+ZIP_NAME="template-helper-v${RELEASE_VERSION}"
 ZIP_PATH="${RELEASE_DIR}/${ZIP_NAME}"
 
-echo "📦 Packing Moderator Template Helper (v${VERSION})..."
+echo "📦 Packing Moderator Template Helper (v${RELEASE_VERSION}; manifest ${VERSION})..."
 
 # Gooi oude zips en standalone bestanden weg
 rm -f ${RELEASE_DIR}/template-helper-*.zip

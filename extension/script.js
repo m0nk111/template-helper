@@ -297,6 +297,7 @@ const i18n = {
       copy: '📋 Kopieer naar klembord',
       clear: 'Wissen',
       captureScreenshot: 'Maak screenshot van CRS',
+      removeScreenshot: 'Verwijder screenshot',
       languageTitle: 'Wissel taal en vertaal inhoud',
       themeTitle: 'Wissel Licht/Donker'
     },
@@ -411,6 +412,7 @@ const i18n = {
       copy: '📋 Copy to clipboard',
       clear: 'Clear',
       captureScreenshot: 'Capture screenshot from CRS',
+      removeScreenshot: 'Remove screenshot',
       languageTitle: 'Switch language and translate content',
       themeTitle: 'Switch Light/Dark'
     },
@@ -900,6 +902,33 @@ function getScreenshotErrorMessage(errorCode) {
   return status.failed;
 }
 
+function createScreenshotItem(dataUrl) {
+  const screenshotItem = document.createElement('span');
+  screenshotItem.className = 'screenshot-item';
+  screenshotItem.contentEditable = 'false';
+
+  const image = document.createElement('img');
+  image.src = dataUrl;
+  image.alt = getLangPack().screenshotAlt;
+  image.draggable = false;
+
+  const removeButton = document.createElement('button');
+  removeButton.type = 'button';
+  removeButton.className = 'screenshot-remove';
+  removeButton.title = getLangPack().buttons.removeScreenshot;
+  removeButton.setAttribute('aria-label', getLangPack().buttons.removeScreenshot);
+  removeButton.textContent = '×';
+  removeButton.addEventListener('click', (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    screenshotItem.remove();
+    updatePreview();
+  });
+
+  screenshotItem.append(image, removeButton);
+  return screenshotItem;
+}
+
 function appendScreenshotToField(targetField, dataUrl) {
   const field = document.getElementById(targetField);
   if (!field || !screenshotTargetFields.includes(targetField)) return false;
@@ -908,10 +937,7 @@ function appendScreenshotToField(targetField, dataUrl) {
     field.appendChild(document.createElement('br'));
   }
 
-  const image = document.createElement('img');
-  image.src = dataUrl;
-  image.alt = getLangPack().screenshotAlt;
-  field.appendChild(image);
+  field.appendChild(createScreenshotItem(dataUrl));
   field.classList.remove('error');
   field.setAttribute('aria-invalid', 'false');
   updatePreview();
@@ -1499,8 +1525,16 @@ async function switchLanguageAndTranslate() {
 
 function buildMessageHTML() {
   const getCleanHTML = (id) => {
-    const html = document.getElementById(id).innerHTML || '';
-    return html.replace(/\s+style=(['"]).*?\1/gi, '').trim();
+    const source = document.getElementById(id);
+    const cleanField = source.cloneNode(true);
+
+    cleanField.querySelectorAll('.screenshot-remove').forEach((button) => button.remove());
+    cleanField.querySelectorAll('.screenshot-item').forEach((item) => {
+      const image = item.querySelector('img');
+      item.replaceWith(image || '');
+    });
+
+    return cleanField.innerHTML.replace(/\s+style=(['"]).*?\1/gi, '').trim();
   };
 
   const labels = getLangPack().outputLabels;
@@ -1750,7 +1784,7 @@ function resolveTemplateVersion() {
   try {
     if (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.getManifest) {
       const manifest = chrome.runtime.getManifest();
-      if (manifest && manifest.version) return manifest.version;
+      if (manifest && manifest.version) return manifest.version_name || manifest.version;
     }
   } catch {
     // Ignore and fallback to meta value.

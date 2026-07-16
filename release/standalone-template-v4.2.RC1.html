@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="template-version" content="4.2.0">
+  <meta name="template-version" content="4.2.RC1">
   <title>Vraag Template</title>
   <style>
     :root {
@@ -388,6 +388,52 @@
     .btn-capture-screenshot:disabled {
       cursor: wait;
       opacity: 0.4;
+    }
+
+    .screenshot-item {
+      position: relative;
+      display: inline-block;
+      max-width: 100%;
+      margin: 8px 0;
+      line-height: 0;
+      vertical-align: top;
+    }
+
+    .screenshot-item img {
+      display: block;
+      max-width: 100%;
+      height: auto;
+    }
+
+    .screenshot-remove {
+      position: absolute;
+      top: 4px;
+      right: 4px;
+      display: inline-grid;
+      place-items: center;
+      width: 22px;
+      height: 22px;
+      padding: 0;
+      border: 1px solid rgba(255, 255, 255, 0.75);
+      border-radius: 50%;
+      background: rgba(11, 17, 26, 0.9);
+      color: #ffffff;
+      font-size: 16px;
+      font-weight: 600;
+      line-height: 1;
+      opacity: 0.9;
+    }
+
+    .screenshot-remove:hover {
+      background: var(--red);
+      opacity: 1;
+      transform: scale(1.08);
+    }
+
+    .screenshot-remove:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+      opacity: 1;
     }
 
     .tcc-short-field {
@@ -1026,6 +1072,7 @@ const i18n = {
       copy: '📋 Kopieer naar klembord',
       clear: 'Wissen',
       captureScreenshot: 'Maak screenshot van CRS',
+      removeScreenshot: 'Verwijder screenshot',
       languageTitle: 'Wissel taal en vertaal inhoud',
       themeTitle: 'Wissel Licht/Donker'
     },
@@ -1140,6 +1187,7 @@ const i18n = {
       copy: '📋 Copy to clipboard',
       clear: 'Clear',
       captureScreenshot: 'Capture screenshot from CRS',
+      removeScreenshot: 'Remove screenshot',
       languageTitle: 'Switch language and translate content',
       themeTitle: 'Switch Light/Dark'
     },
@@ -1629,6 +1677,33 @@ function getScreenshotErrorMessage(errorCode) {
   return status.failed;
 }
 
+function createScreenshotItem(dataUrl) {
+  const screenshotItem = document.createElement('span');
+  screenshotItem.className = 'screenshot-item';
+  screenshotItem.contentEditable = 'false';
+
+  const image = document.createElement('img');
+  image.src = dataUrl;
+  image.alt = getLangPack().screenshotAlt;
+  image.draggable = false;
+
+  const removeButton = document.createElement('button');
+  removeButton.type = 'button';
+  removeButton.className = 'screenshot-remove';
+  removeButton.title = getLangPack().buttons.removeScreenshot;
+  removeButton.setAttribute('aria-label', getLangPack().buttons.removeScreenshot);
+  removeButton.textContent = '×';
+  removeButton.addEventListener('click', (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    screenshotItem.remove();
+    updatePreview();
+  });
+
+  screenshotItem.append(image, removeButton);
+  return screenshotItem;
+}
+
 function appendScreenshotToField(targetField, dataUrl) {
   const field = document.getElementById(targetField);
   if (!field || !screenshotTargetFields.includes(targetField)) return false;
@@ -1637,10 +1712,7 @@ function appendScreenshotToField(targetField, dataUrl) {
     field.appendChild(document.createElement('br'));
   }
 
-  const image = document.createElement('img');
-  image.src = dataUrl;
-  image.alt = getLangPack().screenshotAlt;
-  field.appendChild(image);
+  field.appendChild(createScreenshotItem(dataUrl));
   field.classList.remove('error');
   field.setAttribute('aria-invalid', 'false');
   updatePreview();
@@ -2228,8 +2300,16 @@ async function switchLanguageAndTranslate() {
 
 function buildMessageHTML() {
   const getCleanHTML = (id) => {
-    const html = document.getElementById(id).innerHTML || '';
-    return html.replace(/\s+style=(['"]).*?\1/gi, '').trim();
+    const source = document.getElementById(id);
+    const cleanField = source.cloneNode(true);
+
+    cleanField.querySelectorAll('.screenshot-remove').forEach((button) => button.remove());
+    cleanField.querySelectorAll('.screenshot-item').forEach((item) => {
+      const image = item.querySelector('img');
+      item.replaceWith(image || '');
+    });
+
+    return cleanField.innerHTML.replace(/\s+style=(['"]).*?\1/gi, '').trim();
   };
 
   const labels = getLangPack().outputLabels;
@@ -2479,7 +2559,7 @@ function resolveTemplateVersion() {
   try {
     if (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.getManifest) {
       const manifest = chrome.runtime.getManifest();
-      if (manifest && manifest.version) return manifest.version;
+      if (manifest && manifest.version) return manifest.version_name || manifest.version;
     }
   } catch {
     // Ignore and fallback to meta value.

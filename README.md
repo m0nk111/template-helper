@@ -8,6 +8,11 @@ It is built to reduce copy mistakes, keep formatting consistent, and speed up CR
 ### Wat is dit?
 Template Helper ondersteunt moderators met een vaste, snelle en consistente workflow voor vraag- en antwoordtemplates.
 
+### Nieuw in v4.2.RC1
+- Ticket Check Chat (TCC) is toegevoegd met aparte verzoek- en antwoordtemplates, een bewaarde domeinkeuze en TCC-specifieke validatie.
+- Tijdens een TCC-verzoek synchroniseert de CRS-notitie live; bij een lokale wijziging kies je bewust welke versie je behoudt.
+- Maak vanuit de CRS-sidebar met `📸` een screenshot voor Klantvraag, Antwoord of TCC Screenshots. De sidebar verdwijnt kort uit beeld en elke ingevoegde screenshot heeft een klein `×`-kruis rechtsboven om hem direct met de muis te verwijderen.
+
 ### Complete featurelijst
 - Vier templateweergaven: V&A `Vraag Template` en `Antwoord Template`, plus TCC `Ticketcontrole Verzoek` en `Ticketcontrole Antwoord`.
 - Een compacte domeinswitch wisselt tussen Technische Kennis V&A en Ticket Check Chat (TCC); de bestaande templateknop wisselt binnen het actieve domein tussen verzoek en antwoord.
@@ -16,7 +21,7 @@ Template Helper ondersteunt moderators met een vaste, snelle en consistente work
 - Leest automatisch `Klantnummer` en notitie uit CRS en prefilt relevante templatevelden.
 - TCC-verzoek hergebruikt dezelfde CRS-prefill voor klantnummer en notitie.
 - Tijdens een actief TCC-verzoek wordt de CRS-notitie live gesynchroniseerd; na een lokale template-aanpassing kies je expliciet of de nieuwe CRS-notitie de template-notitie mag overschrijven.
-- Met de compacte `📸`-knop naast Klantvraag, Antwoord en TCC Screenshots maak je in de CRS-sidebar zonder toetsenbord een screenshot van het zichtbare CRS-venster; de sidebar wordt tijdelijk verborgen en de afbeelding wordt direct aan het gekozen veld toegevoegd.
+- Met de compacte `📸`-knop naast Klantvraag, Antwoord en TCC Screenshots maak je in de CRS-sidebar zonder toetsenbord een screenshot van het zichtbare CRS-venster; de sidebar wordt tijdelijk verborgen, de afbeelding wordt direct aan het gekozen veld toegevoegd en is via het kleine `×`-kruis rechtsboven met de muis te verwijderen.
 - In extension mode opent de template direct vanuit de workflow in een in-app zijpaneel.
 - Docking-ondersteuning voor zijpaneel (links, rechts, boven, onder) met bewaarde positie.
 - Drag-to-dock: sleep de blauwe sidebar-header om live te docken naar links, rechts, boven of onder.
@@ -102,6 +107,11 @@ localStorage.setItem('vraag-tmpl-azure-translator-endpoint', 'https://api.cognit
 ### What is this?
 Template Helper provides moderators with a consistent and fast template workflow for both question and answer handoff.
 
+### New in v4.2.RC1
+- Ticket Check Chat (TCC) adds dedicated request and answer templates, a persistent domain selection, and TCC-specific validation.
+- During a TCC request, the CRS note stays synchronized live; after a local edit, you explicitly choose which version to keep.
+- Use `📸` in the CRS sidebar to capture Customer question, Answer, or TCC Screenshots. The sidebar briefly hides and every inserted screenshot has a small top-right `×` control to remove it with the mouse.
+
 ### Full feature set
 - Four template views: V&A `Question Template` and `Answer Template`, plus TCC `Ticket Check Request` and `Ticket Check Answer`.
 - A compact domain switch changes between Technical Knowledge Q&A and Ticket Check Chat (TCC); the existing template button switches between request and answer within the active domain.
@@ -110,7 +120,7 @@ Template Helper provides moderators with a consistent and fast template workflow
 - Automatically reads `Customer number` and note context from CRS and pre-fills relevant template fields.
 - TCC request reuses the same CRS prefill for customer number and note.
 - During an active TCC request, the CRS note stays synchronized live; after a local template edit, users explicitly choose whether a newer CRS note may overwrite the template note.
-- The compact `📸` button next to Customer question, Answer, and TCC Screenshots captures the visible CRS window from the CRS sidebar without keyboard input; the sidebar is briefly hidden and the image is added directly to the selected field.
+- The compact `📸` button next to Customer question, Answer, and TCC Screenshots captures the visible CRS window from the CRS sidebar without keyboard input; the sidebar is briefly hidden, the image is added directly to the selected field, and the small top-right `×` control removes it with the mouse.
 - In extension mode, the template opens directly from workflow context in an in-app sidebar.
 - Sidebar docking support (left, right, top, bottom) with persisted dock position.
 - Drag-to-dock: drag the blue sidebar header to dock live to left, right, top, or bottom.
@@ -176,7 +186,7 @@ Template Helper provides moderators with a consistent and fast template workflow
 3. Install the new version afterwards.
 
 ### Developer notes
-- Single source of truth: only edit `extension/template.html` and `extension/script.js`.
+- Single source of truth: edit source files in `extension/`, including `template.html`, `script.js`, `inject.js`, `background.js`, and `manifest.json`.
 - Generate standalone via `scripts/build-standalone.sh`.
 - Build release artifacts via `scripts/pack.sh`.
 - Artifacts are written to `release/` as versioned ZIP and standalone HTML.

@@ -15,9 +15,10 @@ manifest_path = Path("extension/manifest.json")
 
 manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
 version = manifest.get("version", "0.0.0-dev")
+release_version = manifest.get("version_name", version)
 
 Path("release").mkdir(exist_ok=True)
-output_path = Path(f"release/standalone-template-v{version}.html")
+output_path = Path(f"release/standalone-template-v{release_version}.html")
 marker = '<script src="script.js"></script>'
 
 template = template_path.read_text(encoding="utf-8")
@@ -27,7 +28,7 @@ if marker not in template:
         raise SystemExit("ERROR: marker <script src=\"script.js\"></script> niet gevonden in extension/template.html")
 
 standalone = template.replace(marker, f"<script>\n{script}\n</script>")
-standalone = standalone.replace('content="0.0.0-dev"', f'content="{version}"')
+standalone = standalone.replace('content="0.0.0-dev"', f'content="{release_version}"')
 output_path.write_text(standalone, encoding="utf-8")
 print(f"Standalone file written to: {output_path}")
 PY

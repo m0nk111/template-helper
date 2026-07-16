@@ -1,9 +1,11 @@
 # Changelog
 
-## [Unreleased]
+## [4.2.RC1] - 2026-07-16
 
 - **Added:** Live CRS-to-TCC note synchronization now updates an unchanged template note automatically and asks the user whether to use CRS or retain the template note when local edits conflict.
-- **Added:** Compact screenshot buttons now capture the visible CRS window, temporarily hide the template sidebar, and add the image directly to V&A customer question, V&A answer, or TCC screenshots.
+- **Added:** Compact screenshot buttons now capture the visible CRS window, temporarily hide the template sidebar, and add the image directly to V&A customer question, V&A answer, or TCC screenshots. Each captured screenshot has a top-right remove control that is excluded from preview and Teams clipboard output.
+- **Fixed:** CRS screenshot capture now has the Chrome permission required for the CRS-sidebar workflow and displays an actionable error when Chrome denies capture.
+- **Changed:** The technical manifest version is `4.2.1`; the displayed and release version is `4.2.RC1`.
 
 ## [4.2.0] - 2026-07-16
 

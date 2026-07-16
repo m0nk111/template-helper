@@ -1,6 +1,6 @@
 # Privacybeleid - Moderator Template Helper
 
-**Laatst bijgewerkt:** 30 april 2026
+**Laatst bijgewerkt:** 16 juli 2026
 
 De "Moderator Template Helper" Chrome-extensie hecht grote waarde aan uw privacy. De extensie draait lokaal in uw browser en gebruikt gegevens alleen om het vraag- en antwoordtemplate te vullen.
 
@@ -13,7 +13,7 @@ De extensie bewaart lokaal enkele gebruikersinstellingen in de browser, zoals de
 Wij verzenden, delen of verkopen geen gegevens aan derden. De extensie bevat geen analytics, tracking, advertenties of externe API-koppelingen voor gebruikersdata.
 
 ### 3. Toestemmingen
-De extensie vraagt alleen hostrechten aan voor het specifieke CRS-portaal waar de templateknop getoond moet worden. Er wordt niet meegelezen met andere websites of browseractiviteiten.
+De templateknop en inhoudscripts draaien alleen op het CRS-portaal. Voor de door de gebruiker gestarte screenshotfunctie moet Chrome de algemene capturebevoegdheid toestaan; de extensie accepteert screenshotverzoeken in code uitsluitend van het actieve CRS-tabblad. Er wordt niet meegelezen met andere websites of browseractiviteiten.
 
 ### Contact
 Voor vragen over dit privacybeleid of de broncode, kunt u terecht op onze GitHub repository.
