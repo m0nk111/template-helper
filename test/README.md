@@ -1,8 +1,8 @@
 # Browser Tests
 
-The screenshot-removal test opens the local `extension/template.html` in an
-isolated headless Chrome profile and validates the DOM, preview, and Teams export
-behavior.
+The browser tests use isolated headless Chrome profiles. They validate the
+template DOM, preview and Teams export behavior, as well as automatic collapsed
+panel loading and recovery inside CRS pages.
 
 Requirements:
 
@@ -12,7 +12,7 @@ Requirements:
 Run the test from the repository root:
 
 ```sh
-pytest -q test/test_screenshot_removal.py
+pytest -q test/test_screenshot_removal.py test/test_sidebar_vraag_trigger.py
 ```
 
 Install missing Python dependencies with:

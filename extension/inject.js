@@ -37,10 +37,6 @@ if (!window.location.href.toLowerCase().includes('crs')) {
     var activeScreenshotCaptureRequestId = null;
     var screenshotCaptureTimeoutId = null;
     var fallbackDraftId = null;
-    var SIDEBAR_VRAAG_MENU_ITEM_ID = 'moderator-vraag-menu-item';
-    var SIDEBAR_VRAAG_LABEL_MIN_WIDTH_PX = 80;
-    var sidebarResizeObserver = null;
-    var observedCrsSidebar = null;
 
     function isValidDraftId(draftId) {
         return typeof draftId === 'string' && /^[A-Za-z0-9_-]{8,128}$/.test(draftId);
@@ -117,6 +113,8 @@ if (!window.location.href.toLowerCase().includes('crs')) {
         sidebarContainer.dataset.open = isOpen ? 'true' : 'false';
         sidebarContainer.style.transform = isOpen ? 'translate(0, 0)' : getClosedTransform(dockMode);
         toggleBtn.innerHTML = isOpen ? getOpenToggleIcon(dockMode) : getClosedToggleIcon(dockMode);
+        toggleBtn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+        toggleBtn.setAttribute('aria-label', isOpen ? 'Vraag Template inklappen' : 'Vraag Template uitklappen');
     }
 
     function applyDockMode(sidebarContainer, toggleBtn, dockMode) {
@@ -160,6 +158,10 @@ if (!window.location.href.toLowerCase().includes('crs')) {
             toggleBtn.style.cssText = "position: absolute; left: -36px; top: 50%; transform: translateY(-50%); width: 36px; height: 70px; background-color: #002B54; color: white; display: flex; justify-content: center; align-items: center; cursor: pointer; border-radius: 8px 0 0 8px; box-shadow: -3px 0 10px rgba(0,0,0,0.2); font-size: 18px; user-select: none;";
         }
 
+        toggleBtn.style.border = 'none';
+        toggleBtn.style.padding = '0';
+        toggleBtn.style.fontFamily = 'inherit';
+        toggleBtn.style.appearance = 'none';
         setSidebarOpen(sidebarContainer, toggleBtn, isOpen);
     }
 
@@ -411,32 +413,47 @@ if (!window.location.href.toLowerCase().includes('crs')) {
         };
     }
 
-    function openVraagTemplate() {
-        var crsContext = readCurrentCrsContext();
-        var url = chrome.runtime.getURL('template.html');
+    function createTemplateUrl(crsContext) {
         var urlParams = new URLSearchParams();
         urlParams.set('klantnummer', crsContext.customerNumber);
         urlParams.set('klantvraag', crsContext.customerNote);
         urlParams.set('draftId', getTabDraftId());
-        var finalUrl = url + '?' + urlParams.toString();
+        return chrome.runtime.getURL('template.html') + '?' + urlParams.toString();
+    }
 
+    function initializeTemplatePanel() {
+        if (!document.body) return null;
+
+        var crsContext = readCurrentCrsContext();
         var sidebarContainer = document.getElementById('moderator-template-sidebar-container');
         if (sidebarContainer) {
-            document.getElementById('moderator-template-sidebar-iframe').src = finalUrl;
-
-            var existingToggleButton = document.getElementById('moderator-template-sidebar-toggle');
-            if (existingToggleButton) {
-                applyDockMode(sidebarContainer, existingToggleButton, sidebarContainer.dataset.dockMode || getSavedDockMode());
-                setSidebarOpen(sidebarContainer, existingToggleButton, true);
+            var existingToggleButton = sidebarContainer.querySelector('#moderator-template-sidebar-toggle');
+            var existingIframe = sidebarContainer.querySelector('#moderator-template-sidebar-iframe');
+            if (existingToggleButton && existingIframe) {
+                if (sidebarContainer.dataset.customerNumber !== crsContext.customerNumber) {
+                    sidebarContainer.dataset.customerNumber = crsContext.customerNumber;
+                    existingIframe.src = createTemplateUrl(crsContext);
+                }
+                return sidebarContainer;
             }
-            return;
+            sidebarContainer.remove();
         }
+
+        var finalUrl = createTemplateUrl(crsContext);
 
         sidebarContainer = document.createElement('div');
         sidebarContainer.id = 'moderator-template-sidebar-container';
+        sidebarContainer.dataset.open = 'false';
+        sidebarContainer.dataset.customerNumber = crsContext.customerNumber;
 
-        var toggleButton = document.createElement('div');
+        var toggleFocusStyle = document.createElement('style');
+        toggleFocusStyle.textContent = '#moderator-template-sidebar-toggle:focus-visible { outline: 3px solid #ffbf47; outline-offset: 2px; }';
+        sidebarContainer.appendChild(toggleFocusStyle);
+
+        var toggleButton = document.createElement('button');
+        toggleButton.type = 'button';
         toggleButton.id = 'moderator-template-sidebar-toggle';
+        toggleButton.setAttribute('aria-controls', 'moderator-template-sidebar-iframe');
         toggleButton.title = 'Verberg / Toon Vraag Template';
         toggleButton.onclick = function() {
             setSidebarOpen(sidebarContainer, toggleButton, sidebarContainer.dataset.open === 'false');
@@ -484,97 +501,47 @@ if (!window.location.href.toLowerCase().includes('crs')) {
         sidebarContainer.appendChild(templateIframe);
         applyDockMode(sidebarContainer, toggleButton, getSavedDockMode());
         document.body.appendChild(sidebarContainer);
+        return sidebarContainer;
     }
 
-    function updateVraagMenuLabel(menuItem) {
-        var label = menuItem.querySelector('.moderator-vraag-menu-label');
-        var crsSidebar = menuItem.closest('.main-sidebar');
-        if (!label || !crsSidebar) return;
-
-        label.style.display = crsSidebar.getBoundingClientRect().width >= SIDEBAR_VRAAG_LABEL_MIN_WIDTH_PX
-            ? 'inline-block'
-            : 'none';
-    }
-
-    function observeSidebarSize(crsSidebar) {
-        if (!window.ResizeObserver || !crsSidebar || observedCrsSidebar === crsSidebar) return;
-
-        if (sidebarResizeObserver) sidebarResizeObserver.disconnect();
-        observedCrsSidebar = crsSidebar;
-        sidebarResizeObserver = new ResizeObserver(function() {
-            var menuItem = document.getElementById(SIDEBAR_VRAAG_MENU_ITEM_ID);
-            if (menuItem) updateVraagMenuLabel(menuItem);
-        });
-        sidebarResizeObserver.observe(crsSidebar);
-    }
-
-    function createVraagMenuItem() {
-        var menuItem = document.createElement('li');
-        menuItem.id = SIDEBAR_VRAAG_MENU_ITEM_ID;
-        menuItem.className = 'sidebar-menu-item nav-item';
-        menuItem.title = 'Vraag maken';
-
-        var trigger = document.createElement('a');
-        trigger.className = 'nav-link';
-        trigger.href = '#';
-        trigger.setAttribute('role', 'button');
-        trigger.setAttribute('aria-label', 'Vraag maken');
-        trigger.style.cursor = 'pointer';
-        trigger.addEventListener('click', function(event) {
-            event.preventDefault();
-            openVraagTemplate();
-        });
-        trigger.addEventListener('keydown', function(event) {
-            if (event.key !== ' ') return;
-            event.preventDefault();
-            openVraagTemplate();
-        });
-
-        var icon = document.createElement('span');
-        icon.className = 'moderator-vraag-menu-icon';
-        icon.setAttribute('aria-hidden', 'true');
-        icon.innerText = '?';
-        icon.style.cssText = 'display: inline-block; width: 1.25em; text-align: center; font-family: sans-serif; font-size: 1.25em; font-weight: bold; line-height: 1;';
-
-        var label = document.createElement('span');
-        label.className = 'moderator-vraag-menu-label menu-title';
-        label.innerText = 'Vraag maken';
-        label.style.marginLeft = '0.5rem';
-
-        trigger.appendChild(icon);
-        trigger.appendChild(label);
-        menuItem.appendChild(trigger);
-        return menuItem;
-    }
-
-    function reconcileVraagMenuItem() {
+    function reconcileTemplatePanel() {
         var noteElement = document.getElementById('IWMEMO_SCRIPT_EIGENINPUT');
         if (noteElement) attachLiveCrsNoteSync(noteElement);
 
         var legacyButton = document.getElementById('moderator-vraag-btn');
         if (legacyButton) legacyButton.remove();
 
-        var profileLink = document.getElementById('IWBUTTON_MT_INGELOGDE_MEDEWERKER');
-        var profileMenuItem = profileLink ? profileLink.closest('li') : null;
-        if (!profileMenuItem || !profileMenuItem.parentNode) return;
+        var menuItem = document.getElementById('moderator-vraag-menu-item');
+        if (menuItem) menuItem.remove();
 
-        var menuItem = document.getElementById(SIDEBAR_VRAAG_MENU_ITEM_ID);
-        if (!menuItem) menuItem = createVraagMenuItem();
-
-        if (profileMenuItem.previousElementSibling !== menuItem) {
-            profileMenuItem.parentNode.insertBefore(menuItem, profileMenuItem);
-        }
-        updateVraagMenuLabel(menuItem);
-        observeSidebarSize(menuItem.closest('.main-sidebar'));
+        initializeTemplatePanel();
     }
 
-    reconcileVraagMenuItem();
+    var reconciliationTimerId = null;
+    function scheduleTemplatePanelReconciliation() {
+        if (reconciliationTimerId !== null) return;
 
-    var observer = new MutationObserver(reconcileVraagMenuItem);
-    observer.observe(document.body, {
-        childList: true,
-        subtree: true,
-        attributes: true,
-        attributeFilter: ['class', 'style']
-    });
+        reconciliationTimerId = setTimeout(function() {
+            reconciliationTimerId = null;
+            reconcileTemplatePanel();
+        }, 0);
+    }
+
+    var observer = new MutationObserver(scheduleTemplatePanelReconciliation);
+    function startTemplatePanelLifecycle() {
+        if (!document.documentElement) {
+            document.addEventListener('DOMContentLoaded', startTemplatePanelLifecycle, { once: true });
+            return;
+        }
+
+        reconcileTemplatePanel();
+
+        // The html root survives CRS body replacements, so panel recovery remains active.
+        observer.observe(document.documentElement, {
+            childList: true,
+            subtree: true
+        });
+    }
+
+    startTemplatePanelLifecycle();
 }

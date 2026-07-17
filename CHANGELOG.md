@@ -1,5 +1,13 @@
 # Changelog
 
+## [5.0.1] - 2026-07-17
+
+- **Fixed:** Template Helper wordt nu op iedere ondersteunde CRS-pagina automatisch geladen, zonder afhankelijkheid van een CRS-menu-item, `Profiel`-knop of scriptnotitieveld.
+- **Changed:** Het paneel start ingeklapt, zodat alleen het bestaande blauwe uitsteekseltje zichtbaar is. Dit uitsteekseltje klapt het reeds geladen paneel uit zonder het iframe opnieuw te maken.
+- **Fixed:** Na een dynamische vervanging van de CRS-pagina-inhoud wordt het ingeklapte paneel automatisch opnieuw opgebouwd met dezelfde browsertab-draft.
+- **Fixed:** Wanneer CRS binnen hetzelfde document naar een andere klantcontext wisselt, ververst het iframe automatisch de klantprefill zonder dat een startknop nodig is.
+- **Changed:** De technische manifestversie en de zichtbare releaseversie zijn beide `5.0.1`.
+
 ## [5.0.0] - 2026-07-17
 
 - **Fixed:** `Vraag maken` staat nu als vraagtekenknop in de vaste blauwe CRS-zijbalk, direct boven `Profiel`. Bij een uitgeklapte zijbalk verschijnt ook het label `Vraag maken`.

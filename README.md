@@ -8,6 +8,10 @@ It is built to reduce copy mistakes, keep formatting consistent, and speed up CR
 ### Wat is dit?
 Template Helper ondersteunt moderators met een vaste, snelle en consistente workflow voor vraag- en antwoordtemplates.
 
+### Nieuw in v5.0.1
+- Template Helper wordt automatisch ingeklapt geladen op iedere ondersteunde CRS-pagina; de blauwe toggle-tab is de enige bediening die nodig is om het reeds geladen paneel te openen.
+- Het paneel herstelt na dynamische CRS-contentvervanging en ververst de klantprefill wanneer CRS binnen hetzelfde document naar een andere klant wisselt.
+
 ### Nieuw in v4.3.3
 - Een draft voor dezelfde klant blijft behouden als CRS tijdelijk geen klantnummer levert of de template niet kan laden. De tijdelijke pagina toont geen klantgegevens en kan de bewaarde draft niet automatisch aanpassen of verwijderen.
 - Met `Wissen` verwijder je een bewaarde draft ook bewust tijdens zo'n tijdelijke contextloze pagina.
@@ -29,18 +33,18 @@ Template Helper ondersteunt moderators met een vaste, snelle en consistente work
 - Vier templateweergaven: V&A `Vraag Template` en `Antwoord Template`, plus TCC `Ticketcontrole Verzoek` en `Ticketcontrole Antwoord`.
 - Een compacte domeinswitch wisselt tussen Technische Kennis V&A en Ticket Check Chat (TCC); de bestaande templateknop wisselt binnen het actieve domein tussen verzoek en antwoord.
 - Werkt als Chrome extensie in CRS en als standalone HTML buiten CRS.
-- Injecteert een `?`-knop in de vaste blauwe CRS-zijbalk, direct boven `Profiel`; bij een uitgeklapte zijbalk verschijnt `Vraag maken`.
+- Laadt automatisch op iedere ondersteunde CRS-pagina en start ingeklapt; alleen het bestaande blauwe uitsteekseltje blijft zichtbaar om het reeds geladen paneel uit te klappen.
 - Leest automatisch `Klantnummer` en notitie uit CRS en prefilt relevante templatevelden.
 - TCC-verzoek hergebruikt dezelfde CRS-prefill voor klantnummer en notitie.
 - Tijdens een actief TCC-verzoek wordt de CRS-notitie live gesynchroniseerd; na een lokale template-aanpassing kies je expliciet of de nieuwe CRS-notitie de template-notitie mag overschrijven.
 - Met de compacte `📸`-knop bij elk rich-text veld maak je in de CRS-sidebar zonder toetsenbord een screenshot van het zichtbare CRS-venster; de sidebar wordt tijdelijk verborgen, de afbeelding wordt direct aan het gekozen veld toegevoegd en is via het kleine `×`-kruis rechtsboven met de muis te verwijderen.
-- In extension mode opent de template direct vanuit de workflow in een in-app zijpaneel.
+- In extension mode is de template direct als ingeklapt in-app zijpaneel beschikbaar, zonder aparte startknop in CRS.
 - Docking-ondersteuning voor zijpaneel (links, rechts, boven, onder) met bewaarde positie.
 - Drag-to-dock: sleep de blauwe sidebar-header om live te docken naar links, rechts, boven of onder.
 - Sidebar toggle-tab om snel te verbergen/tonen zonder context te verliezen.
 - Pop-out knop (`↗`) om de template los in een apart venster te openen.
 - Dock mode persistence: onthoudt de laatst gebruikte dock-positie.
-- SPA-resilience: injectie herstelt automatisch bij dynamische CRS redraws.
+- SPA-resilience: het ingeklapte paneel wordt automatisch hersteld bij dynamische CRS redraws en vervanging van de CRS-body.
 - Domeinbeperking: injectie draait alleen op CRS-URL's.
 - Volledige rich-text invoervelden voor `Klantvraag`, `Vastloper`, `Gewenste uitkomst`, `Antwoord`, `Bron` en `Vervolgstap`.
 - Screenshot/afbeelding invoer in rich-text velden inclusief formattering in de output.
@@ -70,7 +74,7 @@ Template Helper ondersteunt moderators met een vaste, snelle en consistente work
 - Nieuwe installaties starten met `NL` en `EN` als actieve rotatietalen.
 - UI-teksten blijven NL/EN; voor andere doeltalen blijft de UI Engels en vertaalt alleen inhoud.
 - In extension mode gebruikt de iframe `clipboard-write` permissie voor stabieler kopieren in CRS.
-- Herhaald klikken op `Vraag maken` hergebruikt de bestaande sidebar en ververst de context/prefill.
+- Het blauwe toggle-uitsteekseltje opent en sluit hetzelfde reeds geladen iframe zonder de template opnieuw te initialiseren.
 - Bewaart ingevulde templatevelden en screenshots tijdelijk per browsertab en herstelt ze bij hetzelfde klantnummer; bij een ander of gewijzigd klantnummer, of bij een overgang tussen wel en geen klantnummer, wordt de draft gewist.
 - URL-prefill ondersteuning voor kernvelden via query parameters, inclusief TCC-klantnummer en -notitie.
 - Lokale text-beautifier voor geselecteerde talen bij blur.
@@ -120,6 +124,10 @@ localStorage.setItem('vraag-tmpl-azure-translator-endpoint', 'https://api.cognit
 ### What is this?
 Template Helper provides moderators with a consistent and fast template workflow for both question and answer handoff.
 
+### New in v5.0.1
+- Template Helper automatically loads collapsed on every supported CRS page; the blue toggle tab is the only control needed to open the already loaded panel.
+- The panel recovers after dynamic CRS content replacement and refreshes the customer prefill when CRS switches to another customer within the same document.
+
 ### New in v4.3.3
 - A draft for the same customer is retained when CRS temporarily provides no customer number or cannot load the template. The temporary page shows no customer data and cannot automatically change or delete the retained draft.
 - `Clear` intentionally removes a retained draft even from that temporary contextless page.
@@ -141,18 +149,18 @@ Template Helper provides moderators with a consistent and fast template workflow
 - Four template views: V&A `Question Template` and `Answer Template`, plus TCC `Ticket Check Request` and `Ticket Check Answer`.
 - A compact domain switch changes between Technical Knowledge Q&A and Ticket Check Chat (TCC); the existing template button switches between request and answer within the active domain.
 - Works as a Chrome extension in CRS and as standalone HTML outside CRS.
-- Injects a `?` action button in the persistent blue CRS sidebar, directly above `Profile`; `Vraag maken` appears when the sidebar is expanded.
+- Loads automatically on every supported CRS page and starts collapsed; only the existing blue toggle tab remains visible to expand the already loaded panel.
 - Automatically reads `Customer number` and note context from CRS and pre-fills relevant template fields.
 - TCC request reuses the same CRS prefill for customer number and note.
 - During an active TCC request, the CRS note stays synchronized live; after a local template edit, users explicitly choose whether a newer CRS note may overwrite the template note.
 - The compact `📸` button at every rich-text field captures the visible CRS window from the CRS sidebar without keyboard input; the sidebar is briefly hidden, the image is added directly to the selected field, and the small top-right `×` control removes it with the mouse.
-- In extension mode, the template opens directly from workflow context in an in-app sidebar.
+- In extension mode, the template is immediately available as a collapsed in-app sidebar without a separate CRS launch button.
 - Sidebar docking support (left, right, top, bottom) with persisted dock position.
 - Drag-to-dock: drag the blue sidebar header to dock live to left, right, top, or bottom.
 - Sidebar toggle tab for fast hide/show without losing context.
 - Pop-out button (`↗`) to open the template in a detached window.
 - Dock mode persistence: remembers last used dock placement.
-- SPA resilience: button/sidebar injection auto-recovers on dynamic CRS redraws.
+- SPA resilience: the collapsed panel auto-recovers after dynamic CRS redraws and CRS body replacement.
 - Domain scoping: injection runs only on CRS URLs.
 - Full rich-text editable fields for `Customer question`, `Where are you stuck`, `Desired outcome`, `Answer`, `Source`, and `Next step`.
 - Screenshot/image support inside rich-text fields with preserved formatting.
@@ -182,7 +190,7 @@ Template Helper provides moderators with a consistent and fast template workflow
 - New installs start with `NL` and `EN` enabled in rotation.
 - UI stays Dutch/English only; for other target languages, UI remains English while content is translated.
 - In extension mode, the iframe uses `clipboard-write` permission for more reliable copy behavior in CRS.
-- Repeated clicks on `Vraag maken` reuse the existing sidebar and refresh context/prefill.
+- The blue toggle tab opens and closes the same loaded iframe without reinitializing the template.
 - Temporarily preserves filled template fields and screenshots per browser tab and restores them for the same customer number; changing the customer context, including transitions to or from an empty customer number, clears the draft.
 - URL prefill support for core fields via query parameters, including TCC customer number and note.
 - Local text beautifier on blur for selected languages.

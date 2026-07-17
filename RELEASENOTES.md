@@ -1,13 +1,15 @@
-# v5.0.0 Release Notes
+# v5.0.1 Release Notes
 
 ## Nederlandse uitleg
-Deze release notes bevatten eerst de Nederlandse versie en daarna de Engelse versie. Deze definitieve release gebruikt Chrome-manifestversie `5.0.0` en toont `5.0.0` als zichtbare versie.
+Deze release notes bevatten eerst de Nederlandse versie en daarna de Engelse versie. Deze definitieve release gebruikt Chrome-manifestversie `5.0.1` en toont `5.0.1` als zichtbare versie.
 
 ## Nederlandse versie
 
-### Changelog v5.0.0
-- **Vaste knop in de CRS-zijbalk:** `Vraag maken` staat nu als een `?` in de blauwe CRS-zijbalk, direct boven `Profiel`. Zodra de zijbalk is uitgeklapt, verschijnt de tekst `Vraag maken`.
-- **Beschikbaar op elk CRS-scherm:** De knop hangt niet langer af van de scriptnotitie. Hij blijft beschikbaar op schermen zonder notitieveld en wordt na dynamische CRS-redraws automatisch teruggezet. Bij elke klik leest de extensie het actuele klantnummer en de actuele notitie opnieuw uit.
+### Changelog v5.0.1
+- **Altijd geladen in CRS:** Template Helper wordt op iedere ondersteunde CRS-pagina automatisch geladen, zonder een CRS-knop, `Profiel`-element of scriptnotitieveld als startvoorwaarde.
+- **Alleen het blauwe uitsteekseltje:** Het paneel start ingeklapt. Het bestaande blauwe uitsteekseltje opent en sluit uitsluitend het reeds geladen paneel, zonder het iframe opnieuw te maken.
+- **Herstel en actuele klantcontext:** Na dynamische CRS-contentvervanging bouwt het paneel zichzelf opnieuw op met dezelfde browsertab-draft. Wisselt CRS binnen hetzelfde document naar een andere klant, dan ververst de template automatisch de klantprefill.
+- **Toegankelijker bediening:** Het blauwe uitsteekseltje is nu een toetsenbordtoegankelijke knop met zichtbare focus en status voor schermlezers.
 
 ### Installatie Instructies
 1. Download het `.zip` bestand en pak het uit
@@ -20,7 +22,7 @@ Of download `standalone-template-v[versie].html` en open dit direct in je browse
 
 ### Volledig feature-overzicht
 Alle huidige features staan in de root README:
-https://github.com/m0nk111/template-helper/blob/v5.0.0/README.md
+https://github.com/m0nk111/template-helper/blob/v5.0.1/README.md
 
 ### Probleem ontdekt?
 Heb je een probleem ontdekt? Het makkelijkste is om hier op GitHub even een issue aan te maken. Op die manier kunnen we het probleem gestructureerd onderzoeken en oplossen!
@@ -30,9 +32,11 @@ Heb je een probleem ontdekt? Het makkelijkste is om hier op GitHub even een issu
 
 ## English version
 
-### Changelog v5.0.0
-- **Persistent CRS sidebar trigger:** `Vraag maken` now appears as a `?` in the blue CRS sidebar, directly above `Profile`. The `Vraag maken` label appears when the sidebar is expanded.
-- **Available on every CRS screen:** The trigger no longer depends on the script note. It remains available on pages without a note field, restores itself after dynamic CRS redraws, and reads the current customer number and note again on every click.
+### Changelog v5.0.1
+- **Always loaded in CRS:** Template Helper automatically loads on every supported CRS page, without requiring a CRS button, `Profile` element, or script note field as a launch condition.
+- **Only the blue toggle tab:** The panel starts collapsed. Its existing blue protruding toggle only opens and closes the already loaded panel without recreating the iframe.
+- **Recovery and current customer context:** After dynamic CRS content replacement, the panel rebuilds itself with the same browser-tab draft. When CRS switches to another customer in the same document, the template refreshes its customer prefill automatically.
+- **More accessible control:** The blue protruding toggle is now a keyboard-accessible button with visible focus and screen-reader state.
 
 ### Installation Instructions
 1. Download the `.zip` file and extract it
@@ -45,7 +49,7 @@ Or download `standalone-template-v[version].html` and open it directly in your b
 
 ### Complete Feature Overview
 For the complete feature set, see the root README:
-https://github.com/m0nk111/template-helper/blob/v5.0.0/README.md
+https://github.com/m0nk111/template-helper/blob/v5.0.1/README.md
 
 ### Found an issue?
 If you discovered an issue, the easiest way is to open an issue on GitHub. That helps us investigate and solve it in a structured way.
