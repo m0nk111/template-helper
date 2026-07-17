@@ -1,5 +1,11 @@
 # Changelog
 
+## [4.3.4] - 2026-07-17
+
+- **Fixed:** `Vraag maken` staat nu als vraagtekenknop in de vaste blauwe CRS-zijbalk, direct boven `Profiel`. Bij een uitgeklapte zijbalk verschijnt ook het label `Vraag maken`.
+- **Fixed:** De knop blijft beschikbaar op CRS-schermen zonder scriptnotitie en wordt na dynamische CRS-redraws automatisch hersteld. Bij elke klik leest de extensie de actuele klantcontext opnieuw uit.
+- **Changed:** De technische manifestversie en de zichtbare releaseversie zijn beide `4.3.4`.
+
 ## [4.3.3] - 2026-07-17
 
 - **Fixed:** Een draft van dezelfde klant blijft nu bewaard wanneer CRS tijdelijk geen klantcontext kan leveren of de template niet kan laden. De tijdelijke pagina toont geen eerdere klantgegevens en kan de bewaarde draft niet automatisch overschrijven of verwijderen.

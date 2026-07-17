@@ -37,6 +37,10 @@ if (!window.location.href.toLowerCase().includes('crs')) {
     var activeScreenshotCaptureRequestId = null;
     var screenshotCaptureTimeoutId = null;
     var fallbackDraftId = null;
+    var SIDEBAR_VRAAG_MENU_ITEM_ID = 'moderator-vraag-menu-item';
+    var SIDEBAR_VRAAG_LABEL_MIN_WIDTH_PX = 80;
+    var sidebarResizeObserver = null;
+    var observedCrsSidebar = null;
 
     function isValidDraftId(draftId) {
         return typeof draftId === 'string' && /^[A-Za-z0-9_-]{8,128}$/.test(draftId);
@@ -395,140 +399,182 @@ if (!window.location.href.toLowerCase().includes('crs')) {
         captureCrsScreenshot(iframe, data);
     });
 
-    // Main function responsible for building and placing our custom action button
-    function createVraagButton() {
-        // TARGET ACQUISITION: Find the specific text area where the CRM loads user input
-        var targetArea = document.getElementById('IWMEMO_SCRIPT_EIGENINPUT');
-        // If the textarea hasn't loaded yet (or we're on the wrong page within CRS), abort
-        if (!targetArea) return;
+    function readCurrentCrsContext() {
+        var customerNumberElement = document.querySelector('.ut_DFI_EL_PARTY_ID');
+        var noteElement = document.getElementById('IWMEMO_SCRIPT_EIGENINPUT');
 
-        attachLiveCrsNoteSync(targetArea);
-
-        // Prevent duplicate injections: check if our button already exists on the page
-        if (document.getElementById('moderator-vraag-btn')) return;
-
-        // 2. BUTTON CREATION
-        // Create our custom "Create Question" (Vraag Maken) button dynamically
-        var btn = document.createElement('button');
-        btn.id = 'moderator-vraag-btn';
-        btn.innerText = 'Vraag maken';
-        // Inline CSS styling to match corporate identity layout
-        btn.style.cssText = "background-color: #002B54; color: white; border: none; padding: 3px 8px; border-radius: 3px; font-weight: normal; cursor: pointer; margin-bottom: 8px; font-size: 12px;";
-
-        // 3. BUTTON CLICK HANDLER (When the user clicks our injected button)
-        btn.addEventListener('click', function(e) {
-            e.preventDefault();
-
-            // DATA EXTRACTION: Scrape the page DOM to find the customer ID and context question
-            var klnrEl = document.querySelector('.ut_DFI_EL_PARTY_ID');
-            var klantnummer = klnrEl ? klnrEl.innerText.trim().slice(0, MAX_CUSTOMER_NUMBER_LENGTH) : '';
-
-            var notitieEl = document.getElementById('IWMEMO_SCRIPT_EIGENINPUT');
-            var klantvraag = notitieEl ? notitieEl.value.trim() : '';
-
-            // URL CONSTRUCTION: Bind the extracted data as URL parameters
-            // chrome.runtime.getURL gets the exact internal chrome-extension:// path for our bundled HTML
-            var url = chrome.runtime.getURL("template.html");
-            var urlParams = new URLSearchParams();
-            urlParams.set('klantnummer', klantnummer);
-            urlParams.set('klantvraag', klantvraag);
-            urlParams.set('draftId', getTabDraftId());
-            var finalUrl = url + '?' + urlParams.toString();
-
-            // 4. SIDEBAR RENDERING LOGIC
-            var sidebarContainer = document.getElementById('moderator-template-sidebar-container');
-            if (sidebarContainer) {
-                // If sidebar is already created, just update the iframe URL with new data
-                document.getElementById('moderator-template-sidebar-iframe').src = finalUrl;
-
-                var toggleBtn = document.getElementById('moderator-template-sidebar-toggle');
-                if (toggleBtn) {
-                    applyDockMode(sidebarContainer, toggleBtn, sidebarContainer.dataset.dockMode || getSavedDockMode());
-                    setSidebarOpen(sidebarContainer, toggleBtn, true);
-                }
-            } else {
-                // FIRST TIME CREATION: Build the sidebar UI overlay
-                sidebarContainer = document.createElement('div');
-                sidebarContainer.id = 'moderator-template-sidebar-container';
-
-                // --- TOGGLE TAB (Small sticky tab hanging explicitly outside the sidebar) ---
-                var toggleBtn = document.createElement('div');
-                toggleBtn.id = 'moderator-template-sidebar-toggle';
-                toggleBtn.title = "Verberg / Toon Vraag Template";
-
-                // Toggle animation logic linked to the CSS transform property
-                toggleBtn.onclick = function() {
-                    setSidebarOpen(sidebarContainer, toggleBtn, sidebarContainer.dataset.open === 'false');
-                };
-                sidebarContainer.appendChild(toggleBtn);
-                // ----------------------------------------
-
-                // HEADER SECTION (Title & Hard Close Button)
-                var header = document.createElement('div');
-                header.style.cssText = "display: flex; justify-content: space-between; align-items: center; gap: 8px; background-color: #002B54; color: white; padding: 12px 15px; font-weight: bold; font-family: sans-serif;";
-                header.title = "Sleep de balk naar links, rechts, boven of onderaan";
-                header.style.cursor = 'grab';
-
-                var headerTitle = document.createElement('div');
-                headerTitle.innerText = "Vraag Template";
-                headerTitle.style.cssText = "white-space: nowrap; overflow: hidden; text-overflow: ellipsis;";
-
-                var headerControls = document.createElement('div');
-                headerControls.style.cssText = "display: flex; align-items: center; gap: 4px; margin-left: auto;";
-                headerControls.appendChild(createHeaderButton('↗', 'Open los venster', function() {
-                    var iframe = document.getElementById('moderator-template-sidebar-iframe');
-                    var popupUrl = iframe ? iframe.src : finalUrl;
-                    var popupWindow = window.open(popupUrl, 'moderator-template-helper-window', 'popup=yes,width=500,height=760,left=80,top=80');
-                    if (popupWindow) popupWindow.focus();
-                    setSidebarOpen(sidebarContainer, toggleBtn, false);
-                }));
-
-                var closeBtn = document.createElement('button');
-                closeBtn.innerText = "✖ Sluiten";
-                closeBtn.style.cssText = "background: rgba(255,255,255,0.2); border: none; color: white; font-size: 13px; cursor: pointer; padding: 4px 8px; border-radius: 4px;";
-                // Add hover effects cleanly through event listeners instead of massive CSS strings
-                closeBtn.addEventListener('mouseover', function() { closeBtn.style.background = 'rgba(255,255,255,0.4)'; });
-                closeBtn.addEventListener('mouseout', function() { closeBtn.style.background = 'rgba(255,255,255,0.2)'; });
-                // Clicking close behaves the exact same way as clicking the toggle tab (soft close)
-                closeBtn.onclick = function() { setSidebarOpen(sidebarContainer, toggleBtn, false); };
-                header.appendChild(headerTitle);
-                header.appendChild(headerControls);
-                header.appendChild(closeBtn);
-                enableHeaderDrag(header, sidebarContainer, toggleBtn);
-
-                // 5. IFRAME MOUNTING
-                // Create an isolated iframe to load our template.html file
-                // Using an iframe prevents the CRS page's global CSS/JS from interfering with our template
-                var iframe = document.createElement('iframe');
-                iframe.id = 'moderator-template-sidebar-iframe';
-                // Allow the iframe to use the modern Clipboard API so copying text works
-                iframe.setAttribute('allow', 'clipboard-write');
-                iframe.addEventListener('load', sendCurrentCrsNoteUpdate);
-                // Load the constructed URL (including payload parameters) into the iframe
-                iframe.src = finalUrl;
-                iframe.style.cssText = "flex-grow: 1; border: none; width: 100%; height: 100%; background: #f4f6f8;";
-
-                // Assemble the DOM structure
-                sidebarContainer.appendChild(header);
-                sidebarContainer.appendChild(iframe);
-                applyDockMode(sidebarContainer, toggleBtn, getSavedDockMode());
-                // Mount to main document
-                document.body.appendChild(sidebarContainer);
-            }
-        });
-
-        // 6. MOUNT INITIAL BUTTON
-        // Inject the button directly above the 'targetArea' textarea
-        targetArea.parentNode.insertBefore(btn, targetArea);
+        return {
+            customerNumber: customerNumberElement
+                ? customerNumberElement.innerText.trim().slice(0, MAX_CUSTOMER_NUMBER_LENGTH)
+                : '',
+            customerNote: noteElement ? noteElement.value.trim() : ''
+        };
     }
 
-    // Execute injection explicitly during script load
-    createVraagButton();
+    function openVraagTemplate() {
+        var crsContext = readCurrentCrsContext();
+        var url = chrome.runtime.getURL('template.html');
+        var urlParams = new URLSearchParams();
+        urlParams.set('klantnummer', crsContext.customerNumber);
+        urlParams.set('klantvraag', crsContext.customerNote);
+        urlParams.set('draftId', getTabDraftId());
+        var finalUrl = url + '?' + urlParams.toString();
 
-    // 7. SINGLE PAGE APPLICATION (SPA) SUPPORT
-    // Many modern corporate websites load data dynamically without refreshing the page (React, Angular).
-    // A MutationObserver watches the DOM stream continuously for changes.
-    // If the page redraws or loads new data, this ensures our button gets re-injected automatically.
-    var observer = new MutationObserver(createVraagButton);
-    observer.observe(document.body, { childList: true, subtree: true });
+        var sidebarContainer = document.getElementById('moderator-template-sidebar-container');
+        if (sidebarContainer) {
+            document.getElementById('moderator-template-sidebar-iframe').src = finalUrl;
+
+            var existingToggleButton = document.getElementById('moderator-template-sidebar-toggle');
+            if (existingToggleButton) {
+                applyDockMode(sidebarContainer, existingToggleButton, sidebarContainer.dataset.dockMode || getSavedDockMode());
+                setSidebarOpen(sidebarContainer, existingToggleButton, true);
+            }
+            return;
+        }
+
+        sidebarContainer = document.createElement('div');
+        sidebarContainer.id = 'moderator-template-sidebar-container';
+
+        var toggleButton = document.createElement('div');
+        toggleButton.id = 'moderator-template-sidebar-toggle';
+        toggleButton.title = 'Verberg / Toon Vraag Template';
+        toggleButton.onclick = function() {
+            setSidebarOpen(sidebarContainer, toggleButton, sidebarContainer.dataset.open === 'false');
+        };
+        sidebarContainer.appendChild(toggleButton);
+
+        var header = document.createElement('div');
+        header.style.cssText = 'display: flex; justify-content: space-between; align-items: center; gap: 8px; background-color: #002B54; color: white; padding: 12px 15px; font-weight: bold; font-family: sans-serif;';
+        header.title = 'Sleep de balk naar links, rechts, boven of onderaan';
+        header.style.cursor = 'grab';
+
+        var headerTitle = document.createElement('div');
+        headerTitle.innerText = 'Vraag Template';
+        headerTitle.style.cssText = 'white-space: nowrap; overflow: hidden; text-overflow: ellipsis;';
+
+        var headerControls = document.createElement('div');
+        headerControls.style.cssText = 'display: flex; align-items: center; gap: 4px; margin-left: auto;';
+        headerControls.appendChild(createHeaderButton('↗', 'Open los venster', function() {
+            var iframe = document.getElementById('moderator-template-sidebar-iframe');
+            var popupUrl = iframe ? iframe.src : finalUrl;
+            var popupWindow = window.open(popupUrl, 'moderator-template-helper-window', 'popup=yes,width=500,height=760,left=80,top=80');
+            if (popupWindow) popupWindow.focus();
+            setSidebarOpen(sidebarContainer, toggleButton, false);
+        }));
+
+        var closeButton = document.createElement('button');
+        closeButton.innerText = '✖ Sluiten';
+        closeButton.style.cssText = 'background: rgba(255,255,255,0.2); border: none; color: white; font-size: 13px; cursor: pointer; padding: 4px 8px; border-radius: 4px;';
+        closeButton.addEventListener('mouseover', function() { closeButton.style.background = 'rgba(255,255,255,0.4)'; });
+        closeButton.addEventListener('mouseout', function() { closeButton.style.background = 'rgba(255,255,255,0.2)'; });
+        closeButton.onclick = function() { setSidebarOpen(sidebarContainer, toggleButton, false); };
+        header.appendChild(headerTitle);
+        header.appendChild(headerControls);
+        header.appendChild(closeButton);
+        enableHeaderDrag(header, sidebarContainer, toggleButton);
+
+        var templateIframe = document.createElement('iframe');
+        templateIframe.id = 'moderator-template-sidebar-iframe';
+        templateIframe.setAttribute('allow', 'clipboard-write');
+        templateIframe.addEventListener('load', sendCurrentCrsNoteUpdate);
+        templateIframe.src = finalUrl;
+        templateIframe.style.cssText = 'flex-grow: 1; border: none; width: 100%; height: 100%; background: #f4f6f8;';
+
+        sidebarContainer.appendChild(header);
+        sidebarContainer.appendChild(templateIframe);
+        applyDockMode(sidebarContainer, toggleButton, getSavedDockMode());
+        document.body.appendChild(sidebarContainer);
+    }
+
+    function updateVraagMenuLabel(menuItem) {
+        var label = menuItem.querySelector('.moderator-vraag-menu-label');
+        var crsSidebar = menuItem.closest('.main-sidebar');
+        if (!label || !crsSidebar) return;
+
+        label.style.display = crsSidebar.getBoundingClientRect().width >= SIDEBAR_VRAAG_LABEL_MIN_WIDTH_PX
+            ? 'inline-block'
+            : 'none';
+    }
+
+    function observeSidebarSize(crsSidebar) {
+        if (!window.ResizeObserver || !crsSidebar || observedCrsSidebar === crsSidebar) return;
+
+        if (sidebarResizeObserver) sidebarResizeObserver.disconnect();
+        observedCrsSidebar = crsSidebar;
+        sidebarResizeObserver = new ResizeObserver(function() {
+            var menuItem = document.getElementById(SIDEBAR_VRAAG_MENU_ITEM_ID);
+            if (menuItem) updateVraagMenuLabel(menuItem);
+        });
+        sidebarResizeObserver.observe(crsSidebar);
+    }
+
+    function createVraagMenuItem() {
+        var menuItem = document.createElement('li');
+        menuItem.id = SIDEBAR_VRAAG_MENU_ITEM_ID;
+        menuItem.className = 'sidebar-menu-item nav-item';
+        menuItem.title = 'Vraag maken';
+
+        var trigger = document.createElement('a');
+        trigger.className = 'nav-link';
+        trigger.href = '#';
+        trigger.setAttribute('role', 'button');
+        trigger.setAttribute('aria-label', 'Vraag maken');
+        trigger.style.cursor = 'pointer';
+        trigger.addEventListener('click', function(event) {
+            event.preventDefault();
+            openVraagTemplate();
+        });
+        trigger.addEventListener('keydown', function(event) {
+            if (event.key !== ' ') return;
+            event.preventDefault();
+            openVraagTemplate();
+        });
+
+        var icon = document.createElement('span');
+        icon.className = 'moderator-vraag-menu-icon';
+        icon.setAttribute('aria-hidden', 'true');
+        icon.innerText = '?';
+        icon.style.cssText = 'display: inline-block; width: 1.25em; text-align: center; font-family: sans-serif; font-size: 1.25em; font-weight: bold; line-height: 1;';
+
+        var label = document.createElement('span');
+        label.className = 'moderator-vraag-menu-label menu-title';
+        label.innerText = 'Vraag maken';
+        label.style.marginLeft = '0.5rem';
+
+        trigger.appendChild(icon);
+        trigger.appendChild(label);
+        menuItem.appendChild(trigger);
+        return menuItem;
+    }
+
+    function reconcileVraagMenuItem() {
+        var noteElement = document.getElementById('IWMEMO_SCRIPT_EIGENINPUT');
+        if (noteElement) attachLiveCrsNoteSync(noteElement);
+
+        var legacyButton = document.getElementById('moderator-vraag-btn');
+        if (legacyButton) legacyButton.remove();
+
+        var profileLink = document.getElementById('IWBUTTON_MT_INGELOGDE_MEDEWERKER');
+        var profileMenuItem = profileLink ? profileLink.closest('li') : null;
+        if (!profileMenuItem || !profileMenuItem.parentNode) return;
+
+        var menuItem = document.getElementById(SIDEBAR_VRAAG_MENU_ITEM_ID);
+        if (!menuItem) menuItem = createVraagMenuItem();
+
+        if (profileMenuItem.previousElementSibling !== menuItem) {
+            profileMenuItem.parentNode.insertBefore(menuItem, profileMenuItem);
+        }
+        updateVraagMenuLabel(menuItem);
+        observeSidebarSize(menuItem.closest('.main-sidebar'));
+    }
+
+    reconcileVraagMenuItem();
+
+    var observer = new MutationObserver(reconcileVraagMenuItem);
+    observer.observe(document.body, {
+        childList: true,
+        subtree: true,
+        attributes: true,
+        attributeFilter: ['class', 'style']
+    });
 }

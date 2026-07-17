@@ -29,7 +29,7 @@ Template Helper ondersteunt moderators met een vaste, snelle en consistente work
 - Vier templateweergaven: V&A `Vraag Template` en `Antwoord Template`, plus TCC `Ticketcontrole Verzoek` en `Ticketcontrole Antwoord`.
 - Een compacte domeinswitch wisselt tussen Technische Kennis V&A en Ticket Check Chat (TCC); de bestaande templateknop wisselt binnen het actieve domein tussen verzoek en antwoord.
 - Werkt als Chrome extensie in CRS en als standalone HTML buiten CRS.
-- Injecteert een blauwe `Vraag maken` knop direct bij het CRS-invoerveld.
+- Injecteert een `?`-knop in de vaste blauwe CRS-zijbalk, direct boven `Profiel`; bij een uitgeklapte zijbalk verschijnt `Vraag maken`.
 - Leest automatisch `Klantnummer` en notitie uit CRS en prefilt relevante templatevelden.
 - TCC-verzoek hergebruikt dezelfde CRS-prefill voor klantnummer en notitie.
 - Tijdens een actief TCC-verzoek wordt de CRS-notitie live gesynchroniseerd; na een lokale template-aanpassing kies je expliciet of de nieuwe CRS-notitie de template-notitie mag overschrijven.
@@ -141,7 +141,7 @@ Template Helper provides moderators with a consistent and fast template workflow
 - Four template views: V&A `Question Template` and `Answer Template`, plus TCC `Ticket Check Request` and `Ticket Check Answer`.
 - A compact domain switch changes between Technical Knowledge Q&A and Ticket Check Chat (TCC); the existing template button switches between request and answer within the active domain.
 - Works as a Chrome extension in CRS and as standalone HTML outside CRS.
-- Injects a blue `Vraag maken` action button directly near the CRS input area.
+- Injects a `?` action button in the persistent blue CRS sidebar, directly above `Profile`; `Vraag maken` appears when the sidebar is expanded.
 - Automatically reads `Customer number` and note context from CRS and pre-fills relevant template fields.
 - TCC request reuses the same CRS prefill for customer number and note.
 - During an active TCC request, the CRS note stays synchronized live; after a local template edit, users explicitly choose whether a newer CRS note may overwrite the template note.
