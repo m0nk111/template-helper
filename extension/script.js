@@ -247,6 +247,7 @@ let draftSaveTimer = null;
 let draftOperationChain = Promise.resolve();
 let draftReady = false;
 let draftStorageAvailable = false;
+let isDraftPersistenceSuspended = false;
 
 function normalizeCustomerNumber(value) {
   return String(value || '').trim();
@@ -430,7 +431,7 @@ function queueDraftOperation(operation) {
 }
 
 function scheduleDraftSave() {
-  if (!draftReady || !currentDraftId || !draftStorageAvailable) return;
+  if (!draftReady || !currentDraftId || !draftStorageAvailable || isDraftPersistenceSuspended) return;
 
   clearTimeout(draftSaveTimer);
   draftSaveTimer = setTimeout(() => {
@@ -444,7 +445,7 @@ function flushDraftSave() {
   if (draftSaveTimer) {
     clearTimeout(draftSaveTimer);
     draftSaveTimer = null;
-    if (draftReady && currentDraftId && draftStorageAvailable) {
+    if (draftReady && currentDraftId && draftStorageAvailable && !isDraftPersistenceSuspended) {
       const record = captureDraftRecord();
       return queueDraftOperation(() => saveDraftRecord(record));
     }
@@ -453,11 +454,11 @@ function flushDraftSave() {
   return draftOperationChain;
 }
 
-function clearStoredDraft() {
+function clearStoredDraft(force = false) {
   clearTimeout(draftSaveTimer);
   draftSaveTimer = null;
-  if (!currentDraftId) return;
-  queueDraftOperation(() => deleteDraftRecord(currentDraftId));
+  if (!currentDraftId || (isDraftPersistenceSuspended && !force)) return Promise.resolve(false);
+  return queueDraftOperation(() => deleteDraftRecord(currentDraftId));
 }
 
 function restoreDraftRecord(record) {
@@ -665,6 +666,7 @@ async function initializeDraftPersistence(draftId, customerContext, currentCrsNo
   currentDraftContext = isValidDraftContext(customerContext)
     ? { ...customerContext }
     : createDraftContext('');
+  isDraftPersistenceSuspended = false;
 
   if (!currentDraftId || typeof indexedDB === 'undefined') {
     draftReady = true;
@@ -678,6 +680,9 @@ async function initializeDraftPersistence(draftId, customerContext, currentCrsNo
     if (record && isValidDraftRecord(record) && areDraftContextsEqual(record.customerContext, currentDraftContext)) {
       restoreDraftRecord(record);
       reconcileRestoredTccNote(record, currentCrsNote);
+    } else if (record && isValidDraftRecord(record) &&
+      !currentDraftContext.hasCustomerNumber && record.customerContext.hasCustomerNumber) {
+      isDraftPersistenceSuspended = true;
     } else if (record) {
       await deleteDraftRecord(currentDraftId);
     }
@@ -2177,7 +2182,7 @@ function clearForm() {
   const allFields = [...fieldsVraag, ...fieldsAntwoord, ...fieldsTccVraag, ...fieldsTccAntwoord];
 
   clearPendingScreenshotRequest();
-  clearStoredDraft();
+  clearStoredDraft(true);
 
   for (const id of allFields) {
     const el = document.getElementById(id);

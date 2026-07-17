@@ -1,13 +1,13 @@
-# v4.3.2 Release Notes
+# v4.3.3 Release Notes
 
 ## Nederlandse uitleg
-Deze release notes bevatten eerst de Nederlandse versie en daarna de Engelse versie. Deze definitieve release gebruikt Chrome-manifestversie `4.3.2` en toont `4.3.2` als zichtbare versie.
+Deze release notes bevatten eerst de Nederlandse versie en daarna de Engelse versie. Deze definitieve release gebruikt Chrome-manifestversie `4.3.3` en toont `4.3.3` als zichtbare versie.
 
 ## Nederlandse versie
 
-### Changelog v4.3.2
-- **Tabelscroll binnen het voorbeeld:** Brede tabellen uit CRS en Teams blijven binnen het voorbeeldvak. De horizontale scrollbar staat alleen bij de betreffende tabel, zodat de sidebar en de rest van de preview niet horizontaal uitrekken.
-- **Ongewijzigde Teams-output:** De gekopieerde HTML behoudt de oorspronkelijke tabel zonder preview-wrapper of scrollbarstijl.
+### Changelog v4.3.3
+- **Drafts blijven bewaard bij tijdelijke CRS-pagina's:** Een draft voor dezelfde klant blijft behouden wanneer CRS tijdelijk geen klantnummer kan leveren of de template niet kan laden. Die tijdelijke pagina toont geen eerdere klantgegevens en kan de bewaarde draft niet automatisch overschrijven of verwijderen.
+- **Wissen blijft expliciet:** Met `Wissen` verwijder je de opgeslagen draft ook bewust tijdens zo'n tijdelijke contextloze pagina.
 
 ### Installatie Instructies
 1. Download het `.zip` bestand en pak het uit
@@ -20,7 +20,7 @@ Of download `standalone-template-v[versie].html` en open dit direct in je browse
 
 ### Volledig feature-overzicht
 Alle huidige features staan in de root README:
-https://github.com/m0nk111/template-helper/blob/v4.3.2/README.md
+https://github.com/m0nk111/template-helper/blob/v4.3.3/README.md
 
 ### Probleem ontdekt?
 Heb je een probleem ontdekt? Het makkelijkste is om hier op GitHub even een issue aan te maken. Op die manier kunnen we het probleem gestructureerd onderzoeken en oplossen!
@@ -30,9 +30,9 @@ Heb je een probleem ontdekt? Het makkelijkste is om hier op GitHub even een issu
 
 ## English version
 
-### Changelog v4.3.2
-- **Preview table scrolling:** Wide tables from CRS and Teams stay inside the preview area. The horizontal scrollbar belongs only to the relevant table, so the sidebar and rest of the preview do not stretch horizontally.
-- **Unchanged Teams output:** Copied HTML retains the original table without preview wrappers or scrollbar styles.
+### Changelog v4.3.3
+- **Drafts survive temporary CRS pages:** A draft for the same customer is retained when CRS temporarily cannot provide a customer number or load the template. That temporary page shows no previous customer data and cannot automatically overwrite or delete the retained draft.
+- **Clear remains explicit:** `Clear` intentionally removes the saved draft even from that temporary contextless page.
 
 ### Installation Instructions
 1. Download the `.zip` file and extract it
@@ -45,7 +45,7 @@ Or download `standalone-template-v[version].html` and open it directly in your b
 
 ### Complete Feature Overview
 For the complete feature set, see the root README:
-https://github.com/m0nk111/template-helper/blob/v4.3.2/README.md
+https://github.com/m0nk111/template-helper/blob/v4.3.3/README.md
 
 ### Found an issue?
 If you discovered an issue, the easiest way is to open an issue on GitHub. That helps us investigate and solve it in a structured way.

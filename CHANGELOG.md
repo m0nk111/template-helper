@@ -1,5 +1,11 @@
 # Changelog
 
+## [4.3.3] - 2026-07-17
+
+- **Fixed:** Een draft van dezelfde klant blijft nu bewaard wanneer CRS tijdelijk geen klantcontext kan leveren of de template niet kan laden. De tijdelijke pagina toont geen eerdere klantgegevens en kan de bewaarde draft niet automatisch overschrijven of verwijderen.
+- **Fixed:** `Wissen` verwijdert de bewaarde draft nu ook expliciet tijdens zo'n tijdelijke contextloze pagina.
+- **Changed:** De technische manifestversie en de zichtbare releaseversie zijn beide `4.3.3`.
+
 ## [4.3.2] - 2026-07-17
 
 - **Fixed:** Brede rich-texttabellen blijven nu binnen het voorbeeldvak. De horizontale scrollbar verschijnt alleen bij de betreffende tabel, zodat de sidebar en preview niet horizontaal uitrekken.

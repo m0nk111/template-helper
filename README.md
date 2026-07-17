@@ -8,6 +8,10 @@ It is built to reduce copy mistakes, keep formatting consistent, and speed up CR
 ### Wat is dit?
 Template Helper ondersteunt moderators met een vaste, snelle en consistente workflow voor vraag- en antwoordtemplates.
 
+### Nieuw in v4.3.3
+- Een draft voor dezelfde klant blijft behouden als CRS tijdelijk geen klantnummer levert of de template niet kan laden. De tijdelijke pagina toont geen klantgegevens en kan de bewaarde draft niet automatisch aanpassen of verwijderen.
+- Met `Wissen` verwijder je een bewaarde draft ook bewust tijdens zo'n tijdelijke contextloze pagina.
+
 ### Nieuw in v4.3.2
 - Brede geplakte tabellen blijven binnen het voorbeeldvak. Gebruik de horizontale scrollbar direct bij de tabel; de sidebar en de rest van de preview blijven op breedte.
 - De Teams/clipboard-output behoudt de oorspronkelijke tabel zonder preview-specifieke wrapper of scrollbarstijl.
@@ -115,6 +119,10 @@ localStorage.setItem('vraag-tmpl-azure-translator-endpoint', 'https://api.cognit
 
 ### What is this?
 Template Helper provides moderators with a consistent and fast template workflow for both question and answer handoff.
+
+### New in v4.3.3
+- A draft for the same customer is retained when CRS temporarily provides no customer number or cannot load the template. The temporary page shows no customer data and cannot automatically change or delete the retained draft.
+- `Clear` intentionally removes a retained draft even from that temporary contextless page.
 
 ### New in v4.3.2
 - Wide pasted tables stay inside the preview area. Use the horizontal scrollbar directly at the table; the sidebar and remaining preview stay within their width.

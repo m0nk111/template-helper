@@ -266,7 +266,82 @@ def test_different_customer_number_clears_previous_draft(
     }
 
 
-def test_empty_customer_context_is_reused_but_number_transition_clears_draft(
+def test_customer_draft_survives_temporary_empty_context_navigation(
+    draft_page: DevToolsPage,
+) -> None:
+    draft_page.evaluate(
+        """
+        (async () => {
+          await window.templateHelperDraftReady;
+          const field = document.getElementById('vastloper');
+          field.innerText = 'Blijf bewaard voor dezelfde klant.';
+          field.dispatchEvent(new Event('input', { bubbles: true }));
+          await flushDraftSave();
+        })()
+        """
+    )
+
+    navigate_template(draft_page, build_template_url('', 'Tijdelijke CRS-pagina'))
+
+    temporary_context = draft_page.evaluate(
+        """
+        (async () => {
+          await flushDraftSave();
+          return {
+            customerNumber: document.getElementById('klantnummer').value,
+            question: document.getElementById('klantvraag').innerText,
+            stuck: document.getElementById('vastloper').innerText,
+          };
+        })()
+        """
+    )
+    assert temporary_context == {
+        'customerNumber': '',
+        'question': 'Tijdelijke CRS-pagina',
+        'stuck': '',
+    }
+
+    navigate_template(draft_page, build_template_url(CUSTOMER_NUMBER, 'Terug bij klant'))
+
+    assert draft_page.evaluate(
+        "document.getElementById('vastloper').innerText"
+    ) == 'Blijf bewaard voor dezelfde klant.'
+
+
+def test_clear_form_during_temporary_empty_context_deletes_customer_draft(
+    draft_page: DevToolsPage,
+) -> None:
+    draft_page.evaluate(
+        """
+        (async () => {
+          await window.templateHelperDraftReady;
+          const field = document.getElementById('vastloper');
+          field.innerText = 'Deze draft moet expliciet worden gewist.';
+          field.dispatchEvent(new Event('input', { bubbles: true }));
+          await flushDraftSave();
+        })()
+        """
+    )
+
+    navigate_template(draft_page, build_template_url('', 'Tijdelijke CRS-pagina'))
+
+    draft_page.evaluate(
+        """
+        (async () => {
+          document.getElementById('btn-clear').click();
+          await flushDraftSave();
+        })()
+        """
+    )
+
+    navigate_template(draft_page, build_template_url(CUSTOMER_NUMBER, 'Terug bij klant'))
+
+    assert draft_page.evaluate(
+        "document.getElementById('vastloper').innerText"
+    ) == ''
+
+
+def test_empty_customer_context_does_not_replace_customer_draft_and_number_transition_clears_it(
     draft_page: DevToolsPage,
 ) -> None:
     draft_page.evaluate(
@@ -301,10 +376,10 @@ def test_empty_customer_context_is_reused_but_number_transition_clears_draft(
     draft_page.evaluate('flushDraftSave()')
     navigate_template(draft_page, build_template_url('', 'Nieuwe notitie zonder klantnummer'))
 
-    reused_empty_context = draft_page.evaluate(
+    next_empty_context = draft_page.evaluate(
         "document.getElementById('klantvraag').innerText"
     )
-    assert reused_empty_context == 'Notitie zonder klantnummer'
+    assert next_empty_context == 'Nieuwe notitie zonder klantnummer'
 
     navigate_template(draft_page, build_template_url('87654321', 'Nieuwe klant'))
 
