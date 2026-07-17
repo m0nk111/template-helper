@@ -1,11 +1,11 @@
-# v4.3.4 Release Notes
+# v5.0.0 Release Notes
 
 ## Nederlandse uitleg
-Deze release notes bevatten eerst de Nederlandse versie en daarna de Engelse versie. Deze definitieve release gebruikt Chrome-manifestversie `4.3.4` en toont `4.3.4` als zichtbare versie.
+Deze release notes bevatten eerst de Nederlandse versie en daarna de Engelse versie. Deze definitieve release gebruikt Chrome-manifestversie `5.0.0` en toont `5.0.0` als zichtbare versie.
 
 ## Nederlandse versie
 
-### Changelog v4.3.4
+### Changelog v5.0.0
 - **Vaste knop in de CRS-zijbalk:** `Vraag maken` staat nu als een `?` in de blauwe CRS-zijbalk, direct boven `Profiel`. Zodra de zijbalk is uitgeklapt, verschijnt de tekst `Vraag maken`.
 - **Beschikbaar op elk CRS-scherm:** De knop hangt niet langer af van de scriptnotitie. Hij blijft beschikbaar op schermen zonder notitieveld en wordt na dynamische CRS-redraws automatisch teruggezet. Bij elke klik leest de extensie het actuele klantnummer en de actuele notitie opnieuw uit.
 
@@ -20,7 +20,7 @@ Of download `standalone-template-v[versie].html` en open dit direct in je browse
 
 ### Volledig feature-overzicht
 Alle huidige features staan in de root README:
-https://github.com/m0nk111/template-helper/blob/v4.3.4/README.md
+https://github.com/m0nk111/template-helper/blob/v5.0.0/README.md
 
 ### Probleem ontdekt?
 Heb je een probleem ontdekt? Het makkelijkste is om hier op GitHub even een issue aan te maken. Op die manier kunnen we het probleem gestructureerd onderzoeken en oplossen!
@@ -30,7 +30,7 @@ Heb je een probleem ontdekt? Het makkelijkste is om hier op GitHub even een issu
 
 ## English version
 
-### Changelog v4.3.4
+### Changelog v5.0.0
 - **Persistent CRS sidebar trigger:** `Vraag maken` now appears as a `?` in the blue CRS sidebar, directly above `Profile`. The `Vraag maken` label appears when the sidebar is expanded.
 - **Available on every CRS screen:** The trigger no longer depends on the script note. It remains available on pages without a note field, restores itself after dynamic CRS redraws, and reads the current customer number and note again on every click.
 
@@ -45,7 +45,7 @@ Or download `standalone-template-v[version].html` and open it directly in your b
 
 ### Complete Feature Overview
 For the complete feature set, see the root README:
-https://github.com/m0nk111/template-helper/blob/v4.3.4/README.md
+https://github.com/m0nk111/template-helper/blob/v5.0.0/README.md
 
 ### Found an issue?
 If you discovered an issue, the easiest way is to open an issue on GitHub. That helps us investigate and solve it in a structured way.
