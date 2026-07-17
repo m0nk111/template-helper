@@ -1,14 +1,14 @@
-# v5.0.2 Release Notes
+# v5.0.3 Release Notes
 
 ## Nederlandse uitleg
-Deze release notes bevatten eerst de Nederlandse versie en daarna de Engelse versie. Deze definitieve release gebruikt Chrome-manifestversie `5.0.2` en toont `5.0.2` als zichtbare versie.
+Deze release notes bevatten eerst de Nederlandse versie en daarna de Engelse versie. Deze definitieve release gebruikt Chrome-manifestversie `5.0.3` en toont `5.0.3` als zichtbare versie.
 
 ## Nederlandse versie
 
-### Changelog v5.0.2
-- **Paneelstand blijft behouden:** De open of ingeklapte status van Template Helper wordt per CRS-browsertab onthouden na een volledige paginareload of navigatie via de linker CRS-navigatie.
-- **Draft keert terug:** Dezelfde browsertab blijft hetzelfde draft-ID gebruiken. Bij dezelfde klant worden eerder ingevoerde tekstvelden en screenshots daardoor automatisch uit de lokale draft hersteld.
-- **Bewust inklappen blijft gelden:** Wanneer je het paneel zelf inklapt, blijft het na de volgende reload ingeklapt.
+### Changelog v5.0.3
+- **CRS-sessieopslag kan de draft niet meer wissen:** Sommige CRS-formulierwisselingen wissen hun eigen sessieopslag. Template Helper bewaart het willekeurige draft-ID en de open/ingeklapte paneelstatus nu per echte Chrome-tab in afgeschermde extensieopslag.
+- **Invoer komt terug na linker navigatie:** Voor dezelfde klant worden eerder ingevoerde tekstvelden en screenshots opnieuw uit de lokale draft geladen, ook nadat CRS zijn sessieopslag heeft gewist.
+- **Beperkte nieuwe opslagtoestemming:** De Chrome-permission `storage` bewaart alleen het draft-ID en de paneelstatus. Klantgegevens, template-inhoud en screenshots blijven lokaal in IndexedDB en worden niet naar extensieopslag gekopieerd.
 
 ### Installatie Instructies
 1. Download het `.zip` bestand en pak het uit
@@ -21,7 +21,7 @@ Of download `standalone-template-v[versie].html` en open dit direct in je browse
 
 ### Volledig feature-overzicht
 Alle huidige features staan in de root README:
-https://github.com/m0nk111/template-helper/blob/v5.0.2/README.md
+https://github.com/m0nk111/template-helper/blob/v5.0.3/README.md
 
 ### Probleem ontdekt?
 Heb je een probleem ontdekt? Het makkelijkste is om hier op GitHub even een issue aan te maken. Op die manier kunnen we het probleem gestructureerd onderzoeken en oplossen!
@@ -31,10 +31,10 @@ Heb je een probleem ontdekt? Het makkelijkste is om hier op GitHub even een issu
 
 ## English version
 
-### Changelog v5.0.2
-- **Panel state is preserved:** Template Helper's open or collapsed state is remembered per CRS browser tab after a full page reload or navigation through the left CRS navigation bar.
-- **Draft restoration:** The same browser tab continues to use the same draft ID. For the same customer, previously entered text fields and screenshots are therefore restored automatically from the local draft.
-- **Explicit collapse is respected:** When you collapse the panel yourself, it remains collapsed after the next reload.
+### Changelog v5.0.3
+- **CRS session storage can no longer erase the draft:** Some CRS form transitions clear their own session storage. Template Helper now keeps the random draft ID and open/collapsed panel state per real Chrome tab in isolated extension storage.
+- **Input returns after left navigation:** For the same customer, previously entered text fields and screenshots are loaded again from the local draft even after CRS clears its session storage.
+- **Limited new storage permission:** The Chrome `storage` permission stores only the draft ID and panel state. Customer data, template content, and screenshots remain local in IndexedDB and are not copied into extension storage.
 
 ### Installation Instructions
 1. Download the `.zip` file and extract it
@@ -47,7 +47,7 @@ Or download `standalone-template-v[version].html` and open it directly in your b
 
 ### Complete Feature Overview
 For the complete feature set, see the root README:
-https://github.com/m0nk111/template-helper/blob/v5.0.2/README.md
+https://github.com/m0nk111/template-helper/blob/v5.0.3/README.md
 
 ### Found an issue?
 If you discovered an issue, the easiest way is to open an issue on GitHub. That helps us investigate and solve it in a structured way.

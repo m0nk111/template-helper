@@ -8,6 +8,10 @@ It is built to reduce copy mistakes, keep formatting consistent, and speed up CR
 ### Wat is dit?
 Template Helper ondersteunt moderators met een vaste, snelle en consistente workflow voor vraag- en antwoordtemplates.
 
+### Nieuw in v5.0.3
+- CRS wist bij sommige wisselingen via de linker navigatie zijn eigen sessieopslag. Template Helper bewaart het draft-ID en de open/ingeklapte status daarom nu per echte Chrome-tab in afgeschermde extensieopslag.
+- Tekstvelden en screenshots blijven in lokale IndexedDB-opslag staan en worden met het behouden draft-ID voor dezelfde klant hersteld.
+
 ### Nieuw in v5.0.2
 - De open of ingeklapte stand van Template Helper blijft per CRS-browsertab behouden na een volledige paginareload of navigatie via de linker CRS-navigatie.
 - Dezelfde tab gebruikt bij dezelfde klant opnieuw hetzelfde draft-ID, zodat eerder ingevoerde tekstvelden en screenshots automatisch uit de lokale draft worden hersteld.
@@ -46,7 +50,7 @@ Template Helper ondersteunt moderators met een vaste, snelle en consistente work
 - Docking-ondersteuning voor zijpaneel (links, rechts, boven, onder) met bewaarde positie.
 - Drag-to-dock: sleep de blauwe sidebar-header om live te docken naar links, rechts, boven of onder.
 - Sidebar toggle-tab om snel te verbergen/tonen zonder context te verliezen.
-- De open of ingeklapte paneelstatus blijft per CRS-browsertab behouden na een paginareload of navigatie via de linker CRS-navigatie.
+- De open of ingeklapte paneelstatus blijft per CRS-browsertab behouden na een paginareload of navigatie via de linker CRS-navigatie, ook wanneer CRS zijn eigen sessieopslag wist.
 - Pop-out knop (`↗`) om de template los in een apart venster te openen.
 - Dock mode persistence: onthoudt de laatst gebruikte dock-positie.
 - SPA-resilience: het ingeklapte paneel wordt automatisch hersteld bij dynamische CRS redraws en vervanging van de CRS-body.
@@ -130,6 +134,10 @@ localStorage.setItem('vraag-tmpl-azure-translator-endpoint', 'https://api.cognit
 ### What is this?
 Template Helper provides moderators with a consistent and fast template workflow for both question and answer handoff.
 
+### New in v5.0.3
+- CRS clears its own session storage during some left-navigation transitions. Template Helper therefore now stores the draft ID and open/collapsed state per actual Chrome tab in isolated extension storage.
+- Text fields and screenshots remain in local IndexedDB storage and are restored for the same customer using the retained draft ID.
+
 ### New in v5.0.2
 - Template Helper's open or collapsed state is preserved per CRS browser tab after a full page reload or navigation through the left CRS navigation bar.
 - The same tab reuses the same draft ID for the same customer, automatically restoring previously entered text fields and screenshots from the local draft.
@@ -168,7 +176,7 @@ Template Helper provides moderators with a consistent and fast template workflow
 - Sidebar docking support (left, right, top, bottom) with persisted dock position.
 - Drag-to-dock: drag the blue sidebar header to dock live to left, right, top, or bottom.
 - Sidebar toggle tab for fast hide/show without losing context.
-- The open or collapsed panel state is preserved per CRS browser tab across page reloads and left-navigation transitions.
+- The open or collapsed panel state is preserved per CRS browser tab across page reloads and left-navigation transitions, even when CRS clears its own session storage.
 - Pop-out button (`↗`) to open the template in a detached window.
 - Dock mode persistence: remembers last used dock placement.
 - SPA resilience: the collapsed panel auto-recovers after dynamic CRS redraws and CRS body replacement.

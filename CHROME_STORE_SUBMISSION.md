@@ -25,6 +25,7 @@ Suggested short description:
 ## Permissions Justification
 
 - `host_permissions`: `https://crs.gw.dfnld.nl/*` limits helper injection and template communication to the CRS portal. `<all_urls>` is required by Chrome's `tabs.captureVisibleTab()` API for the user-requested CRS screenshot feature.
+- `storage`: stores only extension-local preferences plus a random draft ID and open/collapsed state per Chrome tab. CRS clears its own session storage between forms, so this isolated tab state is required to reconnect the same tab to its local IndexedDB draft. Customer numbers, template text, and screenshots are not stored in the tab-state record.
 - Screenshot capture remains restricted in code: the service worker accepts requests only from the active CRS tab and the content script is injected only on CRS.
 - The extension does not read, inject into, or capture other websites.
 - The compliance package does not request broad runtime script-injection permissions.

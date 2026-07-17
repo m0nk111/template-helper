@@ -2,6 +2,13 @@
 
 ## [Unreleased]
 
+## [5.0.3] - 2026-07-17
+
+- **Fixed:** CRS wist bij het openen van een ander formulier zijn volledige `sessionStorage`, waardoor het draft-ID en de paneelstatus van Template Helper verloren gingen. Deze tabstatus staat nu per echte Chrome-tab in extensie-eigen `chrome.storage.session`, buiten het bereik van CRS-scripts.
+- **Fixed:** Eerder opgeslagen tekstvelden en screenshots worden na navigatie via de linker CRS-navigatie weer aan hetzelfde draft-ID gekoppeld en voor dezelfde klant hersteld.
+- **Changed:** De beperkte Chrome-permission `storage` is toegevoegd voor het extensie-eigen draft-ID en de open/ingeklapte status. Klantgegevens en template-inhoud blijven lokaal in IndexedDB en worden niet in deze tabstatus opgeslagen.
+- **Changed:** De technische manifestversie en de zichtbare releaseversie zijn beide `5.0.3`.
+
 ## [5.0.2] - 2026-07-17
 
 - **Fixed:** De open of ingeklapte status van het Template Helper-paneel blijft nu per CRS-browsertab behouden na een volledige paginareload of navigatie via de linker CRS-navigatie.

@@ -38,10 +38,27 @@ CRS_FIXTURE = """<!doctype html>
     <span class="ut_DFI_EL_PARTY_ID">12345678</span>
     <textarea id="IWMEMO_SCRIPT_EIGENINPUT">Eerste notitie</textarea>
     <script>
+            const extensionTabStateKey = 'test-template-helper-tab-state';
       window.chrome = {
         runtime: {
           getURL: function() { return '__TEMPLATE_URL__'; },
           sendMessage: function(message, callback) {
+                        if (message.type === 'template-helper:get-tab-state') {
+                            const storedState = localStorage.getItem(extensionTabStateKey);
+                            const tabState = storedState
+                                ? JSON.parse(storedState)
+                                : { draftId: crypto.randomUUID(), isOpen: false };
+                            localStorage.setItem(extensionTabStateKey, JSON.stringify(tabState));
+                            callback({ ok: true, tabState });
+                            return;
+                        }
+                        if (message.type === 'template-helper:set-tab-state') {
+                            const tabState = JSON.parse(localStorage.getItem(extensionTabStateKey));
+                            tabState.isOpen = message.isOpen;
+                            localStorage.setItem(extensionTabStateKey, JSON.stringify(tabState));
+                            callback({ ok: true });
+                            return;
+                        }
             callback({ ok: true, imageDataUrl: 'data:image/png;base64,AA==' });
           }
         }
@@ -263,12 +280,12 @@ def test_blue_toggle_expands_existing_template_panel(
     }
 
 
-def test_open_panel_and_draft_id_survive_same_tab_page_reload(
+def test_panel_state_and_draft_id_survive_crs_session_storage_clear(
     crs_page: DevToolsPage,
 ) -> None:
     before_reload = crs_page.evaluate(
         """
-                (() => {
+        (() => {
           document.getElementById('moderator-template-sidebar-toggle').click();
           const container = document.getElementById('moderator-template-sidebar-container');
           const iframe = document.getElementById('moderator-template-sidebar-iframe');
@@ -283,6 +300,7 @@ def test_open_panel_and_draft_id_survive_same_tab_page_reload(
     assert isinstance(before_reload['draftId'], str)
     assert re.fullmatch(r'[A-Za-z0-9_-]{8,128}', before_reload['draftId'])
 
+    crs_page.evaluate('sessionStorage.clear()')
     reload_crs_page(crs_page)
     crs_page.evaluate(INJECT_SCRIPT)
     wait_for_template_panel(crs_page)
@@ -310,6 +328,7 @@ def test_open_panel_and_draft_id_survive_same_tab_page_reload(
     crs_page.evaluate(
         "document.getElementById('moderator-template-sidebar-toggle').click()"
     )
+    crs_page.evaluate('sessionStorage.clear()')
     reload_crs_page(crs_page)
     crs_page.evaluate(INJECT_SCRIPT)
     wait_for_template_panel(crs_page)

@@ -12,9 +12,9 @@ if (!window.location.href.toLowerCase().includes('crs')) {
 } else {
 
     var SIDEBAR_DOCK_MODE_KEY = 'moderator-template-helper-dock-mode';
-    var SIDEBAR_OPEN_STATE_SESSION_KEY = 'moderator-template-helper-sidebar-open';
-    var TAB_DRAFT_ID_SESSION_KEY = 'moderator-template-helper-draft-id';
     var MAX_CUSTOMER_NUMBER_LENGTH = 100;
+    var GET_TAB_STATE_MESSAGE_TYPE = 'template-helper:get-tab-state';
+    var SET_TAB_STATE_MESSAGE_TYPE = 'template-helper:set-tab-state';
     var CRS_NOTE_UPDATE_MESSAGE_TYPE = 'template-helper:crs-note-update';
     var CRS_NOTE_SYNC_DELAY_MS = 300;
     var TEMPLATE_SCREENSHOT_REQUEST_MESSAGE_TYPE = 'template-helper:screenshot-request';
@@ -34,10 +34,13 @@ if (!window.location.href.toLowerCase().includes('crs')) {
         'sidebar-unavailable'
     ];
     var CRS_SCREENSHOT_CAPTURE_TIMEOUT_MS = 9000;
+    var TAB_STATE_MESSAGE_RETRY_DELAY_MS = 100;
+    var TAB_STATE_MESSAGE_MAX_ATTEMPTS = 3;
     var isScreenshotCaptureInProgress = false;
     var activeScreenshotCaptureRequestId = null;
     var screenshotCaptureTimeoutId = null;
     var fallbackDraftId = null;
+    var currentTabState = null;
 
     function isValidDraftId(draftId) {
         return typeof draftId === 'string' && /^[A-Za-z0-9_-]{8,128}$/.test(draftId);
@@ -57,18 +60,42 @@ if (!window.location.href.toLowerCase().includes('crs')) {
         return 'tab-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2);
     }
 
-    function getTabDraftId() {
-        try {
-            var savedDraftId = sessionStorage.getItem(TAB_DRAFT_ID_SESSION_KEY);
-            if (isValidDraftId(savedDraftId)) return savedDraftId;
+    function isValidTabState(tabState) {
+        return !!tabState && typeof tabState === 'object' &&
+            isValidDraftId(tabState.draftId) && typeof tabState.isOpen === 'boolean';
+    }
 
-            var newDraftId = createDraftId();
-            sessionStorage.setItem(TAB_DRAFT_ID_SESSION_KEY, newDraftId);
-            return newDraftId;
+    function getFallbackTabState() {
+        if (!isValidDraftId(fallbackDraftId)) fallbackDraftId = createDraftId();
+        return { draftId: fallbackDraftId, isOpen: false };
+    }
+
+    function loadTabState(callback, attemptNumber) {
+        var currentAttempt = attemptNumber || 1;
+        try {
+            chrome.runtime.sendMessage({ type: GET_TAB_STATE_MESSAGE_TYPE }, function(response) {
+                if (chrome.runtime.lastError || !response || !response.ok || !isValidTabState(response.tabState)) {
+                    if (currentAttempt < TAB_STATE_MESSAGE_MAX_ATTEMPTS) {
+                        setTimeout(function() {
+                            loadTabState(callback, currentAttempt + 1);
+                        }, TAB_STATE_MESSAGE_RETRY_DELAY_MS);
+                        return;
+                    }
+                    currentTabState = getFallbackTabState();
+                } else {
+                    currentTabState = response.tabState;
+                }
+                callback();
+            });
         } catch (storageError) {
-            if (!isValidDraftId(fallbackDraftId)) fallbackDraftId = createDraftId();
-            return fallbackDraftId;
+            currentTabState = getFallbackTabState();
+            callback();
         }
+    }
+
+    function getTabDraftId() {
+        if (!isValidTabState(currentTabState)) currentTabState = getFallbackTabState();
+        return currentTabState.draftId;
     }
 
     function getSavedDockMode() {
@@ -89,16 +116,29 @@ if (!window.location.href.toLowerCase().includes('crs')) {
     }
 
     function getSavedSidebarOpen() {
-        try {
-            return sessionStorage.getItem(SIDEBAR_OPEN_STATE_SESSION_KEY) === 'true';
-        } catch (storageError) {
-            return false;
-        }
+        return isValidTabState(currentTabState) && currentTabState.isOpen;
     }
 
-    function saveSidebarOpen(isOpen) {
+    function saveSidebarOpen(isOpen, attemptNumber) {
+        var currentAttempt = attemptNumber || 1;
+        if (!isValidTabState(currentTabState)) currentTabState = getFallbackTabState();
+        currentTabState = { draftId: currentTabState.draftId, isOpen: isOpen };
+
         try {
-            sessionStorage.setItem(SIDEBAR_OPEN_STATE_SESSION_KEY, isOpen ? 'true' : 'false');
+            chrome.runtime.sendMessage({
+                type: SET_TAB_STATE_MESSAGE_TYPE,
+                isOpen: isOpen
+            }, function() {
+                if (chrome.runtime.lastError) {
+                    if (currentAttempt < TAB_STATE_MESSAGE_MAX_ATTEMPTS) {
+                        setTimeout(function() {
+                            saveSidebarOpen(isOpen, currentAttempt + 1);
+                        }, TAB_STATE_MESSAGE_RETRY_DELAY_MS);
+                        return;
+                    }
+                    console.debug('Moderator Template Helper: Sidebar state could not be saved.', chrome.runtime.lastError);
+                }
+            });
         } catch (storageError) {
             console.debug('Moderator Template Helper: Sidebar state could not be saved.', storageError);
         }
@@ -561,5 +601,5 @@ if (!window.location.href.toLowerCase().includes('crs')) {
         });
     }
 
-    startTemplatePanelLifecycle();
+    loadTabState(startTemplatePanelLifecycle);
 }
