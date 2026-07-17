@@ -8,7 +8,7 @@ It is built to reduce copy mistakes, keep formatting consistent, and speed up CR
 ### Wat is dit?
 Template Helper ondersteunt moderators met een vaste, snelle en consistente workflow voor vraag- en antwoordtemplates.
 
-### Nieuw in v4.2.RC2
+### Nieuw in v4.3.0
 - Ingevulde velden en screenshots blijven tijdelijk behouden binnen dezelfde CRS-browsertab en worden hersteld wanneer je opnieuw `Vraag maken` opent voor dezelfde klant.
 - Bij een nieuw klantnummer, of een overgang tussen wel en geen klantnummer, wordt de oude draft bewust gewist zodat klantgegevens niet doorlopen naar een andere context.
 - Herstelde invoer wordt veilig gevalideerd en na 24 uur automatisch opgeruimd. `Waar loop je vast` verduidelijkt nu dat het om het script gaat.
@@ -108,7 +108,7 @@ localStorage.setItem('vraag-tmpl-azure-translator-endpoint', 'https://api.cognit
 ### What is this?
 Template Helper provides moderators with a consistent and fast template workflow for both question and answer handoff.
 
-### New in v4.2.RC2
+### New in v4.3.0
 - Filled fields and screenshots are temporarily preserved within the same CRS browser tab and restored when you open `Vraag maken` again for the same customer.
 - A new customer number, or a transition to or from an empty customer number, deliberately clears the old draft so customer data cannot carry over to another context.
 - Restored input is validated safely and automatically expires after 24 hours. `Where are you stuck` now clarifies that it refers to the script.

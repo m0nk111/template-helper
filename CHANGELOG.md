@@ -1,12 +1,12 @@
 # Changelog
 
-## [4.2.RC2] - 2026-07-17
+## [4.3.0] - 2026-07-17
 
 - **Added:** V&A- en TCC-drafts blijven nu tijdelijk bewaard binnen dezelfde CRS-browsertab, inclusief rich text, wachtrij, checkboxen en screenshots.
 - **Added:** Drafts worden alleen hersteld voor dezelfde klantcontext. Een ander klantnummer, of een overgang tussen wel en geen klantnummer, wist de oude draft om gegevens niet bij de verkeerde klant te tonen.
 - **Changed:** Herstelde drafts worden veilig gevalideerd en geschoond; oude drafts verlopen automatisch na 24 uur.
 - **Changed:** Het label `Waar loop je vast` verduidelijkt nu dat het om het script gaat, inclusief de Engelse vertaling.
-- **Changed:** De technische manifestversie is `4.2.2`; de zichtbare en releaseversie is `4.2.RC2`.
+- **Changed:** De technische manifestversie en de zichtbare releaseversie zijn beide `4.3.0`.
 
 ## [4.2.RC1] - 2026-07-16
 

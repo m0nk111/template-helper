@@ -1,11 +1,11 @@
-# v4.2.RC2 Release Notes
+# v4.3.0 Release Notes
 
 ## Nederlandse uitleg
-Deze release notes bevatten eerst de Nederlandse versie en daarna de Engelse versie. Deze release candidate gebruikt Chrome-manifestversie `4.2.2` voor updates en toont `4.2.RC2` als zichtbare versie.
+Deze release notes bevatten eerst de Nederlandse versie en daarna de Engelse versie. Deze definitieve release gebruikt Chrome-manifestversie `4.3.0` en toont `4.3.0` als zichtbare versie.
 
 ## Nederlandse versie
 
-### Changelog v4.2.RC2
+### Changelog v4.3.0
 - **Draftbehoud per tab:** Ingevulde V&A- en TCC-templates blijven tijdelijk beschikbaar wanneer je in dezelfde CRS-browsertab opnieuw `Vraag maken` opent. Tekst, wachtrij, checkboxen en screenshots worden hersteld.
 - **Veilige klantcontext:** Een draft wordt alleen teruggezet voor hetzelfde klantnummer. Bij een ander klantnummer, of bij de overgang tussen een ingevuld en leeg klantnummer, wordt de vorige draft gewist.
 - **TCC-live-notitie:** De bestaande live-synchronisatie en conflictdialoog voor de CRS-notitie blijven werken naast herstelde drafts.
@@ -23,7 +23,7 @@ Of download `standalone-template-v[versie].html` en open dit direct in je browse
 
 ### Volledig feature-overzicht
 Alle huidige features staan in de root README:
-https://github.com/m0nk111/template-helper/blob/v4.2.RC2/README.md
+https://github.com/m0nk111/template-helper/blob/v4.3.0/README.md
 
 ### Probleem ontdekt?
 Heb je een probleem ontdekt? Het makkelijkste is om hier op GitHub even een issue aan te maken. Op die manier kunnen we het probleem gestructureerd onderzoeken en oplossen!
@@ -33,7 +33,7 @@ Heb je een probleem ontdekt? Het makkelijkste is om hier op GitHub even een issu
 
 ## English version
 
-### Changelog v4.2.RC2
+### Changelog v4.3.0
 - **Per-tab drafts:** Filled V&A and TCC templates remain temporarily available when you open `Vraag maken` again in the same CRS browser tab. Text, queues, switches, and screenshots are restored.
 - **Safe customer context:** A draft is restored only for the same customer number. Changing the customer number, or transitioning between a populated and empty customer number, clears the previous draft.
 - **Live TCC note:** The existing CRS live-note synchronization and conflict dialog continue to work alongside restored drafts.
@@ -51,7 +51,7 @@ Or download `standalone-template-v[version].html` and open it directly in your b
 
 ### Complete Feature Overview
 For the complete feature set, see the root README:
-https://github.com/m0nk111/template-helper/blob/v4.2.RC2/README.md
+https://github.com/m0nk111/template-helper/blob/v4.3.0/README.md
 
 ### Found an issue?
 If you discovered an issue, the easiest way is to open an issue on GitHub. That helps us investigate and solve it in a structured way.
