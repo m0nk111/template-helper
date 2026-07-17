@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="template-version" content="4.2.RC1">
+  <meta name="template-version" content="4.2.RC2">
   <title>Vraag Template</title>
   <style>
     :root {
@@ -992,6 +992,12 @@ const fieldsTccVraag = ['tccKlantnummer', 'tccNotitie', 'tccScreenshots'];
 const fieldsTccAntwoord = ['tccNogControleren', 'tccAanvullen', 'tccAkkoord'];
 const richTextFieldsTcc = ['tccNotitie', 'tccScreenshots', 'tccNogControleren', 'tccAanvullen'];
 const allRichTextFields = [...richTextFields, ...richTextFieldsTcc];
+const draftDatabaseName = 'template-helper-drafts';
+const draftDatabaseVersion = 1;
+const draftStoreName = 'drafts';
+const draftRecordVersion = 1;
+const draftMaxAgeMs = 24 * 60 * 60 * 1000;
+const draftSaveDelayMs = 250;
 const crsOrigin = 'https://crs.gw.dfnld.nl';
 const crsNoteUpdateMessageType = 'template-helper:crs-note-update';
 const crsNoteMaxLength = 50000;
@@ -1000,6 +1006,7 @@ const crsScreenshotResultMessageType = 'template-helper:screenshot-result';
 const crsScreenshotErrorMessageType = 'template-helper:screenshot-error';
 const screenshotTargetFields = ['klantvraag', 'antwoord', 'tccScreenshots'];
 const screenshotDataUrlMaxLength = 20 * 1024 * 1024;
+const draftMaxFieldLength = screenshotDataUrlMaxLength * 4;
 const screenshotRequestTimeoutMs = 10000;
 const translationCache = new Map();
 let translateQueue = Promise.resolve();
@@ -1008,6 +1015,376 @@ let translateBlockedUntil = 0;
 let lastCrsSuppliedTccNote = '';
 let hasManualTccNoteChange = false;
 let isApplyingCrsTccNote = false;
+let currentDraftId = '';
+let currentDraftContext = { hasCustomerNumber: false, value: '' };
+let draftDbPromise = null;
+let draftSaveTimer = null;
+let draftOperationChain = Promise.resolve();
+let draftReady = false;
+let draftStorageAvailable = false;
+
+function normalizeCustomerNumber(value) {
+  return String(value || '').trim();
+}
+
+function createDraftContext(customerNumber) {
+  const value = normalizeCustomerNumber(customerNumber);
+  return { hasCustomerNumber: value.length > 0, value };
+}
+
+function isValidDraftContext(context) {
+  return !!context && typeof context === 'object' &&
+    typeof context.hasCustomerNumber === 'boolean' &&
+    typeof context.value === 'string' &&
+    context.value.length <= 100 &&
+    context.hasCustomerNumber === (context.value.length > 0);
+}
+
+function areDraftContextsEqual(first, second) {
+  return isValidDraftContext(first) && isValidDraftContext(second) &&
+    first.hasCustomerNumber === second.hasCustomerNumber &&
+    first.value === second.value;
+}
+
+function getDraftFieldIds() {
+  return [...new Set([...fieldsVraag, ...fieldsAntwoord, ...fieldsTccVraag, ...fieldsTccAntwoord])];
+}
+
+function getDraftFieldValue(element) {
+  if (element.tagName === 'DIV') {
+    const clone = element.cloneNode(true);
+    clone.querySelectorAll('.screenshot-remove').forEach((button) => {
+      button.removeAttribute('data-template-helper-bound');
+    });
+    return clone.innerHTML;
+  }
+  if (element.type === 'checkbox') return element.checked;
+  return element.value;
+}
+
+function captureDraftRecord() {
+  const fields = {};
+  for (const id of getDraftFieldIds()) {
+    const element = document.getElementById(id);
+    if (element) fields[id] = getDraftFieldValue(element);
+  }
+
+  return {
+    draftId: currentDraftId,
+    recordVersion: draftRecordVersion,
+    customerContext: { ...currentDraftContext },
+    fields,
+    tccNoteState: {
+      lastCrsSuppliedTccNote,
+      hasManualTccNoteChange
+    },
+    updatedAt: Date.now()
+  };
+}
+
+function isValidDraftFieldValue(value) {
+  return typeof value === 'string' || typeof value === 'boolean';
+}
+
+function isValidDraftRecord(record) {
+  if (!record || typeof record !== 'object' || Array.isArray(record)) return false;
+  if (record.recordVersion !== draftRecordVersion || typeof record.draftId !== 'string') return false;
+  if (!isValidDraftContext(record.customerContext) || !record.fields || typeof record.fields !== 'object') return false;
+  if (typeof record.updatedAt !== 'number' || !Number.isFinite(record.updatedAt)) return false;
+
+  for (const id of getDraftFieldIds()) {
+    if (!Object.prototype.hasOwnProperty.call(record.fields, id)) continue;
+    if (!isValidDraftFieldValue(record.fields[id])) return false;
+    if (typeof record.fields[id] === 'string' && record.fields[id].length > draftMaxFieldLength) return false;
+  }
+
+  if (record.tccNoteState !== undefined &&
+    (!record.tccNoteState || typeof record.tccNoteState.lastCrsSuppliedTccNote !== 'string' ||
+      typeof record.tccNoteState.hasManualTccNoteChange !== 'boolean')) {
+    return false;
+  }
+
+  return true;
+}
+
+function openDraftDatabase() {
+  if (!currentDraftId || typeof indexedDB === 'undefined') return Promise.resolve(null);
+  if (draftDbPromise) return draftDbPromise;
+
+  draftDbPromise = new Promise((resolve, reject) => {
+    const request = indexedDB.open(draftDatabaseName, draftDatabaseVersion);
+    request.onupgradeneeded = () => {
+      if (!request.result.objectStoreNames.contains(draftStoreName)) {
+        request.result.createObjectStore(draftStoreName, { keyPath: 'draftId' });
+      }
+    };
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error || new Error('Draft database could not be opened.'));
+  });
+
+  return draftDbPromise;
+}
+
+function getDraftRecord() {
+  return openDraftDatabase().then((database) => {
+    if (!database) return null;
+
+    return new Promise((resolve, reject) => {
+      const request = database.transaction(draftStoreName, 'readonly')
+        .objectStore(draftStoreName)
+        .get(currentDraftId);
+      request.onsuccess = () => resolve(request.result || null);
+      request.onerror = () => reject(request.error || new Error('Draft could not be read.'));
+    });
+  });
+}
+
+function saveDraftRecord(record) {
+  return openDraftDatabase().then((database) => {
+    if (!database) return false;
+
+    return new Promise((resolve, reject) => {
+      const transaction = database.transaction(draftStoreName, 'readwrite');
+      transaction.objectStore(draftStoreName).put(record);
+      transaction.oncomplete = () => resolve(true);
+      transaction.onerror = () => reject(transaction.error || new Error('Draft could not be saved.'));
+      transaction.onabort = () => reject(transaction.error || new Error('Draft save was aborted.'));
+    });
+  });
+}
+
+function deleteDraftRecord(draftId) {
+  if (!draftId) return Promise.resolve(false);
+
+  return openDraftDatabase().then((database) => {
+    if (!database) return false;
+
+    return new Promise((resolve, reject) => {
+      const transaction = database.transaction(draftStoreName, 'readwrite');
+      transaction.objectStore(draftStoreName).delete(draftId);
+      transaction.oncomplete = () => resolve(true);
+      transaction.onerror = () => reject(transaction.error || new Error('Draft could not be deleted.'));
+      transaction.onabort = () => reject(transaction.error || new Error('Draft deletion was aborted.'));
+    });
+  });
+}
+
+function removeExpiredDrafts() {
+  return openDraftDatabase().then((database) => {
+    if (!database) return;
+
+    return new Promise((resolve, reject) => {
+      const transaction = database.transaction(draftStoreName, 'readwrite');
+      const request = transaction.objectStore(draftStoreName).openCursor();
+      const expiryTime = Date.now() - draftMaxAgeMs;
+
+      request.onsuccess = () => {
+        const cursor = request.result;
+        if (!cursor) return;
+        if (!cursor.value || typeof cursor.value.updatedAt !== 'number' || cursor.value.updatedAt < expiryTime) {
+          cursor.delete();
+        }
+        cursor.continue();
+      };
+      request.onerror = () => reject(request.error || new Error('Expired drafts could not be removed.'));
+      transaction.oncomplete = () => resolve();
+      transaction.onerror = () => reject(transaction.error || new Error('Expired draft cleanup failed.'));
+      transaction.onabort = () => reject(transaction.error || new Error('Expired draft cleanup was aborted.'));
+    });
+  });
+}
+
+function reportDraftStorageError(error) {
+  draftStorageAvailable = false;
+  console.debug('Template Helper: draft persistence is unavailable.', error);
+}
+
+function queueDraftOperation(operation) {
+  draftOperationChain = draftOperationChain.then(operation).catch(reportDraftStorageError);
+  return draftOperationChain;
+}
+
+function scheduleDraftSave() {
+  if (!draftReady || !currentDraftId || !draftStorageAvailable) return;
+
+  clearTimeout(draftSaveTimer);
+  draftSaveTimer = setTimeout(() => {
+    draftSaveTimer = null;
+    const record = captureDraftRecord();
+    queueDraftOperation(() => saveDraftRecord(record));
+  }, draftSaveDelayMs);
+}
+
+function flushDraftSave() {
+  if (draftSaveTimer) {
+    clearTimeout(draftSaveTimer);
+    draftSaveTimer = null;
+    if (draftReady && currentDraftId && draftStorageAvailable) {
+      const record = captureDraftRecord();
+      return queueDraftOperation(() => saveDraftRecord(record));
+    }
+  }
+
+  return draftOperationChain;
+}
+
+function clearStoredDraft() {
+  clearTimeout(draftSaveTimer);
+  draftSaveTimer = null;
+  if (!currentDraftId) return;
+  queueDraftOperation(() => deleteDraftRecord(currentDraftId));
+}
+
+function restoreDraftRecord(record) {
+  for (const id of getDraftFieldIds()) {
+    if (!Object.prototype.hasOwnProperty.call(record.fields, id)) continue;
+
+    const element = document.getElementById(id);
+    const value = record.fields[id];
+    if (!element) continue;
+
+    if (element.tagName === 'DIV' && typeof value === 'string') {
+      element.innerHTML = sanitizeDraftHTML(value);
+    } else if (element.type === 'checkbox' && typeof value === 'boolean') {
+      element.checked = value;
+    } else if (element.tagName !== 'DIV' && typeof value === 'string') {
+      element.value = value;
+    }
+  }
+
+  bindScreenshotRemoveButtons();
+  updateTccAgreementValue();
+  updatePreview();
+}
+
+function sanitizeDraftHTML(value) {
+  if (typeof value !== 'string' || value.length > draftMaxFieldLength) return '';
+
+  const template = document.createElement('template');
+  template.innerHTML = value;
+  const allowedTags = new Set(['BR', 'B', 'STRONG', 'I', 'EM', 'U', 'S', 'DIV', 'SPAN', 'P']);
+  const dangerousTags = new Set(['SCRIPT', 'STYLE', 'IFRAME', 'OBJECT', 'EMBED', 'FORM', 'LINK', 'META']);
+
+  const sanitizeChildren = (parent) => {
+    [...parent.childNodes].forEach((node) => {
+      if (node.nodeType === Node.TEXT_NODE) return;
+      if (node.nodeType !== Node.ELEMENT_NODE) {
+        node.remove();
+        return;
+      }
+
+      const tagName = node.tagName;
+      if (dangerousTags.has(tagName)) {
+        node.remove();
+        return;
+      }
+
+      if (tagName === 'IMG') {
+        const source = node.getAttribute('src') || '';
+        if (!isValidScreenshotDataUrl(source) || source.length > screenshotDataUrlMaxLength) {
+          node.remove();
+          return;
+        }
+        node.replaceChildren();
+        [...node.attributes].forEach((attribute) => node.removeAttribute(attribute.name));
+        node.setAttribute('src', source);
+        node.setAttribute('alt', getLangPack().screenshotAlt);
+        node.setAttribute('draggable', 'false');
+        return;
+      }
+
+      if (tagName === 'BUTTON') {
+        if (!node.classList.contains('screenshot-remove') || !node.closest('.screenshot-item')) {
+          node.remove();
+          return;
+        }
+        node.replaceChildren(document.createTextNode('×'));
+        node.setAttribute('type', 'button');
+        node.setAttribute('class', 'screenshot-remove');
+        node.removeAttribute('data-template-helper-bound');
+        node.setAttribute('title', getLangPack().buttons.removeScreenshot);
+        node.setAttribute('aria-label', getLangPack().buttons.removeScreenshot);
+        return;
+      }
+
+      if (tagName === 'SPAN' && node.classList.contains('screenshot-item')) {
+        sanitizeChildren(node);
+        if (!node.querySelector('img')) {
+          node.remove();
+          return;
+        }
+        node.setAttribute('class', 'screenshot-item');
+        node.setAttribute('contenteditable', 'false');
+        return;
+      }
+
+      if (!allowedTags.has(tagName)) {
+        sanitizeChildren(node);
+        const replacement = document.createDocumentFragment();
+        while (node.firstChild) replacement.appendChild(node.firstChild);
+        node.replaceWith(replacement);
+        return;
+      }
+
+      [...node.attributes].forEach((attribute) => node.removeAttribute(attribute.name));
+      sanitizeChildren(node);
+    });
+  };
+
+  sanitizeChildren(template.content);
+  const container = document.createElement('div');
+  container.appendChild(template.content.cloneNode(true));
+  return container.innerHTML;
+}
+
+function reconcileRestoredTccNote(record, currentCrsNote) {
+  const noteState = record.tccNoteState || {
+    lastCrsSuppliedTccNote: '',
+    hasManualTccNoteChange: false
+  };
+  const tccNotitie = document.getElementById('tccNotitie');
+
+  if (currentCrsNote !== null && !noteState.hasManualTccNoteChange && tccNotitie) {
+    tccNotitie.textContent = currentCrsNote;
+  }
+
+  lastCrsSuppliedTccNote = currentCrsNote === null
+    ? noteState.lastCrsSuppliedTccNote
+    : currentCrsNote;
+  hasManualTccNoteChange = noteState.hasManualTccNoteChange;
+}
+
+async function initializeDraftPersistence(draftId, customerContext, currentCrsNote) {
+  currentDraftId = typeof draftId === 'string' ? draftId : '';
+  currentDraftContext = isValidDraftContext(customerContext)
+    ? { ...customerContext }
+    : createDraftContext('');
+
+  if (!currentDraftId || typeof indexedDB === 'undefined') {
+    draftReady = true;
+    return;
+  }
+
+  try {
+    await removeExpiredDrafts();
+    const record = await getDraftRecord();
+
+    if (record && isValidDraftRecord(record) && areDraftContextsEqual(record.customerContext, currentDraftContext)) {
+      restoreDraftRecord(record);
+      reconcileRestoredTccNote(record, currentCrsNote);
+    } else if (record) {
+      await deleteDraftRecord(currentDraftId);
+    }
+
+    draftStorageAvailable = true;
+  } catch (error) {
+    reportDraftStorageError(error);
+  } finally {
+    draftReady = true;
+    updatePreview();
+    scheduleDraftSave();
+  }
+}
 let pendingCrsTccNote = null;
 let lastIgnoredCrsTccNote = null;
 let pendingScreenshotRequest = null;
@@ -1029,7 +1406,7 @@ const i18n = {
       wachtrij: 'Wachtrij',
       klantnummer: 'Klantnummer',
       klantvraag: 'Klantvraag',
-      vastloper: 'Waar loop je vast',
+      vastloper: 'Waar loop je vast (in het script)',
       uitkomst: 'Gewenste uitkomst',
       antwoord: 'Antwoord',
       bron: 'Bron',
@@ -1113,7 +1490,7 @@ const i18n = {
       wachtrij: 'Wachtrij',
       klantnummer: 'Klantnummer',
       klantvraag: 'Klantvraag',
-      vastloper: 'Waar loop je vast',
+      vastloper: 'Waar loop je vast (in het script)',
       uitkomst: 'Gewenste uitkomst',
       antwoord: 'Antwoord',
       bron: 'Bron',
@@ -1144,7 +1521,7 @@ const i18n = {
       wachtrij: 'Queue',
       klantnummer: 'Customer number',
       klantvraag: 'Customer question',
-      vastloper: 'Where are you stuck',
+      vastloper: 'Where are you stuck (in the script)',
       uitkomst: 'Desired outcome',
       antwoord: 'Answer',
       bron: 'Source',
@@ -1228,7 +1605,7 @@ const i18n = {
       wachtrij: 'Queue',
       klantnummer: 'Customer number',
       klantvraag: 'Customer question',
-      vastloper: 'Where are you stuck',
+      vastloper: 'Where are you stuck (in the script)',
       uitkomst: 'Desired outcome',
       antwoord: 'Answer',
       bron: 'Source',
@@ -1585,6 +1962,7 @@ function applyCrsTccNote(note) {
   hasManualTccNoteChange = false;
   lastIgnoredCrsTccNote = null;
   updatePreview();
+  scheduleDraftSave();
 }
 
 function closeCrsNoteConflictDialog(returnFocus) {
@@ -1693,15 +2071,36 @@ function createScreenshotItem(dataUrl) {
   removeButton.title = getLangPack().buttons.removeScreenshot;
   removeButton.setAttribute('aria-label', getLangPack().buttons.removeScreenshot);
   removeButton.textContent = '×';
-  removeButton.addEventListener('click', (event) => {
-    event.preventDefault();
-    event.stopPropagation();
-    screenshotItem.remove();
-    updatePreview();
-  });
 
   screenshotItem.append(image, removeButton);
+  bindScreenshotRemoveButtons(screenshotItem);
   return screenshotItem;
+}
+
+function handleScreenshotRemove(event) {
+  event.preventDefault();
+  event.stopPropagation();
+
+  const screenshotItem = event.currentTarget.closest('.screenshot-item');
+  if (!screenshotItem) return;
+
+  const precedingNode = screenshotItem.previousSibling;
+  if (precedingNode?.nodeName === 'BR') {
+    precedingNode.remove();
+  } else if (screenshotItem.nextSibling?.nodeName === 'BR') {
+    screenshotItem.nextSibling.remove();
+  }
+  screenshotItem.remove();
+  updatePreview();
+  scheduleDraftSave();
+}
+
+function bindScreenshotRemoveButtons(root = document) {
+  root.querySelectorAll('.screenshot-remove').forEach((button) => {
+    if (button.dataset.templateHelperBound === 'true') return;
+    button.dataset.templateHelperBound = 'true';
+    button.addEventListener('click', handleScreenshotRemove);
+  });
 }
 
 function appendScreenshotToField(targetField, dataUrl) {
@@ -1716,6 +2115,7 @@ function appendScreenshotToField(targetField, dataUrl) {
   field.classList.remove('error');
   field.setAttribute('aria-invalid', 'false');
   updatePreview();
+  scheduleDraftSave();
   return true;
 }
 
@@ -2444,6 +2844,7 @@ function clearForm() {
   const allFields = [...fieldsVraag, ...fieldsAntwoord, ...fieldsTccVraag, ...fieldsTccAntwoord];
 
   clearPendingScreenshotRequest();
+  clearStoredDraft();
 
   for (const id of allFields) {
     const el = document.getElementById(id);
@@ -2502,11 +2903,16 @@ document.querySelectorAll('div[contenteditable="true"]').forEach((el) => {
   });
 });
 
+function handleFieldChange() {
+  updatePreview();
+  scheduleDraftSave();
+}
+
 for (const id of [...fieldsVraag, ...fieldsAntwoord, ...fieldsTccVraag, ...fieldsTccAntwoord]) {
   const el = document.getElementById(id);
   if (!el) continue;
-  el.addEventListener('input', updatePreview);
-  el.addEventListener('change', updatePreview);
+  el.addEventListener('input', handleFieldChange);
+  el.addEventListener('change', handleFieldChange);
 }
 
 document.getElementById('tccNotitie').addEventListener('input', handleTccNotitieInput);
@@ -2589,31 +2995,42 @@ if (savedTheme === 'dark') {
   document.getElementById('themeBtn').textContent = '🌙';
 }
 
-const urlParams = new URLSearchParams(window.location.search);
-for (const key of ['wachtrij', 'klantnummer', 'klantvraag', 'vastloper', 'uitkomst']) {
-  if (!urlParams.has(key)) continue;
+function isValidDraftId(draftId) {
+  return typeof draftId === 'string' && /^[A-Za-z0-9_-]{8,128}$/.test(draftId);
+}
 
-  const el = document.getElementById(key);
-  if (!el) continue;
+function applyUrlPrefill(urlParams) {
+  for (const key of ['wachtrij', 'klantnummer', 'klantvraag', 'vastloper', 'uitkomst']) {
+    if (!urlParams.has(key)) continue;
 
-  const value = decodeURIComponent(urlParams.get(key));
-  if (el.tagName === 'DIV') {
-    el.innerText = value;
-  } else {
-    el.value = value;
+    const element = document.getElementById(key);
+    if (!element) continue;
+
+    const value = urlParams.get(key) || '';
+    if (element.tagName === 'DIV') {
+      element.innerText = value;
+    } else {
+      element.value = value;
+    }
+  }
+
+  if (urlParams.has('klantnummer')) {
+    document.getElementById('tccKlantnummer').value = urlParams.get('klantnummer') || '';
+  }
+
+  if (urlParams.has('klantvraag')) {
+    const crsPrefillNote = urlParams.get('klantvraag') || '';
+    document.getElementById('tccNotitie').textContent = crsPrefillNote;
+    lastCrsSuppliedTccNote = crsPrefillNote;
+    hasManualTccNoteChange = false;
   }
 }
 
-if (urlParams.has('klantnummer')) {
-  document.getElementById('tccKlantnummer').value = decodeURIComponent(urlParams.get('klantnummer'));
-}
-
-if (urlParams.has('klantvraag')) {
-  const crsPrefillNote = decodeURIComponent(urlParams.get('klantvraag'));
-  document.getElementById('tccNotitie').textContent = crsPrefillNote;
-  lastCrsSuppliedTccNote = crsPrefillNote;
-  hasManualTccNoteChange = false;
-}
+const urlParams = new URLSearchParams(window.location.search);
+const initialDraftId = isValidDraftId(urlParams.get('draftId')) ? urlParams.get('draftId') : '';
+const initialCustomerContext = createDraftContext(urlParams.get('klantnummer'));
+const initialCrsNote = urlParams.has('klantvraag') ? (urlParams.get('klantvraag') || '') : null;
+applyUrlPrefill(urlParams);
 
 renderTemplateVersion();
 applyLanguage(activeLang, false);
@@ -2701,6 +3118,7 @@ function applyLocalTextBeautifier(e) {
   if (el.innerText !== val) {
     el.innerText = val;
     updatePreview();
+    scheduleDraftSave();
   }
 }
 
@@ -2709,6 +3127,17 @@ for (const id of allRichTextFields) {
   if (!el) continue;
   el.addEventListener('blur', applyLocalTextBeautifier);
 }
+
+window.addEventListener('pagehide', flushDraftSave);
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'hidden') flushDraftSave();
+});
+
+window.templateHelperDraftReady = initializeDraftPersistence(
+  initialDraftId,
+  initialCustomerContext,
+  initialCrsNote
+);
 
 </script>
 

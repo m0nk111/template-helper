@@ -12,6 +12,8 @@ if (!window.location.href.toLowerCase().includes('crs')) {
 } else {
 
     var SIDEBAR_DOCK_MODE_KEY = 'moderator-template-helper-dock-mode';
+    var TAB_DRAFT_ID_SESSION_KEY = 'moderator-template-helper-draft-id';
+    var MAX_CUSTOMER_NUMBER_LENGTH = 100;
     var CRS_NOTE_UPDATE_MESSAGE_TYPE = 'template-helper:crs-note-update';
     var CRS_NOTE_SYNC_DELAY_MS = 300;
     var TEMPLATE_SCREENSHOT_REQUEST_MESSAGE_TYPE = 'template-helper:screenshot-request';
@@ -31,6 +33,39 @@ if (!window.location.href.toLowerCase().includes('crs')) {
     var isScreenshotCaptureInProgress = false;
     var activeScreenshotCaptureRequestId = null;
     var screenshotCaptureTimeoutId = null;
+    var fallbackDraftId = null;
+
+    function isValidDraftId(draftId) {
+        return typeof draftId === 'string' && /^[A-Za-z0-9_-]{8,128}$/.test(draftId);
+    }
+
+    function createDraftId() {
+        if (window.crypto && typeof window.crypto.randomUUID === 'function') {
+            return window.crypto.randomUUID();
+        }
+
+        if (window.crypto && typeof window.crypto.getRandomValues === 'function') {
+            var randomValues = new Uint32Array(4);
+            window.crypto.getRandomValues(randomValues);
+            return Array.from(randomValues, function(value) { return value.toString(16); }).join('-');
+        }
+
+        return 'tab-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2);
+    }
+
+    function getTabDraftId() {
+        try {
+            var savedDraftId = sessionStorage.getItem(TAB_DRAFT_ID_SESSION_KEY);
+            if (isValidDraftId(savedDraftId)) return savedDraftId;
+
+            var newDraftId = createDraftId();
+            sessionStorage.setItem(TAB_DRAFT_ID_SESSION_KEY, newDraftId);
+            return newDraftId;
+        } catch (storageError) {
+            if (!isValidDraftId(fallbackDraftId)) fallbackDraftId = createDraftId();
+            return fallbackDraftId;
+        }
+    }
 
     function getSavedDockMode() {
         try {
@@ -383,15 +418,19 @@ if (!window.location.href.toLowerCase().includes('crs')) {
 
             // DATA EXTRACTION: Scrape the page DOM to find the customer ID and context question
             var klnrEl = document.querySelector('.ut_DFI_EL_PARTY_ID');
-            var klantnummer = klnrEl ? encodeURIComponent(klnrEl.innerText.trim()) : '';
+            var klantnummer = klnrEl ? klnrEl.innerText.trim().slice(0, MAX_CUSTOMER_NUMBER_LENGTH) : '';
 
             var notitieEl = document.getElementById('IWMEMO_SCRIPT_EIGENINPUT');
-            var klantvraag = notitieEl ? encodeURIComponent(notitieEl.value.trim()) : '';
+            var klantvraag = notitieEl ? notitieEl.value.trim() : '';
 
             // URL CONSTRUCTION: Bind the extracted data as URL parameters
             // chrome.runtime.getURL gets the exact internal chrome-extension:// path for our bundled HTML
             var url = chrome.runtime.getURL("template.html");
-            var finalUrl = url + '?klantnummer=' + klantnummer + '&klantvraag=' + klantvraag;
+            var urlParams = new URLSearchParams();
+            urlParams.set('klantnummer', klantnummer);
+            urlParams.set('klantvraag', klantvraag);
+            urlParams.set('draftId', getTabDraftId());
+            var finalUrl = url + '?' + urlParams.toString();
 
             // 4. SIDEBAR RENDERING LOGIC
             var sidebarContainer = document.getElementById('moderator-template-sidebar-container');

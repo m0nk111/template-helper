@@ -8,10 +8,10 @@ It is built to reduce copy mistakes, keep formatting consistent, and speed up CR
 ### Wat is dit?
 Template Helper ondersteunt moderators met een vaste, snelle en consistente workflow voor vraag- en antwoordtemplates.
 
-### Nieuw in v4.2.RC1
-- Ticket Check Chat (TCC) is toegevoegd met aparte verzoek- en antwoordtemplates, een bewaarde domeinkeuze en TCC-specifieke validatie.
-- Tijdens een TCC-verzoek synchroniseert de CRS-notitie live; bij een lokale wijziging kies je bewust welke versie je behoudt.
-- Maak vanuit de CRS-sidebar met `📸` een screenshot voor Klantvraag, Antwoord of TCC Screenshots. De sidebar verdwijnt kort uit beeld en elke ingevoegde screenshot heeft een klein `×`-kruis rechtsboven om hem direct met de muis te verwijderen.
+### Nieuw in v4.2.RC2
+- Ingevulde velden en screenshots blijven tijdelijk behouden binnen dezelfde CRS-browsertab en worden hersteld wanneer je opnieuw `Vraag maken` opent voor dezelfde klant.
+- Bij een nieuw klantnummer, of een overgang tussen wel en geen klantnummer, wordt de oude draft bewust gewist zodat klantgegevens niet doorlopen naar een andere context.
+- Herstelde invoer wordt veilig gevalideerd en na 24 uur automatisch opgeruimd. `Waar loop je vast` verduidelijkt nu dat het om het script gaat.
 
 ### Complete featurelijst
 - Vier templateweergaven: V&A `Vraag Template` en `Antwoord Template`, plus TCC `Ticketcontrole Verzoek` en `Ticketcontrole Antwoord`.
@@ -59,6 +59,7 @@ Template Helper ondersteunt moderators met een vaste, snelle en consistente work
 - UI-teksten blijven NL/EN; voor andere doeltalen blijft de UI Engels en vertaalt alleen inhoud.
 - In extension mode gebruikt de iframe `clipboard-write` permissie voor stabieler kopieren in CRS.
 - Herhaald klikken op `Vraag maken` hergebruikt de bestaande sidebar en ververst de context/prefill.
+- Bewaart ingevulde templatevelden en screenshots tijdelijk per browsertab en herstelt ze bij hetzelfde klantnummer; bij een ander of gewijzigd klantnummer, of bij een overgang tussen wel en geen klantnummer, wordt de draft gewist.
 - URL-prefill ondersteuning voor kernvelden via query parameters, inclusief TCC-klantnummer en -notitie.
 - Lokale text-beautifier voor geselecteerde talen bij blur.
 - Versie-weergave in de footer (manifest/meta fallback).
@@ -107,10 +108,10 @@ localStorage.setItem('vraag-tmpl-azure-translator-endpoint', 'https://api.cognit
 ### What is this?
 Template Helper provides moderators with a consistent and fast template workflow for both question and answer handoff.
 
-### New in v4.2.RC1
-- Ticket Check Chat (TCC) adds dedicated request and answer templates, a persistent domain selection, and TCC-specific validation.
-- During a TCC request, the CRS note stays synchronized live; after a local edit, you explicitly choose which version to keep.
-- Use `📸` in the CRS sidebar to capture Customer question, Answer, or TCC Screenshots. The sidebar briefly hides and every inserted screenshot has a small top-right `×` control to remove it with the mouse.
+### New in v4.2.RC2
+- Filled fields and screenshots are temporarily preserved within the same CRS browser tab and restored when you open `Vraag maken` again for the same customer.
+- A new customer number, or a transition to or from an empty customer number, deliberately clears the old draft so customer data cannot carry over to another context.
+- Restored input is validated safely and automatically expires after 24 hours. `Where are you stuck` now clarifies that it refers to the script.
 
 ### Full feature set
 - Four template views: V&A `Question Template` and `Answer Template`, plus TCC `Ticket Check Request` and `Ticket Check Answer`.
@@ -158,6 +159,7 @@ Template Helper provides moderators with a consistent and fast template workflow
 - UI stays Dutch/English only; for other target languages, UI remains English while content is translated.
 - In extension mode, the iframe uses `clipboard-write` permission for more reliable copy behavior in CRS.
 - Repeated clicks on `Vraag maken` reuse the existing sidebar and refresh context/prefill.
+- Temporarily preserves filled template fields and screenshots per browser tab and restores them for the same customer number; changing the customer context, including transitions to or from an empty customer number, clears the draft.
 - URL prefill support for core fields via query parameters, including TCC customer number and note.
 - Local text beautifier on blur for selected languages.
 - Footer version rendering with manifest/meta fallback.
