@@ -1,5 +1,11 @@
 # Changelog
 
+## [4.3.2] - 2026-07-17
+
+- **Fixed:** Brede rich-texttabellen blijven nu binnen het voorbeeldvak. De horizontale scrollbar verschijnt alleen bij de betreffende tabel, zodat de sidebar en preview niet horizontaal uitrekken.
+- **Changed:** De Teams/clipboard-output behoudt de oorspronkelijke tabel zonder preview-specifieke wrapper of scrollbarstijl.
+- **Changed:** De technische manifestversie en de zichtbare releaseversie zijn beide `4.3.2`.
+
 ## [4.3.1] - 2026-07-17
 
 - **Added:** Veilig geplakte rich text uit CRS en Teams behoudt nu tabellen, celopmaak, lijsten en nadruk in alle rich-text velden. Onveilige HTML, externe afbeeldingen en actieve links worden verwijderd.

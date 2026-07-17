@@ -29,6 +29,20 @@ SAFE_TABLE_HTML = (
     '<tr><td colspan="1">Controleer verbinding</td></tr></tbody></table>'
 )
 
+WIDE_TABLE_HTML = (
+    '<table style="width: 1200px; border-collapse: collapse"><thead><tr>'
+    + ''.join(
+        f'<th style="border: 1px solid #606060; padding: 4px">Kolom {column}</th>'
+        for column in range(1, 13)
+    )
+    + '</tr></thead><tbody><tr>'
+    + ''.join(
+        f'<td style="border: 1px solid #606060; padding: 4px">Waarde {column}</td>'
+        for column in range(1, 13)
+    )
+    + '</tr></tbody></table>'
+)
+
 
 def test_all_rich_text_fields_preserve_safe_tables_and_strip_unsafe_html(
     template_page: DevToolsPage,
@@ -118,6 +132,59 @@ def test_all_rich_text_fields_preserve_safe_tables_and_strip_unsafe_html(
             'externalImages': 0,
             'eventAttributes': False,
         }, field_id
+
+
+def test_wide_preview_table_scrolls_without_overflowing_the_preview_or_export(
+    template_page: DevToolsPage,
+) -> None:
+    result = template_page.evaluate(
+        f"""
+        (() => {{
+          setDomainMode('va', false);
+          setTemplateMode('antwoord', false);
+          const field = document.getElementById('antwoord');
+          field.innerHTML = {json.dumps(WIDE_TABLE_HTML)};
+
+          const exported = buildMessageHTML();
+          updatePreview();
+
+          const preview = document.getElementById('preview');
+          const tableContainer = preview.querySelector('.preview-table-container');
+          const table = tableContainer?.querySelector('table');
+
+          return {{
+            preview: {{
+              tableContainers: preview.querySelectorAll('.preview-table-container').length,
+              overflowX: tableContainer ? getComputedStyle(tableContainer).overflowX : '',
+              isScrollable: tableContainer
+                ? tableContainer.scrollWidth > tableContainer.clientWidth
+                : false,
+              previewOverflows: preview.scrollWidth > preview.clientWidth,
+              pageOverflows: document.documentElement.scrollWidth > document.documentElement.clientWidth,
+              tableWidth: table ? Math.round(table.getBoundingClientRect().width) : 0,
+              containerWidth: tableContainer?.clientWidth || 0,
+            }},
+            export: {{
+              hasTable: exported.includes('<table'),
+              headerCount: (exported.match(/<th(?:\\s|>)/g) || []).length,
+              hasPreviewWrapper: exported.includes('preview-table-container'),
+            }},
+          }};
+        }})()
+        """
+    )
+
+    assert result['preview']['tableContainers'] == 1
+    assert result['preview']['overflowX'] == 'auto'
+    assert result['preview']['isScrollable'] is True
+    assert result['preview']['previewOverflows'] is False
+    assert result['preview']['pageOverflows'] is False
+    assert result['preview']['tableWidth'] > result['preview']['containerWidth']
+    assert result['export'] == {
+        'hasTable': True,
+        'headerCount': 12,
+        'hasPreviewWrapper': False,
+    }
 
 
 def test_all_rich_text_fields_have_screenshot_buttons_and_clean_separators(

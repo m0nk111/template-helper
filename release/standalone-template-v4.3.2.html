@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="template-version" content="4.3.1">
+  <meta name="template-version" content="4.3.2">
   <title>Vraag Template</title>
   <style>
     :root {
@@ -612,6 +612,16 @@
       padding: 4px;
       border: 1px solid var(--border);
       vertical-align: top;
+    }
+
+    .preview-table-container {
+      display: block;
+      max-width: 100%;
+      overflow-x: auto;
+    }
+
+    .preview-table-container > table {
+      max-width: none;
     }
 
     .textarea-like .screenshot-item img {
@@ -2903,7 +2913,15 @@ function buildMessageHTML() {
 }
 
 function updatePreview() {
-  document.getElementById('preview').innerHTML = buildMessageHTML();
+  const preview = document.getElementById('preview');
+  preview.innerHTML = buildMessageHTML();
+
+  preview.querySelectorAll('table').forEach((table) => {
+    const tableContainer = document.createElement('div');
+    tableContainer.className = 'preview-table-container';
+    table.replaceWith(tableContainer);
+    tableContainer.append(table);
+  });
 }
 
 function validate() {

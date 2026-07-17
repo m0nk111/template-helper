@@ -8,6 +8,10 @@ It is built to reduce copy mistakes, keep formatting consistent, and speed up CR
 ### Wat is dit?
 Template Helper ondersteunt moderators met een vaste, snelle en consistente workflow voor vraag- en antwoordtemplates.
 
+### Nieuw in v4.3.2
+- Brede geplakte tabellen blijven binnen het voorbeeldvak. Gebruik de horizontale scrollbar direct bij de tabel; de sidebar en de rest van de preview blijven op breedte.
+- De Teams/clipboard-output behoudt de oorspronkelijke tabel zonder preview-specifieke wrapper of scrollbarstijl.
+
 ### Nieuw in v4.3.1
 - Veilig plakken uit CRS en Teams behoudt nu tabellen, celopmaak, lijsten en nadruk in alle rich-text velden; onveilige HTML, externe afbeeldingen en actieve links worden verwijderd.
 - De screenshotknop staat nu bij elk rich-text veld. Screenshotverwijdering laat geen extra witruimte achter en blijft compatibel met oudere tijdelijke drafts.
@@ -111,6 +115,10 @@ localStorage.setItem('vraag-tmpl-azure-translator-endpoint', 'https://api.cognit
 
 ### What is this?
 Template Helper provides moderators with a consistent and fast template workflow for both question and answer handoff.
+
+### New in v4.3.2
+- Wide pasted tables stay inside the preview area. Use the horizontal scrollbar directly at the table; the sidebar and remaining preview stay within their width.
+- Teams/clipboard output retains the original table without preview-specific wrappers or scrollbar styles.
 
 ### New in v4.3.1
 - Safe pasting from CRS and Teams now retains tables, cell formatting, lists, and emphasis in every rich-text field; unsafe HTML, external images, and active links are removed.

@@ -1,15 +1,13 @@
-# v4.3.1 Release Notes
+# v4.3.2 Release Notes
 
 ## Nederlandse uitleg
-Deze release notes bevatten eerst de Nederlandse versie en daarna de Engelse versie. Deze definitieve release gebruikt Chrome-manifestversie `4.3.1` en toont `4.3.1` als zichtbare versie.
+Deze release notes bevatten eerst de Nederlandse versie en daarna de Engelse versie. Deze definitieve release gebruikt Chrome-manifestversie `4.3.2` en toont `4.3.2` als zichtbare versie.
 
 ## Nederlandse versie
 
-### Changelog v4.3.1
-- **Veilig rich text plakken:** Tabellen, celopmaak, lijsten en nadruk uit CRS en Teams blijven behouden in elk rich-text veld. Onveilige HTML, externe afbeeldingen en actieve links worden verwijderd.
-- **Screenshotknoppen in alle rich-text velden:** Je kunt nu rechtstreeks screenshots toevoegen aan alle V&A- en TCC-rich-text velden, waaronder Vastloper, Gewenste uitkomst, Bron en Vervolgstap.
-- **Nettere screenshotverwijdering:** Automatisch toegevoegde separators worden gericht opgeruimd, zodat screenshots geen extra witruimte achterlaten. Bestaande handmatige regeleinden blijven behouden.
-- **Compatibele drafts:** Screenshots uit oudere tijdelijke drafts ruimen bij verwijderen ook hun oude ongemarkeerde separator op.
+### Changelog v4.3.2
+- **Tabelscroll binnen het voorbeeld:** Brede tabellen uit CRS en Teams blijven binnen het voorbeeldvak. De horizontale scrollbar staat alleen bij de betreffende tabel, zodat de sidebar en de rest van de preview niet horizontaal uitrekken.
+- **Ongewijzigde Teams-output:** De gekopieerde HTML behoudt de oorspronkelijke tabel zonder preview-wrapper of scrollbarstijl.
 
 ### Installatie Instructies
 1. Download het `.zip` bestand en pak het uit
@@ -22,7 +20,7 @@ Of download `standalone-template-v[versie].html` en open dit direct in je browse
 
 ### Volledig feature-overzicht
 Alle huidige features staan in de root README:
-https://github.com/m0nk111/template-helper/blob/v4.3.1/README.md
+https://github.com/m0nk111/template-helper/blob/v4.3.2/README.md
 
 ### Probleem ontdekt?
 Heb je een probleem ontdekt? Het makkelijkste is om hier op GitHub even een issue aan te maken. Op die manier kunnen we het probleem gestructureerd onderzoeken en oplossen!
@@ -32,11 +30,9 @@ Heb je een probleem ontdekt? Het makkelijkste is om hier op GitHub even een issu
 
 ## English version
 
-### Changelog v4.3.1
-- **Safe rich-text paste:** Tables, cell formatting, lists, and emphasis from CRS and Teams are retained in every rich-text field. Unsafe HTML, external images, and active links are removed.
-- **Screenshot buttons in every rich-text field:** You can now add screenshots directly to all V&A and TCC rich-text fields, including Where are you stuck, Desired outcome, Source, and Next step.
-- **Cleaner screenshot removal:** Automatically added separators are removed precisely, so screenshots leave no extra whitespace. Existing manually added line breaks remain intact.
-- **Compatible drafts:** Screenshots in older temporary drafts also remove their older unmarked separator when removed.
+### Changelog v4.3.2
+- **Preview table scrolling:** Wide tables from CRS and Teams stay inside the preview area. The horizontal scrollbar belongs only to the relevant table, so the sidebar and rest of the preview do not stretch horizontally.
+- **Unchanged Teams output:** Copied HTML retains the original table without preview wrappers or scrollbar styles.
 
 ### Installation Instructions
 1. Download the `.zip` file and extract it
@@ -49,7 +45,7 @@ Or download `standalone-template-v[version].html` and open it directly in your b
 
 ### Complete Feature Overview
 For the complete feature set, see the root README:
-https://github.com/m0nk111/template-helper/blob/v4.3.1/README.md
+https://github.com/m0nk111/template-helper/blob/v4.3.2/README.md
 
 ### Found an issue?
 If you discovered an issue, the easiest way is to open an issue on GitHub. That helps us investigate and solve it in a structured way.

@@ -2088,7 +2088,15 @@ function buildMessageHTML() {
 }
 
 function updatePreview() {
-  document.getElementById('preview').innerHTML = buildMessageHTML();
+  const preview = document.getElementById('preview');
+  preview.innerHTML = buildMessageHTML();
+
+  preview.querySelectorAll('table').forEach((table) => {
+    const tableContainer = document.createElement('div');
+    tableContainer.className = 'preview-table-container';
+    table.replaceWith(tableContainer);
+    tableContainer.append(table);
+  });
 }
 
 function validate() {
