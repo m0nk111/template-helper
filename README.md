@@ -8,6 +8,10 @@ It is built to reduce copy mistakes, keep formatting consistent, and speed up CR
 ### Wat is dit?
 Template Helper ondersteunt moderators met een vaste, snelle en consistente workflow voor vraag- en antwoordtemplates.
 
+### Nieuw in v4.3.1
+- Veilig plakken uit CRS en Teams behoudt nu tabellen, celopmaak, lijsten en nadruk in alle rich-text velden; onveilige HTML, externe afbeeldingen en actieve links worden verwijderd.
+- De screenshotknop staat nu bij elk rich-text veld. Screenshotverwijdering laat geen extra witruimte achter en blijft compatibel met oudere tijdelijke drafts.
+
 ### Nieuw in v4.3.0
 - Ingevulde velden en screenshots blijven tijdelijk behouden binnen dezelfde CRS-browsertab en worden hersteld wanneer je opnieuw `Vraag maken` opent voor dezelfde klant.
 - Bij een nieuw klantnummer, of een overgang tussen wel en geen klantnummer, wordt de oude draft bewust gewist zodat klantgegevens niet doorlopen naar een andere context.
@@ -21,7 +25,7 @@ Template Helper ondersteunt moderators met een vaste, snelle en consistente work
 - Leest automatisch `Klantnummer` en notitie uit CRS en prefilt relevante templatevelden.
 - TCC-verzoek hergebruikt dezelfde CRS-prefill voor klantnummer en notitie.
 - Tijdens een actief TCC-verzoek wordt de CRS-notitie live gesynchroniseerd; na een lokale template-aanpassing kies je expliciet of de nieuwe CRS-notitie de template-notitie mag overschrijven.
-- Met de compacte `📸`-knop naast Klantvraag, Antwoord en TCC Screenshots maak je in de CRS-sidebar zonder toetsenbord een screenshot van het zichtbare CRS-venster; de sidebar wordt tijdelijk verborgen, de afbeelding wordt direct aan het gekozen veld toegevoegd en is via het kleine `×`-kruis rechtsboven met de muis te verwijderen.
+- Met de compacte `📸`-knop bij elk rich-text veld maak je in de CRS-sidebar zonder toetsenbord een screenshot van het zichtbare CRS-venster; de sidebar wordt tijdelijk verborgen, de afbeelding wordt direct aan het gekozen veld toegevoegd en is via het kleine `×`-kruis rechtsboven met de muis te verwijderen.
 - In extension mode opent de template direct vanuit de workflow in een in-app zijpaneel.
 - Docking-ondersteuning voor zijpaneel (links, rechts, boven, onder) met bewaarde positie.
 - Drag-to-dock: sleep de blauwe sidebar-header om live te docken naar links, rechts, boven of onder.
@@ -41,7 +45,7 @@ Template Helper ondersteunt moderators met een vaste, snelle en consistente work
 - Teams-tip in de UI om `Ctrl+V` te gebruiken zodat opmaak en afbeeldingen behouden blijven.
 - Validatie van verplichte velden met duidelijke foutmeldingen.
 - Validatie is mode-afhankelijk: V&A houdt de bestaande verplichte velden, TCC-verzoek vereist klantnummer, notitie en screenshots, en TCC-antwoord heeft optionele tekstvelden.
-- Plakken in rich-text velden wordt naar plain text genormaliseerd (behalve afbeeldingen) voor consistente output.
+- Veilig geplakte rich text behoudt tabellen en gangbare tekstformattering voor consistente Teams-output; onveilige HTML, externe afbeeldingen en actieve links worden verwijderd.
 - Vooraf gedefinieerde wachtrijen voor snelle selectie.
 - Shortcut `Ctrl+Enter` (of `Cmd+Enter`) om direct te kopieren.
 - Template mode persistence: onthoudt laatst gebruikte template.
@@ -108,6 +112,10 @@ localStorage.setItem('vraag-tmpl-azure-translator-endpoint', 'https://api.cognit
 ### What is this?
 Template Helper provides moderators with a consistent and fast template workflow for both question and answer handoff.
 
+### New in v4.3.1
+- Safe pasting from CRS and Teams now retains tables, cell formatting, lists, and emphasis in every rich-text field; unsafe HTML, external images, and active links are removed.
+- The screenshot button is now available for every rich-text field. Removing screenshots leaves no extra whitespace and remains compatible with older temporary drafts.
+
 ### New in v4.3.0
 - Filled fields and screenshots are temporarily preserved within the same CRS browser tab and restored when you open `Vraag maken` again for the same customer.
 - A new customer number, or a transition to or from an empty customer number, deliberately clears the old draft so customer data cannot carry over to another context.
@@ -121,7 +129,7 @@ Template Helper provides moderators with a consistent and fast template workflow
 - Automatically reads `Customer number` and note context from CRS and pre-fills relevant template fields.
 - TCC request reuses the same CRS prefill for customer number and note.
 - During an active TCC request, the CRS note stays synchronized live; after a local template edit, users explicitly choose whether a newer CRS note may overwrite the template note.
-- The compact `📸` button next to Customer question, Answer, and TCC Screenshots captures the visible CRS window from the CRS sidebar without keyboard input; the sidebar is briefly hidden, the image is added directly to the selected field, and the small top-right `×` control removes it with the mouse.
+- The compact `📸` button at every rich-text field captures the visible CRS window from the CRS sidebar without keyboard input; the sidebar is briefly hidden, the image is added directly to the selected field, and the small top-right `×` control removes it with the mouse.
 - In extension mode, the template opens directly from workflow context in an in-app sidebar.
 - Sidebar docking support (left, right, top, bottom) with persisted dock position.
 - Drag-to-dock: drag the blue sidebar header to dock live to left, right, top, or bottom.
@@ -141,7 +149,7 @@ Template Helper provides moderators with a consistent and fast template workflow
 - Teams tip in UI to use `Ctrl+V` so formatting and screenshots are preserved.
 - Required field validation with clear error feedback.
 - Validation is mode-aware: V&A keeps its existing required fields, TCC request requires customer number, note, and screenshots, while TCC answer text fields are optional.
-- Rich-text paste is normalized to plain text (except images) for consistent output.
+- Safe rich-text paste retains tables and common text formatting for consistent Teams output; unsafe HTML, external images, and active links are removed.
 - Predefined queue options for fast routing.
 - `Ctrl+Enter` (or `Cmd+Enter`) shortcut to copy instantly.
 - Template mode persistence: remembers the last used template.

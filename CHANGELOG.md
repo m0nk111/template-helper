@@ -1,5 +1,13 @@
 # Changelog
 
+## [4.3.1] - 2026-07-17
+
+- **Added:** Veilig geplakte rich text uit CRS en Teams behoudt nu tabellen, celopmaak, lijsten en nadruk in alle rich-text velden. Onveilige HTML, externe afbeeldingen en actieve links worden verwijderd.
+- **Added:** Elk rich-text veld heeft nu een screenshotknop, inclusief `Vastloper`, `Gewenste uitkomst`, `Bron`, `Vervolgstap` en alle TCC-velden.
+- **Fixed:** Screenshot-separators worden alleen verwijderd wanneer ze door de extensie zijn gemaakt. Dat voorkomt extra witruimte en houdt handmatig ingevoegde regeleinden intact.
+- **Fixed:** Opgeslagen screenshots uit oudere drafts ruimen hun oude ongemarkeerde separator weer op bij verwijderen.
+- **Changed:** De technische manifestversie en de zichtbare releaseversie zijn beide `4.3.1`.
+
 ## [4.3.0] - 2026-07-17
 
 - **Added:** V&A- en TCC-drafts blijven nu tijdelijk bewaard binnen dezelfde CRS-browsertab, inclusief rich text, wachtrij, checkboxen en screenshots.

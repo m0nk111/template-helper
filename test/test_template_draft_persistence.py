@@ -358,7 +358,10 @@ def test_restored_html_is_sanitized_without_removing_valid_screenshots(
 ) -> None:
     unsafe_html = (
         f'<script>window.__draftXss = true;</script>'
+        '<span class="screenshot-item" contenteditable="false" onclick="window.__draftXss = true">'
         f'<img src="{SCREENSHOT_DATA_URL}" onerror="window.__draftXss = true">'
+        '<button class="screenshot-remove" type="button" onmouseover="window.__draftXss = true">×</button>'
+        '</span>'
         '<b>Veilige tekst</b>'
     )
     result = draft_page.evaluate(
@@ -370,6 +373,10 @@ def test_restored_html_is_sanitized_without_removing_valid_screenshots(
             scripts: holder.querySelectorAll('script').length,
             images: holder.querySelectorAll('img').length,
             onerror: holder.querySelector('img')?.hasAttribute('onerror') || false,
+                        eventAttributes: [...holder.querySelectorAll('*')].some((node) =>
+                            [...node.attributes].some((attribute) => attribute.name.startsWith('on'))
+                        ),
+                        removeButtons: holder.querySelectorAll('.screenshot-remove').length,
             text: holder.innerText,
           }};
         }})()
@@ -380,5 +387,7 @@ def test_restored_html_is_sanitized_without_removing_valid_screenshots(
         'scripts': 0,
         'images': 1,
         'onerror': False,
-        'text': 'Veilige tekst',
+        'eventAttributes': False,
+        'removeButtons': 1,
+        'text': '×Veilige tekst',
     }

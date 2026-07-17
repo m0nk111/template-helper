@@ -284,6 +284,41 @@ def test_removing_first_screenshot_does_not_accumulate_line_breaks(
     }
 
 
+def test_removing_legacy_screenshot_cleans_its_unmarked_separator(
+        template_page: DevToolsPage,
+) -> None:
+        result = template_page.evaluate(
+                f"""
+                (() => {{
+                    setDomainMode('tcc', false);
+                    setTemplateMode('vraag', false);
+
+                    const field = document.getElementById('tccScreenshots');
+                    field.innerHTML =
+                        'Oude inhoud<br>' +
+                        '<span class="screenshot-item" contenteditable="false">' +
+                        '<img src="{SCREENSHOT_DATA_URL}" alt="Screenshot" draggable="false">' +
+                        '<button class="screenshot-remove" type="button">×</button>' +
+                        '</span>';
+                    bindScreenshotRemoveButtons(field);
+                    field.querySelector('.screenshot-remove').click();
+
+                    return {{
+                        html: field.innerHTML,
+                        screenshotItems: field.querySelectorAll('.screenshot-item').length,
+                        lineBreaks: field.querySelectorAll('br').length,
+                    }};
+                }})()
+                """
+        )
+
+        assert result == {
+                'html': 'Oude inhoud',
+                'screenshotItems': 0,
+                'lineBreaks': 0,
+        }
+
+
 def test_removing_middle_screenshot_does_not_accumulate_line_breaks(
     template_page: DevToolsPage,
 ) -> None:

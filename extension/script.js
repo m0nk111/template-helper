@@ -229,7 +229,7 @@ const crsNoteMaxLength = 50000;
 const crsScreenshotRequestMessageType = 'template-helper:screenshot-request';
 const crsScreenshotResultMessageType = 'template-helper:screenshot-result';
 const crsScreenshotErrorMessageType = 'template-helper:screenshot-error';
-const screenshotTargetFields = ['klantvraag', 'antwoord', 'tccScreenshots'];
+const screenshotTargetFields = [...allRichTextFields];
 const screenshotDataUrlMaxLength = 20 * 1024 * 1024;
 const draftMaxFieldLength = screenshotDataUrlMaxLength * 4;
 const screenshotRequestTimeoutMs = 10000;
@@ -482,12 +482,64 @@ function restoreDraftRecord(record) {
   updatePreview();
 }
 
+function sanitizeSafeStyle(value) {
+  const source = document.createElement('table');
+  source.setAttribute('style', value || '');
+  const allowedProperties = [
+    'background-color',
+    'border',
+    'border-collapse',
+    'border-color',
+    'border-style',
+    'border-width',
+    'color',
+    'font-size',
+    'font-style',
+    'font-weight',
+    'height',
+    'max-height',
+    'max-width',
+    'min-height',
+    'min-width',
+    'padding',
+    'padding-bottom',
+    'padding-left',
+    'padding-right',
+    'padding-top',
+    'text-align',
+    'text-decoration',
+    'vertical-align',
+    'width'
+  ];
+  const sanitized = document.createElement('table');
+
+  for (const property of allowedProperties) {
+    const propertyValue = source.style.getPropertyValue(property).trim();
+    if (!propertyValue || /(?:url\s*\(|expression\s*\(|@import|javascript:|var\s*\()/i.test(propertyValue)) continue;
+    sanitized.style.setProperty(property, propertyValue);
+  }
+
+  return sanitized.getAttribute('style') || '';
+}
+
+function sanitizeTableAttribute(node, name, maximum) {
+  const value = node.getAttribute(name) || '';
+  if (!/^\d+$/.test(value)) return '';
+
+  const numericValue = Number(value);
+  return numericValue >= 1 && numericValue <= maximum ? String(numericValue) : '';
+}
+
 function sanitizeDraftHTML(value) {
   if (typeof value !== 'string' || value.length > draftMaxFieldLength) return '';
 
   const template = document.createElement('template');
   template.innerHTML = value;
-  const allowedTags = new Set(['BR', 'B', 'STRONG', 'I', 'EM', 'U', 'S', 'DIV', 'SPAN', 'P']);
+  const allowedTags = new Set([
+    'A', 'B', 'BLOCKQUOTE', 'BR', 'CAPTION', 'COL', 'COLGROUP', 'DIV', 'EM', 'I', 'LI',
+    'OL', 'P', 'S', 'SPAN', 'STRONG', 'TABLE', 'TBODY', 'TD', 'TFOOT', 'TH', 'THEAD',
+    'TR', 'U', 'UL'
+  ]);
   const dangerousTags = new Set(['SCRIPT', 'STYLE', 'IFRAME', 'OBJECT', 'EMBED', 'FORM', 'LINK', 'META']);
 
   const sanitizeChildren = (parent) => {
@@ -524,24 +576,48 @@ function sanitizeDraftHTML(value) {
           return;
         }
         node.replaceChildren(document.createTextNode('×'));
+        [...node.attributes].forEach((attribute) => node.removeAttribute(attribute.name));
         node.setAttribute('type', 'button');
         node.setAttribute('class', 'screenshot-remove');
-        node.removeAttribute('data-template-helper-bound');
         node.setAttribute('title', getLangPack().buttons.removeScreenshot);
         node.setAttribute('aria-label', getLangPack().buttons.removeScreenshot);
         return;
       }
 
+      if (tagName === 'BR') {
+        const isScreenshotSeparator = node.hasAttribute('data-screenshot-separator');
+        node.replaceChildren();
+        [...node.attributes].forEach((attribute) => node.removeAttribute(attribute.name));
+        if (isScreenshotSeparator) node.setAttribute('data-screenshot-separator', 'true');
+        return;
+      }
+
       if (tagName === 'SPAN' && node.classList.contains('screenshot-item')) {
+        const isManagedScreenshot = node.getAttribute('data-template-helper-screenshot') === 'true';
         sanitizeChildren(node);
         if (!node.querySelector('img')) {
           node.remove();
           return;
         }
+        [...node.attributes].forEach((attribute) => node.removeAttribute(attribute.name));
         node.setAttribute('class', 'screenshot-item');
         node.setAttribute('contenteditable', 'false');
+        if (isManagedScreenshot) node.setAttribute('data-template-helper-screenshot', 'true');
         return;
       }
+
+      const safeStyle = sanitizeSafeStyle(node.getAttribute('style'));
+      const safeRowSpan = (tagName === 'TD' || tagName === 'TH')
+        ? sanitizeTableAttribute(node, 'rowspan', 100)
+        : '';
+      const safeColSpan = (tagName === 'TD' || tagName === 'TH')
+        ? sanitizeTableAttribute(node, 'colspan', 100)
+        : '';
+      const safeSpan = tagName === 'COL' ? sanitizeTableAttribute(node, 'span', 100) : '';
+      const scope = node.getAttribute('scope') || '';
+      const safeScope = tagName === 'TH' && ['col', 'colgroup', 'row', 'rowgroup'].includes(scope)
+        ? scope
+        : '';
 
       if (!allowedTags.has(tagName)) {
         sanitizeChildren(node);
@@ -552,6 +628,11 @@ function sanitizeDraftHTML(value) {
       }
 
       [...node.attributes].forEach((attribute) => node.removeAttribute(attribute.name));
+      if (safeStyle) node.setAttribute('style', safeStyle);
+      if (safeRowSpan) node.setAttribute('rowspan', safeRowSpan);
+      if (safeColSpan) node.setAttribute('colspan', safeColSpan);
+      if (safeSpan) node.setAttribute('span', safeSpan);
+      if (safeScope) node.setAttribute('scope', safeScope);
       sanitizeChildren(node);
     });
   };
@@ -1284,6 +1365,7 @@ function createScreenshotItem(dataUrl) {
   const screenshotItem = document.createElement('span');
   screenshotItem.className = 'screenshot-item';
   screenshotItem.contentEditable = 'false';
+  screenshotItem.setAttribute('data-template-helper-screenshot', 'true');
 
   const image = document.createElement('img');
   image.src = dataUrl;
@@ -1302,6 +1384,15 @@ function createScreenshotItem(dataUrl) {
   return screenshotItem;
 }
 
+function isScreenshotSeparator(node) {
+  return node?.nodeName === 'BR' && node.getAttribute('data-screenshot-separator') === 'true';
+}
+
+function isLegacyScreenshotSeparator(node, isPreceding) {
+  return node?.nodeName === 'BR' && !isScreenshotSeparator(node) &&
+    (isPreceding || node.nextSibling?.classList?.contains('screenshot-item'));
+}
+
 function handleScreenshotRemove(event) {
   event.preventDefault();
   event.stopPropagation();
@@ -1310,10 +1401,14 @@ function handleScreenshotRemove(event) {
   if (!screenshotItem) return;
 
   const precedingNode = screenshotItem.previousSibling;
-  if (precedingNode?.nodeName === 'BR') {
+  const followingNode = screenshotItem.nextSibling;
+  const isLegacyScreenshot = screenshotItem.getAttribute('data-template-helper-screenshot') !== 'true';
+  if (isScreenshotSeparator(precedingNode) ||
+    (isLegacyScreenshot && isLegacyScreenshotSeparator(precedingNode, true))) {
     precedingNode.remove();
-  } else if (screenshotItem.nextSibling?.nodeName === 'BR') {
-    screenshotItem.nextSibling.remove();
+  } else if (isScreenshotSeparator(followingNode) ||
+    (isLegacyScreenshot && isLegacyScreenshotSeparator(followingNode, false))) {
+    followingNode.remove();
   }
   screenshotItem.remove();
   updatePreview();
@@ -1332,8 +1427,10 @@ function appendScreenshotToField(targetField, dataUrl) {
   const field = document.getElementById(targetField);
   if (!field || !screenshotTargetFields.includes(targetField)) return false;
 
-  if (field.childNodes.length) {
-    field.appendChild(document.createElement('br'));
+  if (field.childNodes.length && field.lastChild?.nodeName !== 'BR') {
+    const separator = document.createElement('br');
+    separator.setAttribute('data-screenshot-separator', 'true');
+    field.appendChild(separator);
   }
 
   field.appendChild(createScreenshotItem(dataUrl));
@@ -1933,8 +2030,11 @@ function buildMessageHTML() {
       const image = item.querySelector('img');
       item.replaceWith(image || '');
     });
+    cleanField.querySelectorAll('br[data-screenshot-separator]').forEach((separator) => {
+      separator.removeAttribute('data-screenshot-separator');
+    });
 
-    return cleanField.innerHTML.replace(/\s+style=(['"]).*?\1/gi, '').trim();
+    return sanitizeDraftHTML(cleanField.innerHTML).trim();
   };
 
   const labels = getLangPack().outputLabels;
@@ -2103,6 +2203,15 @@ function insertPlainTextAsLineBreaks(text) {
   });
 }
 
+function insertSanitizedHTML(value) {
+  const sanitizedHTML = sanitizeDraftHTML(value);
+  if (!sanitizedHTML) return false;
+
+  document.execCommand('insertHTML', false, sanitizedHTML);
+  bindScreenshotRemoveButtons();
+  return true;
+}
+
 document.querySelectorAll('div[contenteditable="true"]').forEach((el) => {
   el.addEventListener('paste', function(e) {
     const clipboardData = e.clipboardData || window.clipboardData;
@@ -2111,8 +2220,10 @@ document.querySelectorAll('div[contenteditable="true"]').forEach((el) => {
     if (clipboardData.files && clipboardData.files.length > 0) return;
 
     e.preventDefault();
-    const text = clipboardData.getData('text/plain');
-    insertPlainTextAsLineBreaks(text);
+    const pastedHTML = clipboardData.getData('text/html');
+    const didInsertHTML = pastedHTML && insertSanitizedHTML(pastedHTML);
+    if (!didInsertHTML) insertPlainTextAsLineBreaks(clipboardData.getData('text/plain'));
+    el.dispatchEvent(new Event('input', { bubbles: true }));
   });
 
   // Plain Enter creates a new block-level <div> in contenteditable, which

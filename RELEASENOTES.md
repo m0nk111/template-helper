@@ -1,16 +1,15 @@
-# v4.3.0 Release Notes
+# v4.3.1 Release Notes
 
 ## Nederlandse uitleg
-Deze release notes bevatten eerst de Nederlandse versie en daarna de Engelse versie. Deze definitieve release gebruikt Chrome-manifestversie `4.3.0` en toont `4.3.0` als zichtbare versie.
+Deze release notes bevatten eerst de Nederlandse versie en daarna de Engelse versie. Deze definitieve release gebruikt Chrome-manifestversie `4.3.1` en toont `4.3.1` als zichtbare versie.
 
 ## Nederlandse versie
 
-### Changelog v4.3.0
-- **Draftbehoud per tab:** Ingevulde V&A- en TCC-templates blijven tijdelijk beschikbaar wanneer je in dezelfde CRS-browsertab opnieuw `Vraag maken` opent. Tekst, wachtrij, checkboxen en screenshots worden hersteld.
-- **Veilige klantcontext:** Een draft wordt alleen teruggezet voor hetzelfde klantnummer. Bij een ander klantnummer, of bij de overgang tussen een ingevuld en leeg klantnummer, wordt de vorige draft gewist.
-- **TCC-live-notitie:** De bestaande live-synchronisatie en conflictdialoog voor de CRS-notitie blijven werken naast herstelde drafts.
-- **Veilige tijdelijke opslag:** Herstelde invoer en screenshots worden gevalideerd en geschoond. Verlopen drafts worden na 24 uur automatisch verwijderd.
-- **Duidelijker label:** `Waar loop je vast` is aangepast naar `Waar loop je vast (in het script)`; de Engelse interface gebruikt `Where are you stuck (in the script)`.
+### Changelog v4.3.1
+- **Veilig rich text plakken:** Tabellen, celopmaak, lijsten en nadruk uit CRS en Teams blijven behouden in elk rich-text veld. Onveilige HTML, externe afbeeldingen en actieve links worden verwijderd.
+- **Screenshotknoppen in alle rich-text velden:** Je kunt nu rechtstreeks screenshots toevoegen aan alle V&A- en TCC-rich-text velden, waaronder Vastloper, Gewenste uitkomst, Bron en Vervolgstap.
+- **Nettere screenshotverwijdering:** Automatisch toegevoegde separators worden gericht opgeruimd, zodat screenshots geen extra witruimte achterlaten. Bestaande handmatige regeleinden blijven behouden.
+- **Compatibele drafts:** Screenshots uit oudere tijdelijke drafts ruimen bij verwijderen ook hun oude ongemarkeerde separator op.
 
 ### Installatie Instructies
 1. Download het `.zip` bestand en pak het uit
@@ -23,7 +22,7 @@ Of download `standalone-template-v[versie].html` en open dit direct in je browse
 
 ### Volledig feature-overzicht
 Alle huidige features staan in de root README:
-https://github.com/m0nk111/template-helper/blob/v4.3.0/README.md
+https://github.com/m0nk111/template-helper/blob/v4.3.1/README.md
 
 ### Probleem ontdekt?
 Heb je een probleem ontdekt? Het makkelijkste is om hier op GitHub even een issue aan te maken. Op die manier kunnen we het probleem gestructureerd onderzoeken en oplossen!
@@ -33,12 +32,11 @@ Heb je een probleem ontdekt? Het makkelijkste is om hier op GitHub even een issu
 
 ## English version
 
-### Changelog v4.3.0
-- **Per-tab drafts:** Filled V&A and TCC templates remain temporarily available when you open `Vraag maken` again in the same CRS browser tab. Text, queues, switches, and screenshots are restored.
-- **Safe customer context:** A draft is restored only for the same customer number. Changing the customer number, or transitioning between a populated and empty customer number, clears the previous draft.
-- **Live TCC note:** The existing CRS live-note synchronization and conflict dialog continue to work alongside restored drafts.
-- **Safe temporary storage:** Restored input and screenshots are validated and sanitized. Expired drafts are removed automatically after 24 hours.
-- **Clearer label:** `Waar loop je vast` is now `Waar loop je vast (in het script)`; the English interface uses `Where are you stuck (in the script)`.
+### Changelog v4.3.1
+- **Safe rich-text paste:** Tables, cell formatting, lists, and emphasis from CRS and Teams are retained in every rich-text field. Unsafe HTML, external images, and active links are removed.
+- **Screenshot buttons in every rich-text field:** You can now add screenshots directly to all V&A and TCC rich-text fields, including Where are you stuck, Desired outcome, Source, and Next step.
+- **Cleaner screenshot removal:** Automatically added separators are removed precisely, so screenshots leave no extra whitespace. Existing manually added line breaks remain intact.
+- **Compatible drafts:** Screenshots in older temporary drafts also remove their older unmarked separator when removed.
 
 ### Installation Instructions
 1. Download the `.zip` file and extract it
@@ -51,7 +49,7 @@ Or download `standalone-template-v[version].html` and open it directly in your b
 
 ### Complete Feature Overview
 For the complete feature set, see the root README:
-https://github.com/m0nk111/template-helper/blob/v4.3.0/README.md
+https://github.com/m0nk111/template-helper/blob/v4.3.1/README.md
 
 ### Found an issue?
 If you discovered an issue, the easiest way is to open an issue on GitHub. That helps us investigate and solve it in a structured way.

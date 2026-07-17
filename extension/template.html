@@ -599,6 +599,25 @@
       border: 1px solid var(--border);
     }
 
+    .textarea-like table,
+    .preview table {
+      max-width: 100%;
+      border-collapse: collapse;
+    }
+
+    .textarea-like th,
+    .textarea-like td,
+    .preview th,
+    .preview td {
+      padding: 4px;
+      border: 1px solid var(--border);
+      vertical-align: top;
+    }
+
+    .textarea-like .screenshot-item img {
+      margin: 0;
+    }
+
   </style>
 
 </head>
@@ -660,12 +679,18 @@
   </div>
 
   <div class="form-group">
-    <label id="labelVastloper">Waar loop je vast <span class="required">*</span></label>
+    <div class="field-label-row">
+      <label id="labelVastloper">Waar loop je vast <span class="required">*</span></label>
+      <button class="btn-capture-screenshot" type="button" data-screenshot-target="vastloper" title="Maak screenshot van CRS" aria-label="Maak screenshot van CRS">📸</button>
+    </div>
     <div id="vastloper" contenteditable="true" class="textarea-like" data-placeholder="Beschrijf waar je vastzit..."></div>
   </div>
 
   <div class="form-group">
-    <label id="labelUitkomst">Gewenste uitkomst <span class="required">*</span></label>
+    <div class="field-label-row">
+      <label id="labelUitkomst">Gewenste uitkomst <span class="required">*</span></label>
+      <button class="btn-capture-screenshot" type="button" data-screenshot-target="uitkomst" title="Maak screenshot van CRS" aria-label="Maak screenshot van CRS">📸</button>
+    </div>
     <div id="uitkomst" contenteditable="true" class="textarea-like" data-placeholder="Wat wil je bereiken?"></div>
   </div>
 
@@ -681,11 +706,17 @@
       <div id="antwoord" contenteditable="true" class="textarea-like" data-placeholder="Typ hier je inhoudelijke antwoord en/of screenshot..."></div>
     </div>
     <div class="form-group">
-      <label id="labelBron">Bron</label>
+      <div class="field-label-row">
+        <label id="labelBron">Bron</label>
+        <button class="btn-capture-screenshot" type="button" data-screenshot-target="bron" title="Maak screenshot van CRS" aria-label="Maak screenshot van CRS">📸</button>
+      </div>
       <div id="bron" contenteditable="true" class="textarea-like" data-placeholder="Uit welk systeem komt de informatie?" style="min-height: 46px;"></div>
     </div>
     <div class="form-group">
-      <label id="labelVervolgstap">Vervolgstap</label>
+      <div class="field-label-row">
+        <label id="labelVervolgstap">Vervolgstap</label>
+        <button class="btn-capture-screenshot" type="button" data-screenshot-target="vervolgstap" title="Maak screenshot van CRS" aria-label="Maak screenshot van CRS">📸</button>
+      </div>
       <div id="vervolgstap" contenteditable="true" class="textarea-like" data-placeholder="Wat verwacht je nu van de agent?" style="min-height: 60px;"></div>
     </div>
   </div>
@@ -697,7 +728,10 @@
       <input type="text" id="tccKlantnummer" placeholder="Bijv. 12345678" maxlength="20" autocomplete="off" aria-labelledby="labelTccKlantnummer" aria-required="true">
     </div>
     <div class="form-group">
-      <label id="labelTccNotitie">Notitie <span class="required">*</span></label>
+      <div class="field-label-row">
+        <label id="labelTccNotitie">Notitie <span class="required">*</span></label>
+        <button class="btn-capture-screenshot" type="button" data-screenshot-target="tccNotitie" title="Maak screenshot van CRS" aria-label="Maak screenshot van CRS">📸</button>
+      </div>
       <div id="tccNotitie" contenteditable="true" role="textbox" aria-multiline="true" aria-labelledby="labelTccNotitie" aria-required="true" class="textarea-like" data-placeholder="Plak hier de notitie uit CRS."></div>
     </div>
     <div class="form-group">
@@ -712,11 +746,17 @@
   <!-- TCC ANTWOORD TEMPLATE -->
   <div id="tmpl-tcc-antwoord" style="display: none;">
     <div class="form-group">
-      <label id="labelTccNogControleren">Nog controleren</label>
+      <div class="field-label-row">
+        <label id="labelTccNogControleren">Nog controleren</label>
+        <button class="btn-capture-screenshot" type="button" data-screenshot-target="tccNogControleren" title="Maak screenshot van CRS" aria-label="Maak screenshot van CRS">📸</button>
+      </div>
       <div id="tccNogControleren" contenteditable="true" role="textbox" aria-multiline="true" aria-labelledby="labelTccNogControleren" class="textarea-like tcc-short-field" data-placeholder="Nog te controleren punt..."></div>
     </div>
     <div class="form-group">
-      <label id="labelTccAanvullen">Aanvullen in ticket</label>
+      <div class="field-label-row">
+        <label id="labelTccAanvullen">Aanvullen in ticket</label>
+        <button class="btn-capture-screenshot" type="button" data-screenshot-target="tccAanvullen" title="Maak screenshot van CRS" aria-label="Maak screenshot van CRS">📸</button>
+      </div>
       <div id="tccAanvullen" contenteditable="true" role="textbox" aria-multiline="true" aria-labelledby="labelTccAanvullen" class="textarea-like" data-placeholder="Wat moet in het ticket worden aangevuld?"></div>
     </div>
     <div class="form-group">

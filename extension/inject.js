@@ -20,7 +20,10 @@ if (!window.location.href.toLowerCase().includes('crs')) {
     var TEMPLATE_SCREENSHOT_RESULT_MESSAGE_TYPE = 'template-helper:screenshot-result';
     var TEMPLATE_SCREENSHOT_ERROR_MESSAGE_TYPE = 'template-helper:screenshot-error';
     var CAPTURE_SCREENSHOT_MESSAGE_TYPE = 'template-helper:capture-screenshot';
-    var SCREENSHOT_TARGET_FIELDS = ['klantvraag', 'antwoord', 'tccScreenshots'];
+    var SCREENSHOT_TARGET_FIELDS = [
+        'klantvraag', 'vastloper', 'uitkomst', 'antwoord', 'bron', 'vervolgstap',
+        'tccNotitie', 'tccScreenshots', 'tccNogControleren', 'tccAanvullen'
+    ];
     var SCREENSHOT_CAPTURE_ERROR_CODES = [
         'capture-failed',
         'capture-in-progress',
