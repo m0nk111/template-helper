@@ -8,6 +8,10 @@ It is built to reduce copy mistakes, keep formatting consistent, and speed up CR
 ### Wat is dit?
 Template Helper ondersteunt moderators met een vaste, snelle en consistente workflow voor vraag- en antwoordtemplates.
 
+### Nieuw in v5.0.2
+- De open of ingeklapte stand van Template Helper blijft per CRS-browsertab behouden na een volledige paginareload of navigatie via de linker CRS-navigatie.
+- Dezelfde tab gebruikt bij dezelfde klant opnieuw hetzelfde draft-ID, zodat eerder ingevoerde tekstvelden en screenshots automatisch uit de lokale draft worden hersteld.
+
 ### Nieuw in v5.0.1
 - Template Helper wordt automatisch ingeklapt geladen op iedere ondersteunde CRS-pagina; de blauwe toggle-tab is de enige bediening die nodig is om het reeds geladen paneel te openen.
 - Het paneel herstelt na dynamische CRS-contentvervanging en ververst de klantprefill wanneer CRS binnen hetzelfde document naar een andere klant wisselt.
@@ -42,6 +46,7 @@ Template Helper ondersteunt moderators met een vaste, snelle en consistente work
 - Docking-ondersteuning voor zijpaneel (links, rechts, boven, onder) met bewaarde positie.
 - Drag-to-dock: sleep de blauwe sidebar-header om live te docken naar links, rechts, boven of onder.
 - Sidebar toggle-tab om snel te verbergen/tonen zonder context te verliezen.
+- De open of ingeklapte paneelstatus blijft per CRS-browsertab behouden na een paginareload of navigatie via de linker CRS-navigatie.
 - Pop-out knop (`↗`) om de template los in een apart venster te openen.
 - Dock mode persistence: onthoudt de laatst gebruikte dock-positie.
 - SPA-resilience: het ingeklapte paneel wordt automatisch hersteld bij dynamische CRS redraws en vervanging van de CRS-body.
@@ -76,6 +81,7 @@ Template Helper ondersteunt moderators met een vaste, snelle en consistente work
 - In extension mode gebruikt de iframe `clipboard-write` permissie voor stabieler kopieren in CRS.
 - Het blauwe toggle-uitsteekseltje opent en sluit hetzelfde reeds geladen iframe zonder de template opnieuw te initialiseren.
 - Bewaart ingevulde templatevelden en screenshots tijdelijk per browsertab en herstelt ze bij hetzelfde klantnummer; bij een ander of gewijzigd klantnummer, of bij een overgang tussen wel en geen klantnummer, wordt de draft gewist.
+- Na een CRS-paginareload gebruikt dezelfde browsertab hetzelfde draft-ID, zodat invoer voor dezelfde klant automatisch terugkomt.
 - URL-prefill ondersteuning voor kernvelden via query parameters, inclusief TCC-klantnummer en -notitie.
 - Lokale text-beautifier voor geselecteerde talen bij blur.
 - Versie-weergave in de footer (manifest/meta fallback).
@@ -124,6 +130,10 @@ localStorage.setItem('vraag-tmpl-azure-translator-endpoint', 'https://api.cognit
 ### What is this?
 Template Helper provides moderators with a consistent and fast template workflow for both question and answer handoff.
 
+### New in v5.0.2
+- Template Helper's open or collapsed state is preserved per CRS browser tab after a full page reload or navigation through the left CRS navigation bar.
+- The same tab reuses the same draft ID for the same customer, automatically restoring previously entered text fields and screenshots from the local draft.
+
 ### New in v5.0.1
 - Template Helper automatically loads collapsed on every supported CRS page; the blue toggle tab is the only control needed to open the already loaded panel.
 - The panel recovers after dynamic CRS content replacement and refreshes the customer prefill when CRS switches to another customer within the same document.
@@ -158,6 +168,7 @@ Template Helper provides moderators with a consistent and fast template workflow
 - Sidebar docking support (left, right, top, bottom) with persisted dock position.
 - Drag-to-dock: drag the blue sidebar header to dock live to left, right, top, or bottom.
 - Sidebar toggle tab for fast hide/show without losing context.
+- The open or collapsed panel state is preserved per CRS browser tab across page reloads and left-navigation transitions.
 - Pop-out button (`↗`) to open the template in a detached window.
 - Dock mode persistence: remembers last used dock placement.
 - SPA resilience: the collapsed panel auto-recovers after dynamic CRS redraws and CRS body replacement.
@@ -192,6 +203,7 @@ Template Helper provides moderators with a consistent and fast template workflow
 - In extension mode, the iframe uses `clipboard-write` permission for more reliable copy behavior in CRS.
 - The blue toggle tab opens and closes the same loaded iframe without reinitializing the template.
 - Temporarily preserves filled template fields and screenshots per browser tab and restores them for the same customer number; changing the customer context, including transitions to or from an empty customer number, clears the draft.
+- After a CRS page reload, the same browser tab reuses its draft ID so input for the same customer is restored automatically.
 - URL prefill support for core fields via query parameters, including TCC customer number and note.
 - Local text beautifier on blur for selected languages.
 - Footer version rendering with manifest/meta fallback.

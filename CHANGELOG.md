@@ -1,5 +1,13 @@
 # Changelog
 
+## [Unreleased]
+
+## [5.0.2] - 2026-07-17
+
+- **Fixed:** De open of ingeklapte status van het Template Helper-paneel blijft nu per CRS-browsertab behouden na een volledige paginareload of navigatie via de linker CRS-navigatie.
+- **Fixed:** Bij dezelfde klant en dezelfde browsertab wordt na zo'n reload hetzelfde draft-ID gebruikt, zodat eerder ingevoerde tekstvelden en screenshots automatisch uit de lokale draft worden hersteld.
+- **Changed:** De technische manifestversie en de zichtbare releaseversie zijn beide `5.0.2`.
+
 ## [5.0.1] - 2026-07-17
 
 - **Fixed:** Template Helper wordt nu op iedere ondersteunde CRS-pagina automatisch geladen, zonder afhankelijkheid van een CRS-menu-item, `Profiel`-knop of scriptnotitieveld.

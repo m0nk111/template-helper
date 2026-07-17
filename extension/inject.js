@@ -12,6 +12,7 @@ if (!window.location.href.toLowerCase().includes('crs')) {
 } else {
 
     var SIDEBAR_DOCK_MODE_KEY = 'moderator-template-helper-dock-mode';
+    var SIDEBAR_OPEN_STATE_SESSION_KEY = 'moderator-template-helper-sidebar-open';
     var TAB_DRAFT_ID_SESSION_KEY = 'moderator-template-helper-draft-id';
     var MAX_CUSTOMER_NUMBER_LENGTH = 100;
     var CRS_NOTE_UPDATE_MESSAGE_TYPE = 'template-helper:crs-note-update';
@@ -87,6 +88,22 @@ if (!window.location.href.toLowerCase().includes('crs')) {
         }
     }
 
+    function getSavedSidebarOpen() {
+        try {
+            return sessionStorage.getItem(SIDEBAR_OPEN_STATE_SESSION_KEY) === 'true';
+        } catch (storageError) {
+            return false;
+        }
+    }
+
+    function saveSidebarOpen(isOpen) {
+        try {
+            sessionStorage.setItem(SIDEBAR_OPEN_STATE_SESSION_KEY, isOpen ? 'true' : 'false');
+        } catch (storageError) {
+            console.debug('Moderator Template Helper: Sidebar state could not be saved.', storageError);
+        }
+    }
+
     function getClosedTransform(dockMode) {
         if (dockMode === 'left') return 'translateX(-100%)';
         if (dockMode === 'top') return 'translateY(-100%)';
@@ -111,6 +128,7 @@ if (!window.location.href.toLowerCase().includes('crs')) {
     function setSidebarOpen(sidebarContainer, toggleBtn, isOpen) {
         var dockMode = sidebarContainer.dataset.dockMode || getSavedDockMode();
         sidebarContainer.dataset.open = isOpen ? 'true' : 'false';
+        saveSidebarOpen(isOpen);
         sidebarContainer.style.transform = isOpen ? 'translate(0, 0)' : getClosedTransform(dockMode);
         toggleBtn.innerHTML = isOpen ? getOpenToggleIcon(dockMode) : getClosedToggleIcon(dockMode);
         toggleBtn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
@@ -443,7 +461,7 @@ if (!window.location.href.toLowerCase().includes('crs')) {
 
         sidebarContainer = document.createElement('div');
         sidebarContainer.id = 'moderator-template-sidebar-container';
-        sidebarContainer.dataset.open = 'false';
+        sidebarContainer.dataset.open = getSavedSidebarOpen() ? 'true' : 'false';
         sidebarContainer.dataset.customerNumber = crsContext.customerNumber;
 
         var toggleFocusStyle = document.createElement('style');

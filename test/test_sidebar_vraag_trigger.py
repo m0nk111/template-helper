@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import re
 import subprocess
 import tempfile
 import time
@@ -112,6 +113,38 @@ def wait_for_crs_fixture_dom(page: DevToolsPage) -> None:
         time.sleep(0.1)
 
     raise AssertionError('The CRS fixture did not finish loading in time.')
+
+
+def reload_crs_page(page: DevToolsPage) -> None:
+    previous_time_origin = page.evaluate('performance.timeOrigin')
+    page.evaluate('window.location.reload(); true')
+    deadline = time.monotonic() + CHROME_STARTUP_TIMEOUT_SECONDS
+
+    while time.monotonic() < deadline:
+        try:
+            reload_state = page.evaluate(
+                """
+                ({
+                  timeOrigin: performance.timeOrigin,
+                  isReady: document.readyState === 'complete'
+                    && !!document.getElementById('crs-fixture-ready'),
+                })
+                """
+            )
+        except AssertionError as error:
+            if 'Inspected target navigated or closed' not in str(error):
+                raise
+            time.sleep(0.1)
+            continue
+
+        if (
+            reload_state['timeOrigin'] != previous_time_origin
+            and reload_state['isReady']
+        ):
+            return
+        time.sleep(0.1)
+
+    raise AssertionError('The CRS fixture did not reload in time.')
 
 
 @pytest.fixture
@@ -227,6 +260,77 @@ def test_blue_toggle_expands_existing_template_panel(
         'toggleLabel': 'Vraag Template inklappen',
         'sameIframe': True,
         'sameIframeSrc': True,
+    }
+
+
+def test_open_panel_and_draft_id_survive_same_tab_page_reload(
+    crs_page: DevToolsPage,
+) -> None:
+    before_reload = crs_page.evaluate(
+        """
+                (() => {
+          document.getElementById('moderator-template-sidebar-toggle').click();
+          const container = document.getElementById('moderator-template-sidebar-container');
+          const iframe = document.getElementById('moderator-template-sidebar-iframe');
+          return {
+            isOpen: container.dataset.open,
+            draftId: new URL(iframe.src).searchParams.get('draftId'),
+          };
+        })()
+        """
+    )
+    assert before_reload['isOpen'] == 'true'
+    assert isinstance(before_reload['draftId'], str)
+    assert re.fullmatch(r'[A-Za-z0-9_-]{8,128}', before_reload['draftId'])
+
+    reload_crs_page(crs_page)
+    crs_page.evaluate(INJECT_SCRIPT)
+    wait_for_template_panel(crs_page)
+
+    after_reload = crs_page.evaluate(
+        """
+        (() => {
+          const container = document.getElementById('moderator-template-sidebar-container');
+          const iframe = document.getElementById('moderator-template-sidebar-iframe');
+          return {
+            isOpen: container.dataset.open,
+            transform: container.style.transform,
+            draftId: new URL(iframe.src).searchParams.get('draftId'),
+          };
+        })()
+        """
+    )
+
+    assert after_reload == {
+        'isOpen': 'true',
+        'transform': 'translate(0px, 0px)',
+        'draftId': before_reload['draftId'],
+    }
+
+    crs_page.evaluate(
+        "document.getElementById('moderator-template-sidebar-toggle').click()"
+    )
+    reload_crs_page(crs_page)
+    crs_page.evaluate(INJECT_SCRIPT)
+    wait_for_template_panel(crs_page)
+
+    after_closed_reload = crs_page.evaluate(
+        """
+        (() => {
+          const container = document.getElementById('moderator-template-sidebar-container');
+          const iframe = document.getElementById('moderator-template-sidebar-iframe');
+          return {
+            isOpen: container.dataset.open,
+                        transform: container.style.transform,
+            draftId: new URL(iframe.src).searchParams.get('draftId'),
+          };
+        })()
+        """
+    )
+    assert after_closed_reload == {
+        'isOpen': 'false',
+        'transform': 'translateX(100%)',
+        'draftId': before_reload['draftId'],
     }
 
 
