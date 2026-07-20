@@ -467,6 +467,41 @@ def test_template_panel_reads_customer_context_from_ticket_page(
     assert wait_for_iframe_customer_change(crs_page, '12345678') == '12345'
 
 
+def test_template_panel_reads_customer_context_from_action_page(
+    crs_page: DevToolsPage,
+) -> None:
+    crs_page.evaluate(
+        """
+        (() => {
+          document.querySelector('.ut_DFI_EL_PARTY_ID').remove();
+          const actionCustomer = document.createElement('input');
+          actionCustomer.id = 'IWEDIT_KLANTCODE';
+          actionCustomer.value = '24681357';
+          document.body.appendChild(actionCustomer);
+        })()
+        """
+    )
+
+    assert wait_for_iframe_customer_change(crs_page, '12345678') == '24681357'
+
+
+def test_conflicting_action_customer_source_suspends_customer_context(
+    crs_page: DevToolsPage,
+) -> None:
+    crs_page.evaluate(
+        """
+        (() => {
+          const actionCustomer = document.createElement('input');
+          actionCustomer.id = 'IWEDIT_KLANTCODE';
+          actionCustomer.value = '87654321';
+          document.body.appendChild(actionCustomer);
+        })()
+        """
+    )
+
+    assert wait_for_iframe_customer_change(crs_page, '12345678') == ''
+
+
 def test_same_customer_ticket_alias_keeps_existing_iframe_and_draft(
     crs_page: DevToolsPage,
 ) -> None:

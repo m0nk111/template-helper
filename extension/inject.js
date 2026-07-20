@@ -13,7 +13,11 @@ if (!window.location.href.toLowerCase().includes('crs')) {
 
     var SIDEBAR_DOCK_MODE_KEY = 'moderator-template-helper-dock-mode';
     var MAX_CUSTOMER_NUMBER_LENGTH = 100;
-    var CUSTOMER_NUMBER_SELECTORS = ['.ut_DFI_EL_PARTY_ID', '.ut_CUSTOMER_ID'];
+    var CUSTOMER_NUMBER_SELECTORS = [
+        '.ut_DFI_EL_PARTY_ID',
+        '.ut_CUSTOMER_ID',
+        '#IWEDIT_KLANTCODE'
+    ];
     var GET_TAB_STATE_MESSAGE_TYPE = 'template-helper:get-tab-state';
     var SET_TAB_STATE_MESSAGE_TYPE = 'template-helper:set-tab-state';
     var CRS_NOTE_UPDATE_MESSAGE_TYPE = 'template-helper:crs-note-update';
@@ -466,7 +470,11 @@ if (!window.location.href.toLowerCase().includes('crs')) {
         for (var index = 0; index < CUSTOMER_NUMBER_SELECTORS.length; index += 1) {
             var elements = document.querySelectorAll(CUSTOMER_NUMBER_SELECTORS[index]);
             for (var elementIndex = 0; elementIndex < elements.length; elementIndex += 1) {
-                var value = elements[elementIndex].innerText.trim().slice(0, MAX_CUSTOMER_NUMBER_LENGTH);
+                var element = elements[elementIndex];
+                var rawValue = typeof element.value === 'string'
+                    ? element.value
+                    : (typeof element.innerText === 'string' ? element.innerText : '');
+                var value = rawValue.trim().slice(0, MAX_CUSTOMER_NUMBER_LENGTH);
                 if (value && customerNumbers.indexOf(value) === -1) {
                     customerNumbers.push(value);
                 }

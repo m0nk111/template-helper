@@ -1,5 +1,11 @@
 # Changelog
 
+## [5.0.6] - 2026-07-20
+
+- **Fixed:** CRS-actiepagina's leveren de klantcode via het inputveld `#IWEDIT_KLANTCODE` in plaats van via een klantcode-span. Template Helper leest nu ook de waarde van dit veld, zodat dezelfde klantdraft zichtbaar blijft in Acties.
+- **Fixed:** De bestaande Scripting- en Ticket-aliases blijven actief. Als Acties tijdelijk tegelijk een afwijkende klantcode toont, wordt voor de veiligheid geen klantdraft geopend.
+- **Changed:** De technische manifestversie en de zichtbare releaseversie zijn beide `5.0.6`.
+
 ## [5.0.5] - 2026-07-20
 
 - **Fixed:** CRS-ticketpagina's leveren de klantcode via `.ut_CUSTOMER_ID`, terwijl scriptingpagina's `.ut_DFI_EL_PARTY_ID` gebruiken. Beide DOM-velden zijn nu aliases voor dezelfde klantcontext, zodat dezelfde klantdraft zichtbaar blijft bij wisselen tussen Scripting en Ticket.
