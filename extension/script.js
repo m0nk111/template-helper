@@ -241,6 +241,7 @@ let lastCrsSuppliedTccNote = '';
 let hasManualTccNoteChange = false;
 let isApplyingCrsTccNote = false;
 let currentDraftId = '';
+let currentDraftStorageId = '';
 let currentDraftContext = { hasCustomerNumber: false, value: '' };
 let draftDbPromise = null;
 let draftSaveTimer = null;
@@ -272,6 +273,11 @@ function areDraftContextsEqual(first, second) {
     first.value === second.value;
 }
 
+function createDraftStorageId(draftId, customerContext) {
+  if (!draftId || !customerContext?.hasCustomerNumber) return '';
+  return `${draftId}:customer:${encodeURIComponent(customerContext.value)}`;
+}
+
 function getDraftFieldIds() {
   return [...new Set([...fieldsVraag, ...fieldsAntwoord, ...fieldsTccVraag, ...fieldsTccAntwoord])];
 }
@@ -296,7 +302,8 @@ function captureDraftRecord() {
   }
 
   return {
-    draftId: currentDraftId,
+    draftId: currentDraftStorageId,
+    tabDraftId: currentDraftId,
     recordVersion: draftRecordVersion,
     customerContext: { ...currentDraftContext },
     fields,
@@ -315,6 +322,8 @@ function isValidDraftFieldValue(value) {
 function isValidDraftRecord(record) {
   if (!record || typeof record !== 'object' || Array.isArray(record)) return false;
   if (record.recordVersion !== draftRecordVersion || typeof record.draftId !== 'string') return false;
+  if (record.tabDraftId !== undefined &&
+    (typeof record.tabDraftId !== 'string' || !isValidDraftId(record.tabDraftId))) return false;
   if (!isValidDraftContext(record.customerContext) || !record.fields || typeof record.fields !== 'object') return false;
   if (typeof record.updatedAt !== 'number' || !Number.isFinite(record.updatedAt)) return false;
 
@@ -351,14 +360,16 @@ function openDraftDatabase() {
   return draftDbPromise;
 }
 
-function getDraftRecord() {
+function getDraftRecord(draftId) {
+  if (!draftId) return Promise.resolve(null);
+
   return openDraftDatabase().then((database) => {
     if (!database) return null;
 
     return new Promise((resolve, reject) => {
       const request = database.transaction(draftStoreName, 'readonly')
         .objectStore(draftStoreName)
-        .get(currentDraftId);
+        .get(draftId);
       request.onsuccess = () => resolve(request.result || null);
       request.onerror = () => reject(request.error || new Error('Draft could not be read.'));
     });
@@ -458,7 +469,8 @@ function clearStoredDraft(force = false) {
   clearTimeout(draftSaveTimer);
   draftSaveTimer = null;
   if (!currentDraftId || (isDraftPersistenceSuspended && !force)) return Promise.resolve(false);
-  return queueDraftOperation(() => deleteDraftRecord(currentDraftId));
+  if (!currentDraftContext.hasCustomerNumber) return Promise.resolve(false);
+  return queueDraftOperation(() => deleteDraftRecord(currentDraftStorageId));
 }
 
 function restoreDraftRecord(record) {
@@ -666,6 +678,7 @@ async function initializeDraftPersistence(draftId, customerContext, currentCrsNo
   currentDraftContext = isValidDraftContext(customerContext)
     ? { ...customerContext }
     : createDraftContext('');
+  currentDraftStorageId = createDraftStorageId(currentDraftId, currentDraftContext);
   isDraftPersistenceSuspended = false;
 
   if (!currentDraftId || typeof indexedDB === 'undefined') {
@@ -675,16 +688,33 @@ async function initializeDraftPersistence(draftId, customerContext, currentCrsNo
 
   try {
     await removeExpiredDrafts();
-    const record = await getDraftRecord();
-
-    if (record && isValidDraftRecord(record) && areDraftContextsEqual(record.customerContext, currentDraftContext)) {
-      restoreDraftRecord(record);
-      reconcileRestoredTccNote(record, currentCrsNote);
-    } else if (record && isValidDraftRecord(record) &&
-      !currentDraftContext.hasCustomerNumber && record.customerContext.hasCustomerNumber) {
+    if (!currentDraftContext.hasCustomerNumber) {
       isDraftPersistenceSuspended = true;
-    } else if (record) {
-      await deleteDraftRecord(currentDraftId);
+    } else {
+      let record = await getDraftRecord(currentDraftStorageId);
+
+      // v5.0.3 and older saved one record per tab. Migrate only an exact customer match.
+      if (!record) {
+        const legacyRecord = await getDraftRecord(currentDraftId);
+        if (legacyRecord && isValidDraftRecord(legacyRecord) &&
+          areDraftContextsEqual(legacyRecord.customerContext, currentDraftContext)) {
+          record = {
+            ...legacyRecord,
+            draftId: currentDraftStorageId,
+            tabDraftId: currentDraftId
+          };
+          await saveDraftRecord(record);
+          await deleteDraftRecord(currentDraftId);
+        }
+      }
+
+      if (record && isValidDraftRecord(record) &&
+        areDraftContextsEqual(record.customerContext, currentDraftContext)) {
+        restoreDraftRecord(record);
+        reconcileRestoredTccNote(record, currentCrsNote);
+      } else if (record) {
+        await deleteDraftRecord(currentDraftStorageId);
+      }
     }
 
     draftStorageAvailable = true;

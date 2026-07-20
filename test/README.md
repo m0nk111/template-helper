@@ -3,7 +3,7 @@
 The browser tests use isolated headless Chrome profiles. They validate the
 template DOM, preview and Teams export behavior, as well as automatic collapsed
 panel loading, extension-owned per-tab state after CRS clears `sessionStorage`,
-and same-customer draft recovery across full CRS reloads.
+and customer-isolated draft recovery across repeated CRS context switches.
 
 Requirements:
 

@@ -230,7 +230,7 @@ def test_same_customer_restores_fields_and_screenshots_after_reload(
     assert removed == 0
 
 
-def test_different_customer_number_clears_previous_draft(
+def test_different_customer_number_keeps_previous_draft_isolated(
     draft_page: DevToolsPage,
 ) -> None:
     draft_page.evaluate(
@@ -264,6 +264,59 @@ def test_different_customer_number_clears_previous_draft(
         'stuck': '',
         'screenshotCount': 0,
     }
+
+    navigate_template(draft_page, build_template_url(CUSTOMER_NUMBER, 'Terug bij klant'))
+
+    assert draft_page.evaluate(
+        "document.getElementById('vastloper').innerText"
+    ) == 'Alleen voor de vorige klant.'
+
+
+def test_multiple_customer_context_switches_restore_isolated_drafts(
+    draft_page: DevToolsPage,
+) -> None:
+    draft_page.evaluate(
+        """
+        (async () => {
+          await window.templateHelperDraftReady;
+          const field = document.getElementById('vastloper');
+          field.innerText = 'Draft van klant A.';
+          field.dispatchEvent(new Event('input', { bubbles: true }));
+          await flushDraftSave();
+        })()
+        """
+    )
+
+    navigate_template(draft_page, build_template_url('', 'Tijdelijke CRS-pagina'))
+    navigate_template(draft_page, build_template_url('87654321', 'Klant B'))
+
+    assert draft_page.evaluate(
+        "document.getElementById('vastloper').innerText"
+    ) == ''
+
+    draft_page.evaluate(
+        """
+        (async () => {
+          const field = document.getElementById('vastloper');
+          field.innerText = 'Draft van klant B.';
+          field.dispatchEvent(new Event('input', { bubbles: true }));
+          await flushDraftSave();
+        })()
+        """
+    )
+
+    navigate_template(draft_page, build_template_url('', 'Nog een tijdelijke CRS-pagina'))
+    navigate_template(draft_page, build_template_url(CUSTOMER_NUMBER, 'Terug bij klant A'))
+
+    assert draft_page.evaluate(
+        "document.getElementById('vastloper').innerText"
+    ) == 'Draft van klant A.'
+
+    navigate_template(draft_page, build_template_url('87654321', 'Terug bij klant B'))
+
+    assert draft_page.evaluate(
+        "document.getElementById('vastloper').innerText"
+    ) == 'Draft van klant B.'
 
 
 def test_customer_draft_survives_temporary_empty_context_navigation(
@@ -308,7 +361,7 @@ def test_customer_draft_survives_temporary_empty_context_navigation(
     ) == 'Blijf bewaard voor dezelfde klant.'
 
 
-def test_clear_form_during_temporary_empty_context_deletes_customer_draft(
+def test_clear_form_during_temporary_empty_context_preserves_customer_draft(
     draft_page: DevToolsPage,
 ) -> None:
     draft_page.evaluate(
@@ -338,7 +391,7 @@ def test_clear_form_during_temporary_empty_context_deletes_customer_draft(
 
     assert draft_page.evaluate(
         "document.getElementById('vastloper').innerText"
-    ) == ''
+    ) == 'Deze draft moet expliciet worden gewist.'
 
 
 def test_empty_customer_context_does_not_replace_customer_draft_and_number_transition_clears_it(

@@ -1,6 +1,11 @@
 # Changelog
 
-## [Unreleased]
+## [5.0.4] - 2026-07-20
+
+- **Fixed:** Drafts worden nu binnen dezelfde CRS-browsertab afzonderlijk per bevestigd klantnummer bewaard. Na wisselen tussen klanten komen tekstvelden en screenshots alleen terug bij de bijbehorende klantcontext.
+- **Fixed:** Tijdelijke CRS-pagina's zonder klantnummer tonen geen eerdere klantgegevens en kunnen geen klantdraft automatisch of via `Wissen` verwijderen.
+- **Changed:** Een v5.0.3-draft wordt alleen naar de nieuwe klantgebonden opslagindeling gemigreerd wanneer het klantnummer exact overeenkomt.
+- **Changed:** De technische manifestversie en de zichtbare releaseversie zijn beide `5.0.4`.
 
 ## [5.0.3] - 2026-07-17
 

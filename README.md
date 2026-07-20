@@ -8,6 +8,10 @@ It is built to reduce copy mistakes, keep formatting consistent, and speed up CR
 ### Wat is dit?
 Template Helper ondersteunt moderators met een vaste, snelle en consistente workflow voor vraag- en antwoordtemplates.
 
+### Nieuw in v5.0.4
+- Drafts worden lokaal afzonderlijk bewaard per CRS-browsertab en bevestigd klantnummer. Na wisselen tussen meerdere klanten komen tekstvelden en screenshots uitsluitend terug bij de juiste klant.
+- Een tijdelijke CRS-context zonder klantnummer toont geen eerdere klantgegevens en kan geen klantdraft automatisch of via `Wissen` verwijderen.
+
 ### Nieuw in v5.0.3
 - CRS wist bij sommige wisselingen via de linker navigatie zijn eigen sessieopslag. Template Helper bewaart het draft-ID en de open/ingeklapte status daarom nu per echte Chrome-tab in afgeschermde extensieopslag.
 - Tekstvelden en screenshots blijven in lokale IndexedDB-opslag staan en worden met het behouden draft-ID voor dezelfde klant hersteld.
@@ -84,7 +88,7 @@ Template Helper ondersteunt moderators met een vaste, snelle en consistente work
 - UI-teksten blijven NL/EN; voor andere doeltalen blijft de UI Engels en vertaalt alleen inhoud.
 - In extension mode gebruikt de iframe `clipboard-write` permissie voor stabieler kopieren in CRS.
 - Het blauwe toggle-uitsteekseltje opent en sluit hetzelfde reeds geladen iframe zonder de template opnieuw te initialiseren.
-- Bewaart ingevulde templatevelden en screenshots tijdelijk per browsertab en herstelt ze bij hetzelfde klantnummer; bij een ander of gewijzigd klantnummer, of bij een overgang tussen wel en geen klantnummer, wordt de draft gewist.
+- Bewaart ingevulde templatevelden en screenshots tijdelijk per browsertab en bevestigd klantnummer. Een andere of tijdelijke klantcontext krijgt geen eerdere invoer; terugkeren naar dezelfde klant herstelt alleen diens draft.
 - Na een CRS-paginareload gebruikt dezelfde browsertab hetzelfde draft-ID, zodat invoer voor dezelfde klant automatisch terugkomt.
 - URL-prefill ondersteuning voor kernvelden via query parameters, inclusief TCC-klantnummer en -notitie.
 - Lokale text-beautifier voor geselecteerde talen bij blur.
@@ -133,6 +137,10 @@ localStorage.setItem('vraag-tmpl-azure-translator-endpoint', 'https://api.cognit
 
 ### What is this?
 Template Helper provides moderators with a consistent and fast template workflow for both question and answer handoff.
+
+### New in v5.0.4
+- Drafts are stored locally per CRS browser tab and confirmed customer number. After switching between customers, text fields and screenshots return only for the matching customer.
+- A temporary CRS context without a customer number shows no previous customer data and cannot automatically delete, or delete through `Clear`, a customer draft.
 
 ### New in v5.0.3
 - CRS clears its own session storage during some left-navigation transitions. Template Helper therefore now stores the draft ID and open/collapsed state per actual Chrome tab in isolated extension storage.
@@ -210,7 +218,7 @@ Template Helper provides moderators with a consistent and fast template workflow
 - UI stays Dutch/English only; for other target languages, UI remains English while content is translated.
 - In extension mode, the iframe uses `clipboard-write` permission for more reliable copy behavior in CRS.
 - The blue toggle tab opens and closes the same loaded iframe without reinitializing the template.
-- Temporarily preserves filled template fields and screenshots per browser tab and restores them for the same customer number; changing the customer context, including transitions to or from an empty customer number, clears the draft.
+- Temporarily preserves filled template fields and screenshots per browser tab and confirmed customer number. A different or temporary customer context receives no earlier input; returning to the same customer restores only that customer's draft.
 - After a CRS page reload, the same browser tab reuses its draft ID so input for the same customer is restored automatically.
 - URL prefill support for core fields via query parameters, including TCC customer number and note.
 - Local text beautifier on blur for selected languages.

@@ -1,14 +1,14 @@
-# v5.0.3 Release Notes
+# v5.0.4 Release Notes
 
 ## Nederlandse uitleg
-Deze release notes bevatten eerst de Nederlandse versie en daarna de Engelse versie. Deze definitieve release gebruikt Chrome-manifestversie `5.0.3` en toont `5.0.3` als zichtbare versie.
+Deze release notes bevatten eerst de Nederlandse versie en daarna de Engelse versie. Deze definitieve release gebruikt Chrome-manifestversie `5.0.4` en toont `5.0.4` als zichtbare versie.
 
 ## Nederlandse versie
 
-### Changelog v5.0.3
-- **CRS-sessieopslag kan de draft niet meer wissen:** Sommige CRS-formulierwisselingen wissen hun eigen sessieopslag. Template Helper bewaart het willekeurige draft-ID en de open/ingeklapte paneelstatus nu per echte Chrome-tab in afgeschermde extensieopslag.
-- **Invoer komt terug na linker navigatie:** Voor dezelfde klant worden eerder ingevoerde tekstvelden en screenshots opnieuw uit de lokale draft geladen, ook nadat CRS zijn sessieopslag heeft gewist.
-- **Beperkte nieuwe opslagtoestemming:** De Chrome-permission `storage` bewaart alleen het draft-ID en de paneelstatus. Klantgegevens, template-inhoud en screenshots blijven lokaal in IndexedDB en worden niet naar extensieopslag gekopieerd.
+### Changelog v5.0.4
+- **Drafts blijven per klant gescheiden:** Binnen dezelfde CRS-browsertab worden drafts nu afzonderlijk per bevestigd klantnummer bewaard. Na meerdere CRS-wisselingen komen tekstvelden en screenshots alleen terug bij de bijbehorende klant.
+- **Tijdelijke CRS-contexten zijn niet-destructief:** Een pagina zonder klantnummer toont geen eerdere klantgegevens en kan geen klantdraft automatisch of via `Wissen` verwijderen.
+- **Veilige upgrade:** Een bestaande v5.0.3-draft migreert alleen wanneer het klantnummer exact overeenkomt. Alle templategegevens en screenshots blijven lokaal in IndexedDB.
 
 ### Installatie Instructies
 1. Download het `.zip` bestand en pak het uit
@@ -21,7 +21,7 @@ Of download `standalone-template-v[versie].html` en open dit direct in je browse
 
 ### Volledig feature-overzicht
 Alle huidige features staan in de root README:
-https://github.com/m0nk111/template-helper/blob/v5.0.3/README.md
+https://github.com/m0nk111/template-helper/blob/v5.0.4/README.md
 
 ### Probleem ontdekt?
 Heb je een probleem ontdekt? Het makkelijkste is om hier op GitHub even een issue aan te maken. Op die manier kunnen we het probleem gestructureerd onderzoeken en oplossen!
@@ -31,10 +31,10 @@ Heb je een probleem ontdekt? Het makkelijkste is om hier op GitHub even een issu
 
 ## English version
 
-### Changelog v5.0.3
-- **CRS session storage can no longer erase the draft:** Some CRS form transitions clear their own session storage. Template Helper now keeps the random draft ID and open/collapsed panel state per real Chrome tab in isolated extension storage.
-- **Input returns after left navigation:** For the same customer, previously entered text fields and screenshots are loaded again from the local draft even after CRS clears its session storage.
-- **Limited new storage permission:** The Chrome `storage` permission stores only the draft ID and panel state. Customer data, template content, and screenshots remain local in IndexedDB and are not copied into extension storage.
+### Changelog v5.0.4
+- **Drafts remain isolated per customer:** Within the same CRS browser tab, drafts are now stored separately per confirmed customer number. After repeated CRS switches, text fields and screenshots return only for the matching customer.
+- **Temporary CRS contexts are non-destructive:** A page without a customer number shows no previous customer data and cannot automatically delete, or delete through `Clear`, a customer draft.
+- **Safe upgrade:** An existing v5.0.3 draft is migrated only when its customer number is an exact match. All template data and screenshots remain local in IndexedDB.
 
 ### Installation Instructions
 1. Download the `.zip` file and extract it
@@ -47,7 +47,7 @@ Or download `standalone-template-v[version].html` and open it directly in your b
 
 ### Complete Feature Overview
 For the complete feature set, see the root README:
-https://github.com/m0nk111/template-helper/blob/v5.0.3/README.md
+https://github.com/m0nk111/template-helper/blob/v5.0.4/README.md
 
 ### Found an issue?
 If you discovered an issue, the easiest way is to open an issue on GitHub. That helps us investigate and solve it in a structured way.
