@@ -118,6 +118,34 @@ def wait_for_iframe_customer(page: DevToolsPage, customer_number: str) -> None:
     raise AssertionError('The template panel did not refresh its CRS context in time.')
 
 
+def wait_for_iframe_customer_change(
+    page: DevToolsPage,
+    previous_customer_number: str,
+) -> str:
+    deadline = time.monotonic() + CHROME_STARTUP_TIMEOUT_SECONDS
+
+    while time.monotonic() < deadline:
+        current_customer = page.evaluate(
+            "new URL(document.getElementById('moderator-template-sidebar-iframe').src).searchParams.get('klantnummer')"
+        )
+        if current_customer != previous_customer_number:
+            return str(current_customer)
+        time.sleep(0.1)
+
+    raise AssertionError('The template panel did not detect a changed CRS context in time.')
+
+
+def wait_for_element_removal(page: DevToolsPage, element_id: str) -> None:
+    deadline = time.monotonic() + CHROME_STARTUP_TIMEOUT_SECONDS
+
+    while time.monotonic() < deadline:
+        if not page.evaluate(f"!!document.getElementById({json.dumps(element_id)})"):
+            return
+        time.sleep(0.1)
+
+    raise AssertionError(f'The CRS reconciliation did not remove #{element_id} in time.')
+
+
 def wait_for_crs_fixture_dom(page: DevToolsPage) -> None:
     deadline = time.monotonic() + CHROME_STARTUP_TIMEOUT_SECONDS
 
@@ -420,3 +448,80 @@ def test_template_panel_refreshes_changed_customer_context_automatically(
         'customerNumber': '87654321',
         'customerNote': 'Nieuwe klantnotitie',
     }
+
+
+def test_template_panel_reads_customer_context_from_ticket_page(
+    crs_page: DevToolsPage,
+) -> None:
+    crs_page.evaluate(
+        """
+        (() => {
+          const ticketCustomer = document.createElement('span');
+          ticketCustomer.className = 'ut_CUSTOMER_ID';
+          ticketCustomer.textContent = '12345';
+          document.querySelector('.ut_DFI_EL_PARTY_ID').replaceWith(ticketCustomer);
+        })()
+        """
+    )
+
+    assert wait_for_iframe_customer_change(crs_page, '12345678') == '12345'
+
+
+def test_same_customer_ticket_alias_keeps_existing_iframe_and_draft(
+    crs_page: DevToolsPage,
+) -> None:
+    initial_context = crs_page.evaluate(
+        """
+        (() => {
+          const iframe = document.getElementById('moderator-template-sidebar-iframe');
+          const legacyButton = document.createElement('button');
+          legacyButton.id = 'moderator-vraag-btn';
+          document.body.appendChild(legacyButton);
+
+          const ticketCustomer = document.createElement('span');
+          ticketCustomer.className = 'ut_CUSTOMER_ID';
+          ticketCustomer.textContent = '12345678';
+          document.querySelector('.ut_DFI_EL_PARTY_ID').after(ticketCustomer);
+
+          return {
+            src: iframe.src,
+          };
+        })()
+        """
+    )
+    wait_for_element_removal(crs_page, 'moderator-vraag-btn')
+
+    result = crs_page.evaluate(
+        """
+        (() => {
+          const iframe = document.getElementById('moderator-template-sidebar-iframe');
+          const params = new URL(iframe.src).searchParams;
+          return {
+            src: iframe.src,
+            customerNumber: params.get('klantnummer'),
+            draftId: params.get('draftId'),
+          };
+        })()
+        """
+    )
+
+    assert result['src'] == initial_context['src']
+    assert result['customerNumber'] == '12345678'
+    assert re.fullmatch(r'[A-Za-z0-9_-]{8,128}', result['draftId'])
+
+
+def test_conflicting_customer_aliases_suspend_customer_context(
+    crs_page: DevToolsPage,
+) -> None:
+    crs_page.evaluate(
+            """
+            (() => {
+              const ticketCustomer = document.createElement('span');
+              ticketCustomer.className = 'ut_CUSTOMER_ID';
+              ticketCustomer.textContent = '87654321';
+              document.querySelector('.ut_DFI_EL_PARTY_ID').after(ticketCustomer);
+            })()
+            """
+    )
+
+    assert wait_for_iframe_customer_change(crs_page, '12345678') == ''

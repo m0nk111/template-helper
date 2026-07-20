@@ -8,6 +8,10 @@ It is built to reduce copy mistakes, keep formatting consistent, and speed up CR
 ### Wat is dit?
 Template Helper ondersteunt moderators met een vaste, snelle en consistente workflow voor vraag- en antwoordtemplates.
 
+### Nieuw in v5.0.5
+- Scripting- en ticketpagina's gebruiken verschillende CRS-velden voor dezelfde klantcode. Template Helper behandelt `.ut_DFI_EL_PARTY_ID` en `.ut_CUSTOMER_ID` nu als veilige aliases, zodat dezelfde draft actief blijft bij wisselen tussen Scripting en Ticket.
+- Bestaande klantcodeformaten blijven geldig, inclusief codes van vijf cijfers. Conflicterende gelijktijdige klantcodes openen geen draft.
+
 ### Nieuw in v5.0.4
 - Drafts worden lokaal afzonderlijk bewaard per CRS-browsertab en bevestigd klantnummer. Na wisselen tussen meerdere klanten komen tekstvelden en screenshots uitsluitend terug bij de juiste klant.
 - Een tijdelijke CRS-context zonder klantnummer toont geen eerdere klantgegevens en kan geen klantdraft automatisch of via `Wissen` verwijderen.
@@ -137,6 +141,10 @@ localStorage.setItem('vraag-tmpl-azure-translator-endpoint', 'https://api.cognit
 
 ### What is this?
 Template Helper provides moderators with a consistent and fast template workflow for both question and answer handoff.
+
+### New in v5.0.5
+- Scripting and ticket pages expose the same customer code through different CRS fields. Template Helper now treats `.ut_DFI_EL_PARTY_ID` and `.ut_CUSTOMER_ID` as safe aliases, preserving the same draft when switching between Scripting and Ticket.
+- Existing customer-code formats remain valid, including five-digit codes. Conflicting simultaneous customer codes do not open a draft.
 
 ### New in v5.0.4
 - Drafts are stored locally per CRS browser tab and confirmed customer number. After switching between customers, text fields and screenshots return only for the matching customer.

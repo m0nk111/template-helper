@@ -1,5 +1,11 @@
 # Changelog
 
+## [5.0.5] - 2026-07-20
+
+- **Fixed:** CRS-ticketpagina's leveren de klantcode via `.ut_CUSTOMER_ID`, terwijl scriptingpagina's `.ut_DFI_EL_PARTY_ID` gebruiken. Beide DOM-velden zijn nu aliases voor dezelfde klantcontext, zodat dezelfde klantdraft zichtbaar blijft bij wisselen tussen Scripting en Ticket.
+- **Fixed:** De bestaande scriptingselector en klantcodeformaten blijven ondersteund, inclusief klantcodes van vijf cijfers. Als beide aliases tijdelijk verschillende waarden tonen, wordt voor de veiligheid geen klantdraft geopend.
+- **Changed:** De technische manifestversie en de zichtbare releaseversie zijn beide `5.0.5`.
+
 ## [5.0.4] - 2026-07-20
 
 - **Fixed:** Drafts worden nu binnen dezelfde CRS-browsertab afzonderlijk per bevestigd klantnummer bewaard. Na wisselen tussen klanten komen tekstvelden en screenshots alleen terug bij de bijbehorende klantcontext.
