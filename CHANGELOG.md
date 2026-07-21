@@ -1,5 +1,12 @@
 # Changelog
 
+## [5.0.7] - 2026-07-21
+
+- **Fixed:** De notitie in Ticketcontrole Verzoek synchroniseert nu met het CRS-notitieveld `#IWMEMO_SCRIPT_EIGENINPUT`.
+- **Changed:** Synchronisatie werkt op gewone invoer en bundelt snelle wijzigingen gedurende 300 ms. Enter en Ctrl+Enter krijgen geen aparte synchronisatielogica; de bestaande sneltoetsen blijven ongewijzigd.
+- **Fixed:** Alleen Ticketcontrole Verzoek mag naar CRS schrijven. Berichtbron, origin, structuur en maximale notitielengte worden gevalideerd, en programmatische CRS-writes echoen niet terug naar de template.
+- **Changed:** De technische manifestversie en de zichtbare releaseversie zijn beide `5.0.7`.
+
 ## [5.0.6] - 2026-07-20
 
 - **Fixed:** CRS-actiepagina's leveren de klantcode via het inputveld `#IWEDIT_KLANTCODE` in plaats van via een klantcode-span. Template Helper leest nu ook de waarde van dit veld, zodat dezelfde klantdraft zichtbaar blijft in Acties.

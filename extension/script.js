@@ -225,7 +225,9 @@ const draftMaxAgeMs = 24 * 60 * 60 * 1000;
 const draftSaveDelayMs = 250;
 const crsOrigin = 'https://crs.gw.dfnld.nl';
 const crsNoteUpdateMessageType = 'template-helper:crs-note-update';
+const tccNoteUpdateMessageType = 'template-helper:tcc-note-update';
 const crsNoteMaxLength = 50000;
+const tccNoteSyncDelayMs = 300;
 const crsScreenshotRequestMessageType = 'template-helper:screenshot-request';
 const crsScreenshotResultMessageType = 'template-helper:screenshot-result';
 const crsScreenshotErrorMessageType = 'template-helper:screenshot-error';
@@ -240,6 +242,7 @@ let translateBlockedUntil = 0;
 let lastCrsSuppliedTccNote = '';
 let hasManualTccNoteChange = false;
 let isApplyingCrsTccNote = false;
+let tccNoteSyncTimer = null;
 let currentDraftId = '';
 let currentDraftStorageId = '';
 let currentDraftContext = { hasCustomerNumber: false, value: '' };
@@ -1351,6 +1354,19 @@ function handleTccNotitieInput() {
 
   hasManualTccNoteChange = true;
   lastIgnoredCrsTccNote = null;
+
+  if (!isActiveTccRequest()) return;
+
+  const note = document.getElementById('tccNotitie').innerText;
+  clearTimeout(tccNoteSyncTimer);
+  tccNoteSyncTimer = setTimeout(() => {
+    if (!isActiveTccRequest()) return;
+
+    window.parent.postMessage({
+      type: tccNoteUpdateMessageType,
+      note
+    }, crsOrigin);
+  }, tccNoteSyncDelayMs);
 }
 
 function hasExactMessageKeys(data, keys) {

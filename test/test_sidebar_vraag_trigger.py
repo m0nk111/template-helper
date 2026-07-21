@@ -467,6 +467,118 @@ def test_template_panel_reads_customer_context_from_ticket_page(
     assert wait_for_iframe_customer_change(crs_page, '12345678') == '12345'
 
 
+def test_ticket_control_note_update_writes_to_crs_note_field(
+        crs_page: DevToolsPage,
+) -> None:
+        result = crs_page.evaluate(
+                """
+                (() => {
+                    const iframe = document.getElementById('moderator-template-sidebar-iframe');
+                    const templateOrigin = new URL(iframe.src).origin;
+                    window.dispatchEvent(new MessageEvent('message', {
+                        origin: templateOrigin,
+                        source: iframe.contentWindow,
+                        data: {
+                            type: 'template-helper:tcc-note-update',
+                            note: 'Nieuwe Ticketcontrole-notitie',
+                        },
+                    }));
+
+                    return document.getElementById('IWMEMO_SCRIPT_EIGENINPUT').value;
+                })()
+                """
+        )
+
+        assert result == 'Nieuwe Ticketcontrole-notitie'
+
+
+def test_ticket_control_note_update_does_not_echo_back_to_template(
+        crs_page: DevToolsPage,
+) -> None:
+        result = crs_page.evaluate(
+                """
+                (async () => {
+                    const iframe = document.getElementById('moderator-template-sidebar-iframe');
+                    await new Promise((resolve) => {
+                        iframe.addEventListener('load', resolve, { once: true });
+                        iframe.srcdoc = '<!doctype html><title>Template test frame</title>';
+                    });
+                    const templateOrigin = new URL(iframe.src).origin;
+                    const messages = [];
+                    const originalPostMessage = iframe.contentWindow.postMessage;
+                    iframe.contentWindow.postMessage = (data, targetOrigin) => {
+                        messages.push({ data, targetOrigin });
+                    };
+
+                    try {
+                        window.dispatchEvent(new MessageEvent('message', {
+                            origin: templateOrigin,
+                            source: iframe.contentWindow,
+                            data: {
+                                type: 'template-helper:tcc-note-update',
+                                note: 'Nieuwe Ticketcontrole-notitie',
+                            },
+                        }));
+                        await new Promise((resolve) => setTimeout(resolve, 350));
+                        return {
+                            crsNote: document.getElementById('IWMEMO_SCRIPT_EIGENINPUT').value,
+                            messages,
+                        };
+                    } finally {
+                        iframe.contentWindow.postMessage = originalPostMessage;
+                    }
+                })()
+                """
+        )
+
+        assert result == {
+                'crsNote': 'Nieuwe Ticketcontrole-notitie',
+                'messages': [],
+        }
+
+
+def test_ticket_control_note_update_rejects_invalid_messages(
+        crs_page: DevToolsPage,
+) -> None:
+        result = crs_page.evaluate(
+                """
+                (() => {
+                    const iframe = document.getElementById('moderator-template-sidebar-iframe');
+                    const templateOrigin = new URL(iframe.src).origin;
+                    const noteField = document.getElementById('IWMEMO_SCRIPT_EIGENINPUT');
+                    let inputCount = 0;
+                    noteField.addEventListener('input', () => { inputCount += 1; });
+
+                    const dispatch = (origin, source, data) => {
+                        window.dispatchEvent(new MessageEvent('message', { origin, source, data }));
+                    };
+                    const validData = {
+                        type: 'template-helper:tcc-note-update',
+                        note: 'Niet toepassen',
+                    };
+
+                    dispatch('https://example.invalid', iframe.contentWindow, validData);
+                    dispatch(templateOrigin, window, validData);
+                    dispatch(templateOrigin, iframe.contentWindow, {
+                        ...validData,
+                        unexpected: true,
+                    });
+                    dispatch(templateOrigin, iframe.contentWindow, {
+                        type: 'template-helper:tcc-note-update',
+                        note: 'x'.repeat(50001),
+                    });
+
+                    return { value: noteField.value, inputCount };
+                })()
+                """
+        )
+
+        assert result == {
+                'value': 'Eerste notitie',
+                'inputCount': 0,
+        }
+
+
 def test_template_panel_reads_customer_context_from_action_page(
     crs_page: DevToolsPage,
 ) -> None:

@@ -8,6 +8,10 @@ It is built to reduce copy mistakes, keep formatting consistent, and speed up CR
 ### Wat is dit?
 Template Helper ondersteunt moderators met een vaste, snelle en consistente workflow voor vraag- en antwoordtemplates.
 
+### Nieuw in v5.0.7
+- De Notitie in Ticketcontrole Verzoek synchroniseert nu met het CRS-notitieveld. Snelle gewone wijzigingen worden na 300 ms als laatste versie bijgewerkt.
+- Enter en Ctrl+Enter krijgen geen aparte synchronisatiebehandeling; de bestaande sneltoetsen blijven zoals ze waren. Alleen Ticketcontrole Verzoek kan deze sync naar CRS uitvoeren.
+
 ### Nieuw in v5.0.6
 - Actiepagina's gebruiken `#IWEDIT_KLANTCODE` als klantnummer. Template Helper leest deze inputwaarde naast de bestaande Scripting- en Ticket-aliases, zodat dezelfde draft ook in Acties beschikbaar blijft.
 - Wanneer CRS tijdelijk verschillende klantcodes tegelijk toont, wordt geen klantdraft geopend totdat de context weer eenduidig is.
@@ -145,6 +149,10 @@ localStorage.setItem('vraag-tmpl-azure-translator-endpoint', 'https://api.cognit
 
 ### What is this?
 Template Helper provides moderators with a consistent and fast template workflow for both question and answer handoff.
+
+### New in v5.0.7
+- The Note in Ticket Check Request now synchronizes with the CRS note field. Rapid ordinary changes are updated as the latest value after 300 ms.
+- Enter and Ctrl+Enter have no separate synchronization behavior; existing shortcuts remain unchanged. Only Ticket Check Request can synchronize this note to CRS.
 
 ### New in v5.0.6
 - Action pages expose the customer number through `#IWEDIT_KLANTCODE`. Template Helper now reads this input value alongside the existing Scripting and Ticket aliases, keeping the same draft available in Actions.

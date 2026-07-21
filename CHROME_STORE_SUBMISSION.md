@@ -6,7 +6,7 @@ Use this checklist when submitting the Chrome Store compliance build.
 
 Submit the extension package from:
 
-- `release/template-helper-v5.0.6.zip`
+- `release/template-helper-v5.0.7.zip`
 
 The standalone HTML file is for GitHub/manual use and should not be submitted as the Chrome Web Store package.
 

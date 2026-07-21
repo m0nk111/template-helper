@@ -21,6 +21,8 @@ if (!window.location.href.toLowerCase().includes('crs')) {
     var GET_TAB_STATE_MESSAGE_TYPE = 'template-helper:get-tab-state';
     var SET_TAB_STATE_MESSAGE_TYPE = 'template-helper:set-tab-state';
     var CRS_NOTE_UPDATE_MESSAGE_TYPE = 'template-helper:crs-note-update';
+    var TCC_NOTE_UPDATE_MESSAGE_TYPE = 'template-helper:tcc-note-update';
+    var MAX_CRS_NOTE_LENGTH = 50000;
     var CRS_NOTE_SYNC_DELAY_MS = 300;
     var TEMPLATE_SCREENSHOT_REQUEST_MESSAGE_TYPE = 'template-helper:screenshot-request';
     var TEMPLATE_SCREENSHOT_RESULT_MESSAGE_TYPE = 'template-helper:screenshot-result';
@@ -46,6 +48,7 @@ if (!window.location.href.toLowerCase().includes('crs')) {
     var screenshotCaptureTimeoutId = null;
     var fallbackDraftId = null;
     var currentTabState = null;
+    var isApplyingTccNoteUpdate = false;
 
     function isValidDraftId(draftId) {
         return typeof draftId === 'string' && /^[A-Za-z0-9_-]{8,128}$/.test(draftId);
@@ -331,11 +334,26 @@ if (!window.location.href.toLowerCase().includes('crs')) {
         sendCrsNoteUpdate(notitieEl ? notitieEl.value : '');
     }
 
+    function updateCrsNote(note) {
+        var notitieEl = document.getElementById('IWMEMO_SCRIPT_EIGENINPUT');
+        if (!notitieEl || notitieEl.value === note) return;
+
+        isApplyingTccNoteUpdate = true;
+        try {
+            notitieEl.value = note;
+            notitieEl.dispatchEvent(new Event('input', { bubbles: true }));
+        } finally {
+            isApplyingTccNoteUpdate = false;
+        }
+    }
+
     function attachLiveCrsNoteSync(notitieEl) {
         if (notitieEl.dataset.templateHelperLiveSync === 'true') return;
 
         var syncTimer = null;
         var queueNoteSync = function() {
+            if (isApplyingTccNoteUpdate) return;
+
             clearTimeout(syncTimer);
             syncTimer = setTimeout(function() {
                 sendCrsNoteUpdate(notitieEl.value || '');
@@ -455,6 +473,14 @@ if (!window.location.href.toLowerCase().includes('crs')) {
         if (!templateOrigin || event.origin !== templateOrigin) return;
 
         var data = event.data;
+        if (hasExactMessageKeys(data, ['type', 'note']) &&
+            data.type === TCC_NOTE_UPDATE_MESSAGE_TYPE &&
+            typeof data.note === 'string' &&
+            data.note.length <= MAX_CRS_NOTE_LENGTH) {
+            updateCrsNote(data.note);
+            return;
+        }
+
         if (!hasExactMessageKeys(data, ['type', 'targetField', 'requestId']) ||
             data.type !== TEMPLATE_SCREENSHOT_REQUEST_MESSAGE_TYPE ||
             !SCREENSHOT_TARGET_FIELDS.includes(data.targetField) ||

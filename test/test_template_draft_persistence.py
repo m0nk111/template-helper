@@ -481,6 +481,81 @@ def test_tcc_local_note_still_uses_existing_conflict_flow(
     }
 
 
+def test_tcc_request_note_input_queues_one_crs_note_update(
+    draft_page: DevToolsPage,
+) -> None:
+    messages = draft_page.evaluate(
+        """
+        (async () => {
+          const messages = [];
+          const originalPostMessage = window.parent.postMessage;
+          window.parent.postMessage = (data, targetOrigin) => {
+            messages.push({ data, targetOrigin });
+          };
+
+          try {
+            setDomainMode('tcc', false);
+            setTemplateMode('vraag', false);
+
+            const note = document.getElementById('tccNotitie');
+            note.innerText = 'Eerste Ticketcontrole-notitie';
+            note.dispatchEvent(new Event('input', { bubbles: true }));
+            note.innerText = 'Nieuwe Ticketcontrole-notitie';
+            note.dispatchEvent(new Event('input', { bubbles: true }));
+            await new Promise((resolve) => setTimeout(resolve, 350));
+            return messages;
+          } finally {
+            window.parent.postMessage = originalPostMessage;
+          }
+        })()
+        """
+    )
+
+    assert messages == [
+        {
+            'data': {
+                'type': 'template-helper:tcc-note-update',
+                'note': 'Nieuwe Ticketcontrole-notitie',
+            },
+            'targetOrigin': 'https://crs.gw.dfnld.nl',
+        }
+    ]
+
+
+def test_tcc_note_does_not_sync_outside_request_mode(
+        draft_page: DevToolsPage,
+) -> None:
+        messages = draft_page.evaluate(
+                """
+                (() => {
+                    const messages = [];
+                    const originalPostMessage = window.parent.postMessage;
+                    window.parent.postMessage = (data, targetOrigin) => {
+                        messages.push({ data, targetOrigin });
+                    };
+
+                    try {
+                        const note = document.getElementById('tccNotitie');
+                        setDomainMode('va', false);
+                        setTemplateMode('vraag', false);
+                        note.innerText = 'V&A-notitie';
+                        note.dispatchEvent(new Event('input', { bubbles: true }));
+
+                        setDomainMode('tcc', false);
+                        setTemplateMode('antwoord', false);
+                        note.innerText = 'Ticketcontrole-antwoordnotitie';
+                        note.dispatchEvent(new Event('input', { bubbles: true }));
+                        return messages;
+                    } finally {
+                        window.parent.postMessage = originalPostMessage;
+                    }
+                })()
+                """
+        )
+
+        assert messages == []
+
+
 def test_restored_html_is_sanitized_without_removing_valid_screenshots(
     draft_page: DevToolsPage,
 ) -> None:
