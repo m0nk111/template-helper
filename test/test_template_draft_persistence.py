@@ -481,6 +481,101 @@ def test_tcc_local_note_still_uses_existing_conflict_flow(
     }
 
 
+def test_tcc_note_displays_crs_line_breaks(
+    draft_page: DevToolsPage,
+) -> None:
+    result = draft_page.evaluate(
+        """
+        (() => {
+          setDomainMode('tcc', false);
+          setTemplateMode('vraag', false);
+          const crsNote = ['Eerste regel', 'Tweede regel', 'Derde regel'].join(String.fromCharCode(10));
+          applyCrsTccNote(crsNote);
+
+          const note = document.getElementById('tccNotitie');
+          return {
+            textContent: note.textContent,
+            innerText: note.innerText,
+            whiteSpace: getComputedStyle(note).whiteSpace,
+          };
+        })()
+        """
+    )
+
+    assert result == {
+        'textContent': 'Eerste regel\nTweede regel\nDerde regel',
+        'innerText': 'Eerste regel\nTweede regel\nDerde regel',
+        'whiteSpace': 'pre-wrap',
+    }
+
+
+def test_tcc_note_sync_preserves_crs_line_breaks(
+    draft_page: DevToolsPage,
+) -> None:
+    messages = draft_page.evaluate(
+        """
+        (async () => {
+          const messages = [];
+          const originalPostMessage = window.parent.postMessage;
+          window.parent.postMessage = (data, targetOrigin) => {
+            messages.push({ data, targetOrigin });
+          };
+
+          try {
+            setDomainMode('tcc', false);
+            setTemplateMode('vraag', false);
+            const crsNote = ['Eerste regel', 'Tweede regel', 'Derde regel'].join(String.fromCharCode(10));
+            applyCrsTccNote(crsNote);
+            document.getElementById('tccNotitie').dispatchEvent(new Event('input', { bubbles: true }));
+            await new Promise((resolve) => setTimeout(resolve, 350));
+            return messages;
+          } finally {
+            window.parent.postMessage = originalPostMessage;
+          }
+        })()
+        """
+    )
+
+    assert messages == [
+        {
+            'data': {
+                'type': 'template-helper:tcc-note-update',
+                'note': 'Eerste regel\nTweede regel\nDerde regel',
+            },
+            'targetOrigin': 'https://crs.gw.dfnld.nl',
+        }
+    ]
+
+
+def test_tcc_note_accepts_crs_echo_with_mixed_line_breaks(
+        draft_page: DevToolsPage,
+) -> None:
+        result = draft_page.evaluate(
+                """
+                (() => {
+                    setDomainMode('tcc', false);
+                    setTemplateMode('vraag', false);
+
+                    const note = document.getElementById('tccNotitie');
+                    note.innerHTML = 'Eerste regel' + String.fromCharCode(10) + 'Tweede regel<br>Derde regel';
+                    note.dispatchEvent(new Event('input', { bubbles: true }));
+                    const crsEcho = ['Eerste regel', 'Tweede regel', 'Derde regel'].join(String.fromCharCode(10));
+                    handleCrsNoteUpdate(crsEcho);
+
+                    return {
+                        note: note.innerText,
+                        dialogVisible: !document.getElementById('crsNoteConflictDialog').hidden,
+                    };
+                })()
+                """
+        )
+
+        assert result == {
+                'note': 'Eerste regel\nTweede regel\nDerde regel',
+                'dialogVisible': False,
+        }
+
+
 def test_tcc_request_note_input_queues_one_crs_note_update(
     draft_page: DevToolsPage,
 ) -> None:

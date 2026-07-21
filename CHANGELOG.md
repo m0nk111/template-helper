@@ -1,5 +1,12 @@
 # Changelog
 
+## [5.0.8] - 2026-07-21
+
+- **Fixed:** Regelafbrekingen uit het CRS-notitieveld worden nu zichtbaar weergegeven in de Notitie van Ticketcontrole Verzoek. De preview was al correct; het contenteditable invoerveld zelf volgde deze afbrekingen nog niet.
+- **Fixed:** Nieuwe regels blijven behouden bij de synchronisatie terug naar CRS, ook wanneer een CRS-notitie en handmatig ingevoerde Enter-regels door elkaar staan. Een gelijke CRS-echo opent geen onterecht conflictvenster.
+- **Changed:** Alleen het Ticketcontrole-notitieveld gebruikt deze weergavecorrectie; andere templatevelden blijven ongewijzigd.
+- **Changed:** De technische manifestversie en de zichtbare releaseversie zijn beide `5.0.8`.
+
 ## [5.0.7] - 2026-07-21
 
 - **Fixed:** De notitie in Ticketcontrole Verzoek synchroniseert nu met het CRS-notitieveld `#IWMEMO_SCRIPT_EIGENINPUT`.

@@ -1336,7 +1336,7 @@ function handleCrsNoteUpdate(note) {
 
   const tccNotitie = document.getElementById('tccNotitie');
   if (!hasManualTccNoteChange) {
-    if (note === lastCrsSuppliedTccNote && note === tccNotitie.textContent) {
+    if (note === lastCrsSuppliedTccNote && note === tccNotitie.innerText) {
       updatePreview();
       return;
     }
@@ -1344,7 +1344,7 @@ function handleCrsNoteUpdate(note) {
     return;
   }
 
-  if (note === tccNotitie.textContent || note === lastIgnoredCrsTccNote) return;
+  if (note === tccNotitie.innerText || note === lastIgnoredCrsTccNote) return;
 
   showCrsNoteConflictDialog(note);
 }

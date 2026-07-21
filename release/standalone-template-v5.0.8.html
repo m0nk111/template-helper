@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="template-version" content="5.0.7">
+  <meta name="template-version" content="5.0.8">
   <title>Vraag Template</title>
   <style>
     :root {
@@ -580,6 +580,7 @@
       overflow-y: auto;
       resize: vertical;
     }
+    #tccNotitie { white-space: pre-wrap; }
     .textarea-like:focus {
       outline: none;
       border-color: var(--accent);
@@ -2161,7 +2162,7 @@ function handleCrsNoteUpdate(note) {
 
   const tccNotitie = document.getElementById('tccNotitie');
   if (!hasManualTccNoteChange) {
-    if (note === lastCrsSuppliedTccNote && note === tccNotitie.textContent) {
+    if (note === lastCrsSuppliedTccNote && note === tccNotitie.innerText) {
       updatePreview();
       return;
     }
@@ -2169,7 +2170,7 @@ function handleCrsNoteUpdate(note) {
     return;
   }
 
-  if (note === tccNotitie.textContent || note === lastIgnoredCrsTccNote) return;
+  if (note === tccNotitie.innerText || note === lastIgnoredCrsTccNote) return;
 
   showCrsNoteConflictDialog(note);
 }

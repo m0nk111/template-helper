@@ -8,6 +8,10 @@ It is built to reduce copy mistakes, keep formatting consistent, and speed up CR
 ### Wat is dit?
 Template Helper ondersteunt moderators met een vaste, snelle en consistente workflow voor vraag- en antwoordtemplates.
 
+### Nieuw in v5.0.8
+- Regelafbrekingen uit CRS zijn nu ook zichtbaar in het Notitie-veld van Ticketcontrole Verzoek, niet alleen in het voorbeeld.
+- Regels blijven intact bij synchronisatie terug naar CRS, ook na een combinatie van CRS-tekst en handmatig ingedrukte Enter.
+
 ### Nieuw in v5.0.7
 - De Notitie in Ticketcontrole Verzoek synchroniseert nu met het CRS-notitieveld. Snelle gewone wijzigingen worden na 300 ms als laatste versie bijgewerkt.
 - Enter en Ctrl+Enter krijgen geen aparte synchronisatiebehandeling; de bestaande sneltoetsen blijven zoals ze waren. Alleen Ticketcontrole Verzoek kan deze sync naar CRS uitvoeren.
@@ -149,6 +153,10 @@ localStorage.setItem('vraag-tmpl-azure-translator-endpoint', 'https://api.cognit
 
 ### What is this?
 Template Helper provides moderators with a consistent and fast template workflow for both question and answer handoff.
+
+### New in v5.0.8
+- Line breaks from CRS are now visible in the Ticket Check Request Note field as well as in the preview.
+- Lines remain intact when synchronizing back to CRS, including a combination of CRS text and manually entered line breaks.
 
 ### New in v5.0.7
 - The Note in Ticket Check Request now synchronizes with the CRS note field. Rapid ordinary changes are updated as the latest value after 300 ms.
