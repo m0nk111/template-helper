@@ -1,14 +1,14 @@
-# v5.0.8 Release Notes
+# v5.0.9 Release Notes
 
 ## Nederlandse uitleg
-Deze release notes bevatten eerst de Nederlandse versie en daarna de Engelse versie. Deze definitieve release gebruikt Chrome-manifestversie `5.0.8` en toont `5.0.8` als zichtbare versie.
+Deze release notes bevatten eerst de Nederlandse versie en daarna de Engelse versie. Deze definitieve release gebruikt Chrome-manifestversie `5.0.9` en toont `5.0.9` als zichtbare versie.
 
 ## Nederlandse versie
 
-### Changelog v5.0.8
-- **Regelafbrekingen zichtbaar in Notitie:** De Notitie in Ticketcontrole Verzoek toont CRS-regelafbrekingen nu ook in het invoerveld zelf. Het voorbeeld werkte al correct.
-- **Regels blijven behouden bij synchronisatie:** De terug-synchronisatie naar CRS behoudt regelafbrekingen, inclusief een combinatie van CRS-tekst en handmatig ingevoerde Enter-regels.
-- **Geen vals conflict bij echo:** Wanneer CRS dezelfde meerregelige notitie terugstuurt, herkent Template Helper deze als gelijk en opent geen conflictvenster.
+### Changelog v5.0.9
+- **Kleurvrije tabelopmaak:** Geplakte rich text behoudt tabelstructuur en veilige layout, zoals kolombreedtes, celpadding, uitlijning en randen zonder kleur.
+- **Kleuren verwijderd:** Tekst-, achtergrond- en randkleuren uit geplakte HTML worden niet meer overgenomen, ook niet via CSS-shorthands.
+- **Geen losse inline opmaak:** Styles op gewone tekst buiten tabellen worden verwijderd. De bestaande bescherming tegen onveilige HTML, externe afbeeldingen en actieve links blijft actief.
 
 ### Installatie Instructies
 1. Download het `.zip` bestand en pak het uit
@@ -21,7 +21,7 @@ Of download `standalone-template-v[versie].html` en open dit direct in je browse
 
 ### Volledig feature-overzicht
 Alle huidige features staan in de root README:
-https://github.com/m0nk111/template-helper/blob/v5.0.8/README.md
+https://github.com/m0nk111/template-helper/blob/v5.0.9/README.md
 
 ### Probleem ontdekt?
 Heb je een probleem ontdekt? Het makkelijkste is om hier op GitHub even een issue aan te maken. Op die manier kunnen we het probleem gestructureerd onderzoeken en oplossen!
@@ -31,10 +31,10 @@ Heb je een probleem ontdekt? Het makkelijkste is om hier op GitHub even een issu
 
 ## English version
 
-### Changelog v5.0.8
-- **Line breaks visible in Note:** The Ticket Check Request Note now shows CRS line breaks in the input field itself. The preview already rendered them correctly.
-- **Lines remain intact during synchronization:** Synchronization back to CRS preserves line breaks, including a combination of CRS text and manually entered line breaks.
-- **No false conflict on echo:** When CRS returns the same multiline note, Template Helper recognizes it as equal and does not open a conflict dialog.
+### Changelog v5.0.9
+- **Color-free table formatting:** Pasted rich text retains table structure and safe layout, including column widths, cell padding, alignment, and borders without color.
+- **Colors removed:** Text, background, and border colors in pasted HTML are no longer copied, including colors inside CSS shorthands.
+- **No loose inline formatting:** Styles on regular text outside tables are removed. Existing protection against unsafe HTML, external images, and active links remains active.
 
 ### Installation Instructions
 1. Download the `.zip` file and extract it
@@ -47,7 +47,7 @@ Or download `standalone-template-v[version].html` and open it directly in your b
 
 ### Complete Feature Overview
 For the complete feature set, see the root README:
-https://github.com/m0nk111/template-helper/blob/v5.0.8/README.md
+https://github.com/m0nk111/template-helper/blob/v5.0.9/README.md
 
 ### Found an issue?
 If you discovered an issue, the easiest way is to open an issue on GitHub. That helps us investigate and solve it in a structured way.

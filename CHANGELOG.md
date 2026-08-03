@@ -1,5 +1,12 @@
 # Changelog
 
+## [5.0.9] - 2026-08-03
+
+- **Changed:** Geplakte rich text behoudt alleen de structuur en kleurvrije layout van tabellen, zoals kolombreedtes, celpadding, uitlijning en randbreedte/-stijl.
+- **Fixed:** Tekst-, achtergrond- en randkleuren uit geplakte inhoud worden verwijderd, ook wanneer ze in CSS-shorthands staan.
+- **Changed:** Inline opmaak buiten tabelelementen wordt niet meer gekopieerd. Onveilige HTML, externe afbeeldingen en actieve links blijven verwijderd.
+- **Changed:** De technische manifestversie en de zichtbare releaseversie zijn beide `5.0.9`.
+
 ## [5.0.8] - 2026-07-21
 
 - **Fixed:** Regelafbrekingen uit het CRS-notitieveld worden nu zichtbaar weergegeven in de Notitie van Ticketcontrole Verzoek. De preview was al correct; het contenteditable invoerveld zelf volgde deze afbrekingen nog niet.

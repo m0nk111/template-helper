@@ -8,6 +8,10 @@ It is built to reduce copy mistakes, keep formatting consistent, and speed up CR
 ### Wat is dit?
 Template Helper ondersteunt moderators met een vaste, snelle en consistente workflow voor vraag- en antwoordtemplates.
 
+### Nieuw in v5.0.9
+- Geplakte rich text behoudt alleen de structuur en kleurvrije layout van tabellen, zoals kolombreedtes, celpadding, uitlijning en randen.
+- Tekst-, achtergrond- en randkleuren worden verwijderd, ook uit CSS-shorthands. Inline opmaak buiten tabelelementen wordt niet gekopieerd.
+
 ### Nieuw in v5.0.8
 - Regelafbrekingen uit CRS zijn nu ook zichtbaar in het Notitie-veld van Ticketcontrole Verzoek, niet alleen in het voorbeeld.
 - Regels blijven intact bij synchronisatie terug naar CRS, ook na een combinatie van CRS-tekst en handmatig ingedrukte Enter.
@@ -86,7 +90,7 @@ Template Helper ondersteunt moderators met een vaste, snelle en consistente work
 - Teams-tip in de UI om `Ctrl+V` te gebruiken zodat opmaak en afbeeldingen behouden blijven.
 - Validatie van verplichte velden met duidelijke foutmeldingen.
 - Validatie is mode-afhankelijk: V&A houdt de bestaande verplichte velden, TCC-verzoek vereist klantnummer, notitie en screenshots, en TCC-antwoord heeft optionele tekstvelden.
-- Veilig geplakte rich text behoudt tabellen en gangbare tekstformattering voor consistente Teams-output; onveilige HTML, externe afbeeldingen en actieve links worden verwijderd.
+- Veilig geplakte rich text behoudt alleen tabelstructuur en kleurvrije tabel-layout voor consistente Teams-output; kleuren en niet-tabel inline opmaak worden verwijderd, net als onveilige HTML, externe afbeeldingen en actieve links.
 - Vooraf gedefinieerde wachtrijen voor snelle selectie.
 - Shortcut `Ctrl+Enter` (of `Cmd+Enter`) om direct te kopieren.
 - Template mode persistence: onthoudt laatst gebruikte template.
@@ -153,6 +157,10 @@ localStorage.setItem('vraag-tmpl-azure-translator-endpoint', 'https://api.cognit
 
 ### What is this?
 Template Helper provides moderators with a consistent and fast template workflow for both question and answer handoff.
+
+### New in v5.0.9
+- Pasted rich text now retains only table structure and color-free layout, including column widths, cell padding, alignment, and borders.
+- Text, background, and border colors are removed, including colors in CSS shorthands. Inline formatting outside table elements is not copied.
 
 ### New in v5.0.8
 - Line breaks from CRS are now visible in the Ticket Check Request Note field as well as in the preview.
@@ -232,7 +240,7 @@ Template Helper provides moderators with a consistent and fast template workflow
 - Teams tip in UI to use `Ctrl+V` so formatting and screenshots are preserved.
 - Required field validation with clear error feedback.
 - Validation is mode-aware: V&A keeps its existing required fields, TCC request requires customer number, note, and screenshots, while TCC answer text fields are optional.
-- Safe rich-text paste retains tables and common text formatting for consistent Teams output; unsafe HTML, external images, and active links are removed.
+- Safe rich-text paste retains only table structure and color-free table layout for consistent Teams output; colors and non-table inline formatting are removed along with unsafe HTML, external images, and active links.
 - Predefined queue options for fast routing.
 - `Ctrl+Enter` (or `Cmd+Enter`) shortcut to copy instantly.
 - Template mode persistence: remembers the last used template.

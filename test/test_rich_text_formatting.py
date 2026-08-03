@@ -21,11 +21,12 @@ RICH_TEXT_FIELD_IDS = (
 )
 
 SAFE_TABLE_HTML = (
-    '<table style="border-collapse: collapse; background-color: #f4f6f8">'
+    '<table style="border-collapse: collapse; border-spacing: 8px; table-layout: fixed; background-color: #f4f6f8">'
+    '<colgroup><col span="1" style="width: 52px; color: #005a9e"></colgroup>'
     '<thead><tr><th style="border: 1px solid #606060; padding: 4px">Vraag</th>'
     '<th style="border: 1px solid #606060; padding: 4px">Antwoord</th></tr></thead>'
     '<tbody><tr><td rowspan="2" style="text-align: left">Internet</td>'
-    '<td style="color: #005a9e">Geen signaal</td></tr>'
+    '<td style="color: #005a9e; background-color: #ffbf47; border: 1px solid #606060; padding: 4px; text-decoration: underline #005a9e">Geen signaal</td></tr>'
     '<tr><td colspan="1">Controleer verbinding</td></tr></tbody></table>'
 )
 
@@ -44,7 +45,7 @@ WIDE_TABLE_HTML = (
 )
 
 
-def test_all_rich_text_fields_preserve_safe_tables_and_strip_unsafe_html(
+def test_all_rich_text_fields_preserve_table_layout_and_strip_pasted_colors(
     template_page: DevToolsPage,
 ) -> None:
     result = template_page.evaluate(
@@ -85,6 +86,8 @@ def test_all_rich_text_fields_preserve_safe_tables_and_strip_unsafe_html(
               tableHtml + '<script>window.__pasteXss = true;</script>' +
               '<a href="javascript:alert(1)" onclick="window.__pasteXss = true">Unsafe</a>' +
               '<a href="https://example.test/review">External review</a>' +
+              '<span style="color: #005a9e; background-color: #ffbf47">Tekst zonder opmaak</span>' +
+              '<strong>Vet zonder opmaak</strong><em>Cursief zonder opmaak</em>' +
               '<img src="https://example.test/unsafe.png" onerror="window.__pasteXss = true">'
             );
             clipboardData.setData('text/plain', 'Internet Geen signaal Controleer verbinding');
@@ -96,14 +99,33 @@ def test_all_rich_text_fields_preserve_safe_tables_and_strip_unsafe_html(
 
             const table = field.querySelector('table');
             const firstCell = field.querySelector('td');
+            const coloredCell = firstCell?.nextElementSibling;
+            const sanitized = sanitizeDraftHTML(
+              tableHtml + '<span style="color: #005a9e; background-color: #ffbf47">Tekst zonder opmaak</span>'
+            );
+            const sanitizedTemplate = document.createElement('template');
+            sanitizedTemplate.innerHTML = sanitized;
+            const sanitizedCell = sanitizedTemplate.content.querySelector('td:nth-child(2)');
+            const sanitizedCol = sanitizedTemplate.content.querySelector('col');
             results[fieldId] = {{
               tableCount: field.querySelectorAll('table').length,
               headerCount: field.querySelectorAll('th').length,
               cellCount: field.querySelectorAll('td').length,
               rowSpan: firstCell?.getAttribute('rowspan') || '',
-              hasTableBackground: table?.style.backgroundColor === 'rgb(244, 246, 248)',
               hasCollapsedBorders: table ? getComputedStyle(table).borderCollapse === 'collapse' : false,
-              hasCellColor: firstCell?.nextElementSibling?.style.color === 'rgb(0, 90, 158)',
+              hasFixedLayout: table?.style.tableLayout === 'fixed',
+              hasColWidth: sanitizedCol?.style.width === '52px',
+              hasTableBackground: table?.style.backgroundColor !== '',
+              hasCellColor: coloredCell?.style.color !== '',
+              hasCellBackground: coloredCell?.style.backgroundColor !== '',
+              hasCellBorder: coloredCell?.style.borderTopStyle === 'solid' && coloredCell?.style.borderTopWidth === '1px',
+              hasPastedColor: field.innerHTML.includes('#005a9e') || field.innerHTML.includes('#ffbf47'),
+              hasPastedInlineFormatting: /<(?:strong|em)\b/i.test(field.innerHTML),
+              hasSanitizedCellBorder: sanitizedCell?.style.borderStyle === 'solid' && sanitizedCell?.style.borderWidth === '1px',
+              hasSanitizedCellPadding: sanitizedCell?.style.padding === '4px',
+              hasSanitizedColor: /color/.test(sanitizedCell?.getAttribute('style') || '') || /color/.test(sanitizedCol?.getAttribute('style') || ''),
+              hasSanitizedTextDecoration: sanitizedCell?.style.textDecoration !== '',
+              hasSanitizedTextStyle: sanitized.includes('<span style='),
               scripts: field.querySelectorAll('script').length,
               activeLinks: field.querySelectorAll('a[href]').length,
               externalImages: field.querySelectorAll('img[src^="https:"]').length,
@@ -124,9 +146,20 @@ def test_all_rich_text_fields_preserve_safe_tables_and_strip_unsafe_html(
             'headerCount': 2,
             'cellCount': 3,
             'rowSpan': '2',
-            'hasTableBackground': True,
             'hasCollapsedBorders': True,
-            'hasCellColor': True,
+            'hasFixedLayout': True,
+            'hasColWidth': True,
+            'hasTableBackground': False,
+            'hasCellColor': False,
+            'hasCellBackground': False,
+            'hasCellBorder': True,
+            'hasPastedColor': False,
+            'hasPastedInlineFormatting': False,
+            'hasSanitizedCellBorder': True,
+            'hasSanitizedCellPadding': True,
+            'hasSanitizedColor': False,
+            'hasSanitizedTextDecoration': False,
+            'hasSanitizedTextStyle': False,
             'scripts': 0,
             'activeLinks': 0,
             'externalImages': 0,
@@ -252,7 +285,7 @@ def test_all_rich_text_fields_have_screenshot_buttons_and_clean_separators(
         }, field_id
 
 
-def test_screenshot_separators_remain_single_and_exported_tables_keep_formatting(
+def test_screenshot_separators_remain_single_and_exported_tables_keep_layout(
     template_page: DevToolsPage,
 ) -> None:
     result = template_page.evaluate(
@@ -280,6 +313,7 @@ def test_screenshot_separators_remain_single_and_exported_tables_keep_formatting
               tableCount: (exported.match(/<table/g) || []).length,
               hasBackground: exported.includes('background-color: rgb(244, 246, 248);'),
               hasCellColor: exported.includes('color: rgb(0, 90, 158);'),
+              hasCellBorder: exported.includes('border-style: solid;') && exported.includes('border-width: 1px;'),
               hasScreenshot: exported.includes(dataUrl),
               hasScreenshotControl: exported.includes('screenshot-remove'),
               hasSeparatorMetadata: exported.includes('data-screenshot-separator'),
@@ -297,8 +331,9 @@ def test_screenshot_separators_remain_single_and_exported_tables_keep_formatting
     }
     assert result['exported'] == {
         'tableCount': 1,
-        'hasBackground': True,
-        'hasCellColor': True,
+        'hasBackground': False,
+        'hasCellColor': False,
+        'hasCellBorder': True,
         'hasScreenshot': True,
         'hasScreenshotControl': False,
         'hasSeparatorMetadata': False,

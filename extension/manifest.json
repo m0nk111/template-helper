@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "Moderator Template Helper",
-  "version": "5.0.8",
-  "version_name": "5.0.8",
+  "version": "5.0.9",
+  "version_name": "5.0.9",
   "description": "Helpt moderators lokaal V&A- en Ticket Check Chat-templates te vullen vanuit het CRS-portaal.",
   "homepage_url": "https://github.com/m0nk111/template-helper/tree/chrome-store/compliance",
   "action": {

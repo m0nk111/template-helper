@@ -498,20 +498,20 @@ function restoreDraftRecord(record) {
   updatePreview();
 }
 
-function sanitizeSafeStyle(value) {
+function sanitizeSafeTableStyle(value) {
   const source = document.createElement('table');
   source.setAttribute('style', value || '');
   const allowedProperties = [
-    'background-color',
-    'border',
     'border-collapse',
-    'border-color',
-    'border-style',
-    'border-width',
-    'color',
-    'font-size',
-    'font-style',
-    'font-weight',
+    'border-spacing',
+    'border-bottom-style',
+    'border-bottom-width',
+    'border-left-style',
+    'border-left-width',
+    'border-right-style',
+    'border-right-width',
+    'border-top-style',
+    'border-top-width',
     'height',
     'max-height',
     'max-width',
@@ -522,8 +522,8 @@ function sanitizeSafeStyle(value) {
     'padding-left',
     'padding-right',
     'padding-top',
+    'table-layout',
     'text-align',
-    'text-decoration',
     'vertical-align',
     'width'
   ];
@@ -537,6 +537,10 @@ function sanitizeSafeStyle(value) {
 
   return sanitized.getAttribute('style') || '';
 }
+
+const tableStyleTagNames = new Set([
+  'TABLE', 'THEAD', 'TBODY', 'TFOOT', 'TR', 'TD', 'TH', 'COL', 'COLGROUP', 'CAPTION'
+]);
 
 function sanitizeTableAttribute(node, name, maximum) {
   const value = node.getAttribute(name) || '';
@@ -552,9 +556,8 @@ function sanitizeDraftHTML(value) {
   const template = document.createElement('template');
   template.innerHTML = value;
   const allowedTags = new Set([
-    'A', 'B', 'BLOCKQUOTE', 'BR', 'CAPTION', 'COL', 'COLGROUP', 'DIV', 'EM', 'I', 'LI',
-    'OL', 'P', 'S', 'SPAN', 'STRONG', 'TABLE', 'TBODY', 'TD', 'TFOOT', 'TH', 'THEAD',
-    'TR', 'U', 'UL'
+    'BLOCKQUOTE', 'BR', 'CAPTION', 'COL', 'COLGROUP', 'DIV', 'LI', 'OL', 'P', 'SPAN',
+    'TABLE', 'TBODY', 'TD', 'TFOOT', 'TH', 'THEAD', 'TR', 'UL'
   ]);
   const dangerousTags = new Set(['SCRIPT', 'STYLE', 'IFRAME', 'OBJECT', 'EMBED', 'FORM', 'LINK', 'META']);
 
@@ -622,7 +625,9 @@ function sanitizeDraftHTML(value) {
         return;
       }
 
-      const safeStyle = sanitizeSafeStyle(node.getAttribute('style'));
+      const safeStyle = tableStyleTagNames.has(tagName)
+        ? sanitizeSafeTableStyle(node.getAttribute('style'))
+        : '';
       const safeRowSpan = (tagName === 'TD' || tagName === 'TH')
         ? sanitizeTableAttribute(node, 'rowspan', 100)
         : '';
