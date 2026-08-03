@@ -1,14 +1,14 @@
-# v5.0.9 Release Notes
+# v5.0.10 Release Notes
 
 ## Nederlandse uitleg
-Deze release notes bevatten eerst de Nederlandse versie en daarna de Engelse versie. Deze definitieve release gebruikt Chrome-manifestversie `5.0.9` en toont `5.0.9` als zichtbare versie.
+Deze release notes bevatten eerst de Nederlandse versie en daarna de Engelse versie. Deze definitieve release gebruikt Chrome-manifestversie `5.0.10` en toont `5.0.10` als zichtbare versie.
 
 ## Nederlandse versie
 
-### Changelog v5.0.9
-- **Kleurvrije tabelopmaak:** Geplakte rich text behoudt tabelstructuur en veilige layout, zoals kolombreedtes, celpadding, uitlijning en randen zonder kleur.
-- **Kleuren verwijderd:** Tekst-, achtergrond- en randkleuren uit geplakte HTML worden niet meer overgenomen, ook niet via CSS-shorthands.
-- **Geen losse inline opmaak:** Styles op gewone tekst buiten tabellen worden verwijderd. De bestaande bescherming tegen onveilige HTML, externe afbeeldingen en actieve links blijft actief.
+### Changelog v5.0.10
+- **Volledige weblinks als tekst:** Een geplakte veilige `http`- of `https`-link blijft als volledige URL-tekst staan, ook als de oorspronkelijke link een ander label had.
+- **Veilig afgebakend:** De URL blijft niet-klikbare tekst. Andere schema's, zoals `javascript:` en `mailto:`, voegen geen bestemmings-URL toe.
+- **Disclaimer toegevoegd:** Deze release en de README bevatten een gebruik-op-eigen-risico-disclaimer.
 
 ### Installatie Instructies
 1. Download het `.zip` bestand en pak het uit
@@ -21,7 +21,10 @@ Of download `standalone-template-v[versie].html` en open dit direct in je browse
 
 ### Volledig feature-overzicht
 Alle huidige features staan in de root README:
-https://github.com/m0nk111/template-helper/blob/v5.0.9/README.md
+https://github.com/m0nk111/template-helper/blob/v5.0.10/README.md
+
+### Disclaimer
+Gebruik deze tool volledig op eigen risico. Voor zover wettelijk toegestaan aanvaardt de maker geen enkele aansprakelijkheid voor schade, gegevensverlies, fouten of andere gevolgen die voortvloeien uit het gebruik of het niet kunnen gebruiken van deze tool. Controleer inhoud altijd zelf voordat je deze verstuurt of verwerkt.
 
 ### Probleem ontdekt?
 Heb je een probleem ontdekt? Het makkelijkste is om hier op GitHub even een issue aan te maken. Op die manier kunnen we het probleem gestructureerd onderzoeken en oplossen!
@@ -31,10 +34,10 @@ Heb je een probleem ontdekt? Het makkelijkste is om hier op GitHub even een issu
 
 ## English version
 
-### Changelog v5.0.9
-- **Color-free table formatting:** Pasted rich text retains table structure and safe layout, including column widths, cell padding, alignment, and borders without color.
-- **Colors removed:** Text, background, and border colors in pasted HTML are no longer copied, including colors inside CSS shorthands.
-- **No loose inline formatting:** Styles on regular text outside tables are removed. Existing protection against unsafe HTML, external images, and active links remains active.
+### Changelog v5.0.10
+- **Full web links as text:** A pasted safe `http` or `https` link remains as its complete URL text, even when the original link used a different label.
+- **Safely bounded:** The URL remains non-clickable text. Other schemes, including `javascript:` and `mailto:`, do not add their destination URL.
+- **Disclaimer added:** This release and the README include a use-at-your-own-risk disclaimer.
 
 ### Installation Instructions
 1. Download the `.zip` file and extract it
@@ -47,7 +50,10 @@ Or download `standalone-template-v[version].html` and open it directly in your b
 
 ### Complete Feature Overview
 For the complete feature set, see the root README:
-https://github.com/m0nk111/template-helper/blob/v5.0.9/README.md
+https://github.com/m0nk111/template-helper/blob/v5.0.10/README.md
+
+### Disclaimer
+Use this tool entirely at your own risk. To the fullest extent permitted by law, the creator accepts no liability for damage, data loss, errors, or other consequences arising from use or inability to use this tool. Always review content before sending or processing it.
 
 ### Found an issue?
 If you discovered an issue, the easiest way is to open an issue on GitHub. That helps us investigate and solve it in a structured way.

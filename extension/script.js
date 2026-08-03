@@ -550,6 +550,15 @@ function sanitizeTableAttribute(node, name, maximum) {
   return numericValue >= 1 && numericValue <= maximum ? String(numericValue) : '';
 }
 
+function sanitizeWebLinkUrl(value) {
+  try {
+    const url = new URL(value);
+    return url.protocol === 'http:' || url.protocol === 'https:' ? url.href : '';
+  } catch {
+    return '';
+  }
+}
+
 function sanitizeDraftHTML(value) {
   if (typeof value !== 'string' || value.length > draftMaxFieldLength) return '';
 
@@ -573,6 +582,14 @@ function sanitizeDraftHTML(value) {
       if (dangerousTags.has(tagName)) {
         node.remove();
         return;
+      }
+
+      if (tagName === 'A') {
+        const safeUrl = sanitizeWebLinkUrl(node.getAttribute('href') || '');
+        if (safeUrl) {
+          node.replaceWith(document.createTextNode(safeUrl));
+          return;
+        }
       }
 
       if (tagName === 'IMG') {

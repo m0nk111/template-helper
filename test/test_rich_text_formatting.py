@@ -86,6 +86,7 @@ def test_all_rich_text_fields_preserve_table_layout_and_strip_pasted_colors(
               tableHtml + '<script>window.__pasteXss = true;</script>' +
               '<a href="javascript:alert(1)" onclick="window.__pasteXss = true">Unsafe</a>' +
               '<a href="https://example.test/review">External review</a>' +
+              '<a href="mailto:moderator@example.test">E-mail moderator</a>' +
               '<span style="color: #005a9e; background-color: #ffbf47">Tekst zonder opmaak</span>' +
               '<strong>Vet zonder opmaak</strong><em>Cursief zonder opmaak</em>' +
               '<img src="https://example.test/unsafe.png" onerror="window.__pasteXss = true">'
@@ -120,7 +121,11 @@ def test_all_rich_text_fields_preserve_table_layout_and_strip_pasted_colors(
               hasCellBackground: coloredCell?.style.backgroundColor !== '',
               hasCellBorder: coloredCell?.style.borderTopStyle === 'solid' && coloredCell?.style.borderTopWidth === '1px',
               hasPastedColor: field.innerHTML.includes('#005a9e') || field.innerHTML.includes('#ffbf47'),
-              hasPastedInlineFormatting: /<(?:strong|em)\b/i.test(field.innerHTML),
+              hasPastedInlineFormatting: field.querySelector('strong, em') !== null,
+              hasSafeLinkUrl: field.innerText.includes('https://example.test/review'),
+              hasLinkLabel: field.innerText.includes('External review'),
+              hasUnsafeLinkUrl: field.innerText.includes('javascript:alert(1)') ||
+                field.innerText.includes('mailto:moderator@example.test'),
               hasSanitizedCellBorder: sanitizedCell?.style.borderStyle === 'solid' && sanitizedCell?.style.borderWidth === '1px',
               hasSanitizedCellPadding: sanitizedCell?.style.padding === '4px',
               hasSanitizedColor: /color/.test(sanitizedCell?.getAttribute('style') || '') || /color/.test(sanitizedCol?.getAttribute('style') || ''),
@@ -155,6 +160,9 @@ def test_all_rich_text_fields_preserve_table_layout_and_strip_pasted_colors(
             'hasCellBorder': True,
             'hasPastedColor': False,
             'hasPastedInlineFormatting': False,
+            'hasSafeLinkUrl': True,
+            'hasLinkLabel': False,
+            'hasUnsafeLinkUrl': False,
             'hasSanitizedCellBorder': True,
             'hasSanitizedCellPadding': True,
             'hasSanitizedColor': False,

@@ -1,5 +1,12 @@
 # Changelog
 
+## [5.0.10] - 2026-08-03
+
+- **Fixed:** Een geplakte veilige `http`- of `https`-link blijft nu als volledige URL-tekst staan, ook wanneer de oorspronkelijke link een ander label had.
+- **Changed:** De URL blijft gewone, niet-klikbare tekst. Andere schema's, zoals `javascript:` en `mailto:`, voegen geen bestemmings-URL toe.
+- **Added:** De README en release notes bevatten nu een gebruik-op-eigen-risico-disclaimer; voor zover wettelijk toegestaan aanvaardt de maker geen aansprakelijkheid.
+- **Changed:** De technische manifestversie en de zichtbare releaseversie zijn beide `5.0.10`.
+
 ## [5.0.9] - 2026-08-03
 
 - **Changed:** Geplakte rich text behoudt alleen de structuur en kleurvrije layout van tabellen, zoals kolombreedtes, celpadding, uitlijning en randbreedte/-stijl.

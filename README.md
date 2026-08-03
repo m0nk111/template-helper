@@ -8,6 +8,13 @@ It is built to reduce copy mistakes, keep formatting consistent, and speed up CR
 ### Wat is dit?
 Template Helper ondersteunt moderators met een vaste, snelle en consistente workflow voor vraag- en antwoordtemplates.
 
+### Disclaimer
+Gebruik deze tool volledig op eigen risico. Voor zover wettelijk toegestaan aanvaardt de maker geen enkele aansprakelijkheid voor schade, gegevensverlies, fouten of andere gevolgen die voortvloeien uit het gebruik of het niet kunnen gebruiken van deze tool. Controleer inhoud altijd zelf voordat je deze verstuurt of verwerkt.
+
+### Nieuw in v5.0.10
+- Een geplakte veilige `http`- of `https`-link blijft nu als volledige URL-tekst staan, ook wanneer de oorspronkelijke link een ander label had.
+- De URL blijft gewone, niet-klikbare tekst. Andere schema's, zoals `javascript:` en `mailto:`, voegen geen bestemmings-URL toe.
+
 ### Nieuw in v5.0.9
 - Geplakte rich text behoudt alleen de structuur en kleurvrije layout van tabellen, zoals kolombreedtes, celpadding, uitlijning en randen.
 - Tekst-, achtergrond- en randkleuren worden verwijderd, ook uit CSS-shorthands. Inline opmaak buiten tabelelementen wordt niet gekopieerd.
@@ -157,6 +164,13 @@ localStorage.setItem('vraag-tmpl-azure-translator-endpoint', 'https://api.cognit
 
 ### What is this?
 Template Helper provides moderators with a consistent and fast template workflow for both question and answer handoff.
+
+### Disclaimer
+Use this tool entirely at your own risk. To the fullest extent permitted by law, the creator accepts no liability for damage, data loss, errors, or other consequences arising from use or inability to use this tool. Always review content before sending or processing it.
+
+### New in v5.0.10
+- A pasted safe `http` or `https` link now remains as its complete URL text, even when the original link used a different label.
+- The URL remains plain, non-clickable text. Other schemes, including `javascript:` and `mailto:`, do not add their destination URL.
 
 ### New in v5.0.9
 - Pasted rich text now retains only table structure and color-free layout, including column widths, cell padding, alignment, and borders.
