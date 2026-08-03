@@ -14,6 +14,8 @@ const azureTranslatorRegionStorageKey = 'vraag-tmpl-azure-translator-region';
 const azureTranslatorEndpointStorageKey = 'vraag-tmpl-azure-translator-endpoint';
 const googleTranslateEndpoint = 'https://translate.googleapis.com/translate_a/single';
 const azureTranslatorDefaultEndpoint = 'https://api.cognitive.microsofttranslator.com/translate';
+const githubLatestReleaseApiUrl = 'https://api.github.com/repos/m0nk111/template-helper/releases/latest';
+const releaseUpdateCheckTimeoutMs = 3500;
 const languageLongPressMs = 2000;
 const translateRequestMaxChars = 5000;
 const translateChunkSoftLimit = 4200;
@@ -2402,6 +2404,60 @@ function renderTemplateVersion() {
   versionEl.textContent = `v${resolveTemplateVersion()}`;
 }
 
+function parseReleaseVersion(value) {
+  if (typeof value !== 'string') return null;
+
+  const match = /^v?((?:0|[1-9]\d{0,8})(?:\.(?:0|[1-9]\d{0,8})){0,3})$/.exec(value.trim());
+  return match ? match[1].split('.').map(Number) : null;
+}
+
+function isReleaseVersionNewer(candidateVersion, installedVersion) {
+  const candidateParts = parseReleaseVersion(candidateVersion);
+  const installedParts = parseReleaseVersion(installedVersion);
+  if (!candidateParts || !installedParts) return false;
+
+  const length = Math.max(candidateParts.length, installedParts.length);
+  for (let index = 0; index < length; index += 1) {
+    const candidatePart = candidateParts[index] || 0;
+    const installedPart = installedParts[index] || 0;
+    if (candidatePart !== installedPart) return candidatePart > installedPart;
+  }
+
+  return false;
+}
+
+async function checkForReleaseUpdate() {
+  const notification = document.getElementById('releaseUpdateLink');
+  if (!notification || typeof window.fetch !== 'function') return;
+
+  const controller = typeof AbortController === 'function' ? new AbortController() : null;
+  const timeoutId = controller
+    ? window.setTimeout(() => controller.abort(), releaseUpdateCheckTimeoutMs)
+    : null;
+
+  try {
+    const response = await window.fetch(githubLatestReleaseApiUrl, {
+      method: 'GET',
+      credentials: 'omit',
+      referrerPolicy: 'no-referrer',
+      cache: 'no-store',
+      headers: { Accept: 'application/vnd.github+json' },
+      signal: controller?.signal,
+    });
+    if (!response.ok) return;
+
+    const release = await response.json();
+    if (!release || typeof release !== 'object' || release.draft || release.prerelease) return;
+    if (!isReleaseVersionNewer(release.tag_name, resolveTemplateVersion())) return;
+
+    notification.hidden = false;
+  } catch {
+    // A failed, offline, or rate-limited update check must remain invisible.
+  } finally {
+    if (timeoutId !== null) window.clearTimeout(timeoutId);
+  }
+}
+
 const savedTheme = localStorage.getItem(themeStorageKey);
 if (savedTheme === 'dark') {
   document.body.classList.remove('light-mode');
@@ -2450,6 +2506,7 @@ const initialCrsNote = urlParams.has('klantvraag') ? (urlParams.get('klantvraag'
 applyUrlPrefill(urlParams);
 
 renderTemplateVersion();
+void checkForReleaseUpdate();
 applyLanguage(activeLang, false);
 setDomainMode(activeDomain, false);
 setTemplateMode(activeTmpl, false);

@@ -6,7 +6,7 @@ Use this checklist when submitting the Chrome Store compliance build.
 
 Submit the extension package from:
 
-- `release/template-helper-v5.0.10.zip`
+- `release/template-helper-v5.0.11.zip`
 
 The standalone HTML file is for GitHub/manual use and should not be submitted as the Chrome Web Store package.
 
@@ -52,14 +52,14 @@ The extension processes CRS page content locally in the browser:
 - template text entered by the user
 - local UI preferences such as theme, dock position, and last selected template mode
 
-The extension does not transmit, sell, share, track, or analyze user data. It does not include analytics, ads, remote APIs, or external scripts.
+The extension does not transmit, sell, share, track, or analyze user data. It does not include analytics, ads, or external scripts. On startup, it makes one unauthenticated, read-only request to GitHub's public Releases API to compare the installed version with the latest stable release. The request does not include CRS content, template data, customer numbers, identifiers, credentials, or a referrer.
 
 ## Privacy Dashboard Guidance
 
 The privacy/data-use answers in the Chrome Web Store dashboard must match the privacy policy and implementation:
 
 - Disclose local handling of website content from the CRS portal.
-- Do not claim that the extension sends data to external servers.
+- Disclose the anonymous GitHub Releases request used for the optional update marker; it sends no CRS or user-entered data.
 - Do not claim analytics, ads, or third-party data sharing.
 - Keep the privacy policy URL pointed at the repository privacy policy or another public copy of `PRIVACY.md`.
 

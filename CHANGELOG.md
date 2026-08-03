@@ -1,5 +1,12 @@
 # Changelog
 
+## [5.0.11] - 2026-08-03
+
+- **Added:** Onderaan de template verschijnt een subtiele, aanklikbare updatebel wanneer GitHub een nieuwere stabiele release heeft dan de gebruikte versie. De bel opent de nieuwste GitHub-release in een nieuw tabblad.
+- **Changed:** De updatecontrole leest alleen de publieke releasetag van GitHub, gebruikt geen inloggegevens of referrer en blijft bij netwerkfouten, ongeldige versies en prereleases onzichtbaar.
+- **Changed:** Privacybeleid en Chrome Web Store-informatie beschrijven nu de anonieme, alleen-lezen updatecontrole.
+- **Changed:** De technische manifestversie en de zichtbare releaseversie zijn beide `5.0.11`.
+
 ## [5.0.10] - 2026-08-03
 
 - **Fixed:** Een geplakte veilige `http`- of `https`-link blijft nu als volledige URL-tekst staan, ook wanneer de oorspronkelijke link een ander label had.

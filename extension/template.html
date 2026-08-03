@@ -629,6 +629,51 @@
       margin: 0;
     }
 
+    .footer-meta {
+      padding: 15px 0 5px;
+      color: #bbbbbb;
+      cursor: default;
+      font-family: monospace;
+      font-size: 10px;
+      text-align: center;
+      user-select: none;
+    }
+
+    .release-update-link {
+      display: inline-flex;
+      align-items: center;
+      margin-left: 4px;
+      color: var(--accent);
+      font-size: 11px;
+      line-height: 1;
+      opacity: 0.35;
+      text-decoration: none;
+      vertical-align: middle;
+      animation: release-update-pulse 2.2s ease-in-out infinite;
+    }
+
+    .release-update-link[hidden] {
+      display: none;
+    }
+
+    .release-update-link:hover,
+    .release-update-link:focus-visible {
+      opacity: 1;
+    }
+
+    .release-update-link:focus-visible {
+      outline: 1px solid currentColor;
+      outline-offset: 2px;
+    }
+
+    @keyframes release-update-pulse {
+      50% { opacity: 0.9; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .release-update-link { animation: none; }
+    }
+
   </style>
 
 </head>
@@ -806,7 +851,7 @@
       <li id="rule7">Verbeter anderen niet in de chat — signaleer bij je TM of senior.</li>
     </ul>
   </details>
-  <div style="font-size:10px; color:#bbbbbb; text-align:center; padding-top:15px; padding-bottom:5px; user-select:none; font-family:monospace; cursor:default;">built by Mark B. en Davey G. | versie: <span id="templateVersion">v-</span></div>
+  <div class="footer-meta">built by Mark B. en Davey G. | versie: <span id="templateVersion">v-</span><a id="releaseUpdateLink" class="release-update-link" href="https://github.com/m0nk111/template-helper/releases/latest" target="_blank" rel="noopener noreferrer" title="Nieuwe versie beschikbaar op GitHub" aria-label="Nieuwe versie beschikbaar op GitHub" hidden><span aria-hidden="true">&#128276;</span></a></div>
 </div>
 
 <div class="toast" id="toast">✅ Gekopieerd!<br><span id="toastHint" style="font-size:11px;opacity:0.8;">(Gebruik Ctrl+V om te plakken in Teams)</span></div>

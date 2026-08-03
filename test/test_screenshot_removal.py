@@ -198,6 +198,7 @@ def test_screenshot_can_be_removed_without_leaking_controls_into_export(
         'exportedRemoveButton': False,
     }
 
+
     removed = template_page.evaluate(
         """
         (() => {
@@ -218,6 +219,65 @@ def test_screenshot_can_be_removed_without_leaking_controls_into_export(
         'images': 0,
         'previewImages': 0,
     }
+
+
+def test_release_update_notification_only_shows_for_newer_stable_release(
+        template_page: DevToolsPage,
+) -> None:
+        result = template_page.evaluate(
+                """
+                (async () => {
+                    const notification = document.getElementById('releaseUpdateLink');
+                    const versionMeta = document.querySelector('meta[name="template-version"]');
+                    const originalFetch = window.fetch;
+                    const originalVersion = versionMeta?.content || '';
+                    const checkRelease = async (release, responseOk = true) => {
+                        notification.hidden = true;
+                        window.fetch = async () => new Response(JSON.stringify(release), {
+                            status: responseOk ? 200 : 503,
+                            headers: { 'Content-Type': 'application/json' },
+                        });
+                        await checkForReleaseUpdate();
+                        return !notification.hidden;
+                    };
+
+                    try {
+                        versionMeta.content = '5.0.10';
+                        return {
+                            marker: {
+                                isLink: notification?.tagName === 'A',
+                                isInitiallyHidden: notification?.hidden === true &&
+                                    getComputedStyle(notification).display === 'none',
+                                href: notification?.getAttribute('href') || '',
+                                target: notification?.getAttribute('target') || '',
+                                rel: notification?.getAttribute('rel') || '',
+                            },
+                            newer: await checkRelease({ tag_name: 'v5.0.11', draft: false, prerelease: false }),
+                            current: await checkRelease({ tag_name: 'v5.0.10', draft: false, prerelease: false }),
+                            prerelease: await checkRelease({ tag_name: 'v5.0.11', draft: false, prerelease: true }),
+                            failed: await checkRelease({}, false),
+                        };
+                    } finally {
+                        window.fetch = originalFetch;
+                        versionMeta.content = originalVersion;
+                    }
+                })()
+                """
+        )
+
+        assert result == {
+                'marker': {
+                        'isLink': True,
+                    'isInitiallyHidden': True,
+                        'href': 'https://github.com/m0nk111/template-helper/releases/latest',
+                        'target': '_blank',
+                        'rel': 'noopener noreferrer',
+                },
+                'newer': True,
+                'current': False,
+                'prerelease': False,
+                'failed': False,
+        }
 
 
 def test_removing_later_screenshot_does_not_accumulate_line_breaks(

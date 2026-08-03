@@ -11,6 +11,10 @@ Template Helper ondersteunt moderators met een vaste, snelle en consistente work
 ### Disclaimer
 Gebruik deze tool volledig op eigen risico. Voor zover wettelijk toegestaan aanvaardt de maker geen enkele aansprakelijkheid voor schade, gegevensverlies, fouten of andere gevolgen die voortvloeien uit het gebruik of het niet kunnen gebruiken van deze tool. Controleer inhoud altijd zelf voordat je deze verstuurt of verwerkt.
 
+### Nieuw in v5.0.11
+- Onderaan de template verschijnt een subtiele, aanklikbare bel wanneer GitHub een nieuwere stabiele release heeft dan de gebruikte versie. De bel opent de nieuwste GitHub-release in een nieuw tabblad.
+- De controle leest alleen de publieke releasetag, gebruikt geen inloggegevens of referrer en blijft bij netwerkfouten, ongeldige versies en prereleases onzichtbaar.
+
 ### Nieuw in v5.0.10
 - Een geplakte veilige `http`- of `https`-link blijft nu als volledige URL-tekst staan, ook wanneer de oorspronkelijke link een ander label had.
 - De URL blijft gewone, niet-klikbare tekst. Andere schema's, zoals `javascript:` en `mailto:`, voegen geen bestemmings-URL toe.
@@ -120,6 +124,7 @@ Gebruik deze tool volledig op eigen risico. Voor zover wettelijk toegestaan aanv
 - URL-prefill ondersteuning voor kernvelden via query parameters, inclusief TCC-klantnummer en -notitie.
 - Lokale text-beautifier voor geselecteerde talen bij blur.
 - Versie-weergave in de footer (manifest/meta fallback).
+- Een subtiele footerbel verschijnt alleen wanneer GitHub een nieuwere stabiele release meldt; de aanklikbare bel opent de nieuwste release in een nieuw tabblad.
 
 ### Enter-toets bugfix (v4.1.2)
 - Een gewone `Enter` in een tekstveld voegt nu altijd een enkele nette regelafbreking toe (zelfde gedrag als `Shift+Enter`), in plaats van een geneste `<div>` die regeleinden liet "stapelen" bij bewerken, vertalen of kopieren.
@@ -167,6 +172,10 @@ Template Helper provides moderators with a consistent and fast template workflow
 
 ### Disclaimer
 Use this tool entirely at your own risk. To the fullest extent permitted by law, the creator accepts no liability for damage, data loss, errors, or other consequences arising from use or inability to use this tool. Always review content before sending or processing it.
+
+### New in v5.0.11
+- A subtle, clickable bell appears at the bottom of the template when GitHub has a newer stable release than the version in use. The bell opens the latest GitHub release in a new tab.
+- The check reads only the public release tag, uses no credentials or referrer, and remains invisible for network failures, invalid versions, and prereleases.
 
 ### New in v5.0.10
 - A pasted safe `http` or `https` link now remains as its complete URL text, even when the original link used a different label.
@@ -277,6 +286,7 @@ Use this tool entirely at your own risk. To the fullest extent permitted by law,
 - URL prefill support for core fields via query parameters, including TCC customer number and note.
 - Local text beautifier on blur for selected languages.
 - Footer version rendering with manifest/meta fallback.
+- A subtle footer bell appears only when GitHub reports a newer stable release; the clickable bell opens the latest release in a new tab.
 
 ### Enter key bugfix (v4.1.2)
 - A plain `Enter` in a rich-text field now always inserts a single clean line break (same behavior as `Shift+Enter`), instead of a nested `<div>` that caused line breaks to "stack" during editing, translation, or copying.

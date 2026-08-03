@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="template-version" content="5.0.10">
+  <meta name="template-version" content="5.0.11">
   <title>Vraag Template</title>
   <style>
     :root {
@@ -629,6 +629,51 @@
       margin: 0;
     }
 
+    .footer-meta {
+      padding: 15px 0 5px;
+      color: #bbbbbb;
+      cursor: default;
+      font-family: monospace;
+      font-size: 10px;
+      text-align: center;
+      user-select: none;
+    }
+
+    .release-update-link {
+      display: inline-flex;
+      align-items: center;
+      margin-left: 4px;
+      color: var(--accent);
+      font-size: 11px;
+      line-height: 1;
+      opacity: 0.35;
+      text-decoration: none;
+      vertical-align: middle;
+      animation: release-update-pulse 2.2s ease-in-out infinite;
+    }
+
+    .release-update-link[hidden] {
+      display: none;
+    }
+
+    .release-update-link:hover,
+    .release-update-link:focus-visible {
+      opacity: 1;
+    }
+
+    .release-update-link:focus-visible {
+      outline: 1px solid currentColor;
+      outline-offset: 2px;
+    }
+
+    @keyframes release-update-pulse {
+      50% { opacity: 0.9; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .release-update-link { animation: none; }
+    }
+
   </style>
 
 </head>
@@ -806,7 +851,7 @@
       <li id="rule7">Verbeter anderen niet in de chat — signaleer bij je TM of senior.</li>
     </ul>
   </details>
-  <div style="font-size:10px; color:#bbbbbb; text-align:center; padding-top:15px; padding-bottom:5px; user-select:none; font-family:monospace; cursor:default;">built by Mark B. en Davey G. | versie: <span id="templateVersion">v-</span></div>
+  <div class="footer-meta">built by Mark B. en Davey G. | versie: <span id="templateVersion">v-</span><a id="releaseUpdateLink" class="release-update-link" href="https://github.com/m0nk111/template-helper/releases/latest" target="_blank" rel="noopener noreferrer" title="Nieuwe versie beschikbaar op GitHub" aria-label="Nieuwe versie beschikbaar op GitHub" hidden><span aria-hidden="true">&#128276;</span></a></div>
 </div>
 
 <div class="toast" id="toast">✅ Gekopieerd!<br><span id="toastHint" style="font-size:11px;opacity:0.8;">(Gebruik Ctrl+V om te plakken in Teams)</span></div>
@@ -840,6 +885,8 @@ const azureTranslatorRegionStorageKey = 'vraag-tmpl-azure-translator-region';
 const azureTranslatorEndpointStorageKey = 'vraag-tmpl-azure-translator-endpoint';
 const googleTranslateEndpoint = 'https://translate.googleapis.com/translate_a/single';
 const azureTranslatorDefaultEndpoint = 'https://api.cognitive.microsofttranslator.com/translate';
+const githubLatestReleaseApiUrl = 'https://api.github.com/repos/m0nk111/template-helper/releases/latest';
+const releaseUpdateCheckTimeoutMs = 3500;
 const languageLongPressMs = 2000;
 const translateRequestMaxChars = 5000;
 const translateChunkSoftLimit = 4200;
@@ -3228,6 +3275,60 @@ function renderTemplateVersion() {
   versionEl.textContent = `v${resolveTemplateVersion()}`;
 }
 
+function parseReleaseVersion(value) {
+  if (typeof value !== 'string') return null;
+
+  const match = /^v?((?:0|[1-9]\d{0,8})(?:\.(?:0|[1-9]\d{0,8})){0,3})$/.exec(value.trim());
+  return match ? match[1].split('.').map(Number) : null;
+}
+
+function isReleaseVersionNewer(candidateVersion, installedVersion) {
+  const candidateParts = parseReleaseVersion(candidateVersion);
+  const installedParts = parseReleaseVersion(installedVersion);
+  if (!candidateParts || !installedParts) return false;
+
+  const length = Math.max(candidateParts.length, installedParts.length);
+  for (let index = 0; index < length; index += 1) {
+    const candidatePart = candidateParts[index] || 0;
+    const installedPart = installedParts[index] || 0;
+    if (candidatePart !== installedPart) return candidatePart > installedPart;
+  }
+
+  return false;
+}
+
+async function checkForReleaseUpdate() {
+  const notification = document.getElementById('releaseUpdateLink');
+  if (!notification || typeof window.fetch !== 'function') return;
+
+  const controller = typeof AbortController === 'function' ? new AbortController() : null;
+  const timeoutId = controller
+    ? window.setTimeout(() => controller.abort(), releaseUpdateCheckTimeoutMs)
+    : null;
+
+  try {
+    const response = await window.fetch(githubLatestReleaseApiUrl, {
+      method: 'GET',
+      credentials: 'omit',
+      referrerPolicy: 'no-referrer',
+      cache: 'no-store',
+      headers: { Accept: 'application/vnd.github+json' },
+      signal: controller?.signal,
+    });
+    if (!response.ok) return;
+
+    const release = await response.json();
+    if (!release || typeof release !== 'object' || release.draft || release.prerelease) return;
+    if (!isReleaseVersionNewer(release.tag_name, resolveTemplateVersion())) return;
+
+    notification.hidden = false;
+  } catch {
+    // A failed, offline, or rate-limited update check must remain invisible.
+  } finally {
+    if (timeoutId !== null) window.clearTimeout(timeoutId);
+  }
+}
+
 const savedTheme = localStorage.getItem(themeStorageKey);
 if (savedTheme === 'dark') {
   document.body.classList.remove('light-mode');
@@ -3276,6 +3377,7 @@ const initialCrsNote = urlParams.has('klantvraag') ? (urlParams.get('klantvraag'
 applyUrlPrefill(urlParams);
 
 renderTemplateVersion();
+void checkForReleaseUpdate();
 applyLanguage(activeLang, false);
 setDomainMode(activeDomain, false);
 setTemplateMode(activeTmpl, false);
